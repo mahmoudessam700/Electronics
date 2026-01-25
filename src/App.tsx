@@ -19,6 +19,8 @@ import { AdminLayout } from './layouts/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
+import { AdminProductFormPage } from './pages/admin/AdminProductFormPage';
+import { AdminFilesPage } from './pages/admin/AdminFilesPage';
 import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
