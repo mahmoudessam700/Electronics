@@ -119,17 +119,16 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Left: Image Gallery */}
           <div className="lg:col-span-5">
-            <div className="sticky top-24">
+            <div className="lg:sticky lg:top-24">
               {/* Thumbnail Strip */}
-              <div className="flex lg:flex-row flex-col gap-4">
-                <div className="flex lg:flex-col gap-2 order-2 lg:order-1">
+              <div className="flex lg:flex-row flex-col-reverse gap-4">
+                <div className="flex flex-row lg:flex-col gap-2 order-2 lg:order-1 overflow-x-auto pb-2 lg:pb-0">
                   {images.map((img, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`w-12 h-12 border-2 rounded overflow-hidden ${
-                        selectedImage === index ? 'border-[#718096]' : 'border-[#D5D9D9]'
-                      }`}
+                      className={`w-16 h-16 lg:w-12 lg:h-12 border-2 rounded overflow-hidden flex-shrink-0 ${selectedImage === index ? 'border-[#718096]' : 'border-[#D5D9D9]'
+                        }`}
                     >
                       <img src={img} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
                     </button>
@@ -138,7 +137,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
 
                 {/* Main Image */}
                 <div className="flex-1 border border-[#D5D9D9] rounded-lg p-4 order-1 lg:order-2">
-                  <div className="aspect-square flex items-center justify-center">
+                  <div className="aspect-square flex items-center justify-center relative">
                     <img
                       src={images[selectedImage]}
                       alt={product.name}
@@ -164,8 +163,8 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
 
           {/* Middle: Product Info */}
           <div className="lg:col-span-4">
-            <h1 className="text-2xl mb-2">{product.name}</h1>
-            
+            <h1 className="text-xl md:text-2xl mb-2">{product.name}</h1>
+
             {/* Brand */}
             <p className="text-sm text-[#007185] hover:text-[#C7511F] cursor-pointer mb-2">
               Visit the TechBrand Store
@@ -179,11 +178,10 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-4 w-4 ${
-                        i < Math.floor(product.rating)
+                      className={`h-4 w-4 ${i < Math.floor(product.rating)
                           ? 'fill-[#718096] text-[#718096]'
                           : 'fill-none text-[#718096]'
-                      }`}
+                        }`}
                     />
                   ))}
                 </div>
@@ -278,7 +276,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
 
           {/* Right: Buy Box */}
           <div className="lg:col-span-3">
-            <div className="border border-[#D5D9D9] rounded-lg p-4 sticky top-24">
+            <div className="border border-[#D5D9D9] rounded-lg p-4 sticky top-4 lg:top-24 bg-white shadow-sm lg:shadow-none z-10">
               {/* Price */}
               <div className="flex items-baseline gap-1 mb-4">
                 <span className="text-sm text-[#0F1111]">E£</span>
@@ -404,7 +402,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
         {/* Customer Reviews */}
         <div className="mt-12 border-t border-[#D5D9D9] pt-8">
           <h2 className="text-2xl mb-6">Customer reviews</h2>
-          
+
           {/* Rating Summary */}
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             <div>
@@ -413,11 +411,10 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-6 w-6 ${
-                        i < Math.floor(product.rating)
+                      className={`h-6 w-6 ${i < Math.floor(product.rating)
                           ? 'fill-[#718096] text-[#718096]'
                           : 'fill-none text-[#718096]'
-                      }`}
+                        }`}
                     />
                   ))}
                 </div>
@@ -465,11 +462,10 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-4 w-4 ${
-                              i < review.rating
+                            className={`h-4 w-4 ${i < review.rating
                                 ? 'fill-[#718096] text-[#718096]'
                                 : 'fill-none text-[#718096]'
-                            }`}
+                              }`}
                           />
                         ))}
                       </div>

@@ -75,22 +75,21 @@ export function HeroSlider({ onNavigate }: HeroSliderProps) {
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 transition-opacity duration-500 ${index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
           >
-            <div 
+            <div
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${slide.image})` }}
             />
             <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}`} />
-            
-            <div className="relative max-w-[1500px] mx-auto px-4 h-full flex items-center">
-              <div className="max-w-xl bg-white/95 p-8 rounded-lg shadow-lg">
-                <h2 className="text-4xl md:text-5xl mb-4">{slide.title}</h2>
-                <p className="text-xl text-[#565959] mb-6">{slide.subtitle}</p>
-                <Button 
-                  className="bg-[#718096] hover:bg-[#4A5568] text-white text-lg px-8 py-6"
+
+            <div className="relative max-w-[1500px] mx-auto px-4 h-full flex items-center justify-center md:justify-start">
+              <div className="max-w-xl bg-white/95 p-6 md:p-8 rounded-lg shadow-lg text-center md:text-left mx-4 md:mx-0">
+                <h2 className="text-2xl md:text-5xl mb-2 md:mb-4 font-bold">{slide.title}</h2>
+                <p className="text-sm md:text-xl text-[#565959] mb-4 md:mb-6">{slide.subtitle}</p>
+                <Button
+                  className="bg-[#718096] hover:bg-[#4A5568] text-white text-sm md:text-lg px-6 py-3 md:px-8 md:py-6"
                   onClick={() => {
                     if (slide.navigationTarget.type === 'category') {
                       onNavigate('category', undefined, slide.navigationTarget.value);
@@ -131,11 +130,10 @@ export function HeroSlider({ onNavigate }: HeroSliderProps) {
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`h-2 rounded-full transition-all ${
-              index === currentSlide 
-                ? 'bg-[#718096] w-8' 
+            className={`h-2 rounded-full transition-all ${index === currentSlide
+                ? 'bg-[#718096] w-8'
                 : 'bg-white/50 w-2 hover:bg-white/80'
-            }`}
+              }`}
           />
         ))}
       </div>
