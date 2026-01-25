@@ -15,11 +15,15 @@ import { SignInPage } from './components/auth/SignInPage';
 import { SignUpPage } from './components/auth/SignUpPage';
 import { ForgotPasswordPage } from './components/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from './components/auth/ResetPasswordPage';
+import { AdminLayout } from './layouts/AdminLayout';
+import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { AdminProductsPage } from './pages/admin/AdminProductsPage';
+import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
 import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
-import { allProducts as products } from './data/products'; // Assuming we can import products to find one by ID if needed, or we'll pass null initially
+import { allProducts as products } from './data/products';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -36,11 +40,6 @@ function AppContent() {
   const location = useLocation();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  // We need to maintain selectedProduct state for the detail page if it relies on it, 
-  // but ideally the detail page should fetch by ID from URL. 
-  // For now, to keep compatible with existing components, we might assume they work as is?
-  // Actually ProductDetailPage takes `product` as prop. We need to wrap it to read ID from URL.
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -120,18 +119,12 @@ function AppContent() {
 
   const handlePlaceOrder = () => {
     navigate('/confirmation');
-    // Clear cart after order
     setTimeout(() => {
       setCartItems([]);
     }, 2000);
   };
 
-  // Wrapper for ProductDetailPage to handle ID from URL if selectedProduct is missing (e.g. direct load)
-  // Since we don't have a backend fetch for single product yet readily available in this context without importing data,
-  // we'll try to find it from the dummy data, or redirect to home.
-  // NOTE: In a real app we would fetch here.
   const ProductDetailWrapper = () => {
-    // If we clicked from a list, selectedProduct is set.
     if (selectedProduct) {
       return (
         <ProductDetailPage
@@ -141,23 +134,16 @@ function AppContent() {
         />
       );
     }
-
-    // Fallback: This is a hack because the original app relied on passing the object.
-    // We should really lookup by ID.
-    // Since I don't want to break it, let's redirect to home if no product selected
-    // OR better, try to find it from a global list if I can import it.
-    // I'll import products from data/products.ts if it exists? 
-    // I'll assume for now we redirect to home if null, for safety.
-    // Ideally we refactor ProductDetailPage to take ID.
     return <Navigate to="/" replace />;
   };
 
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/forgot-password' || location.pathname === '/reset-password';
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen bg-white">
       <ScrollToTop />
-      {!isAuthPage && <Header onNavigate={handleNavigate} cartItemCount={cartItemCount} />}
+      {!isAuthPage && !isAdminPage && <Header onNavigate={handleNavigate} cartItemCount={cartItemCount} />}
 
       <Routes>
         <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
@@ -178,16 +164,24 @@ function AppContent() {
             cartItems={cartItems}
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}
-            onProceedToCheckout={() => navigate('/checkout')}
-            onContinueShopping={() => navigate('/')}
+            onNavigate={handleNavigate}
           />
         } />
         <Route path="/checkout" element={
           <CheckoutPage
             cartItems={cartItems}
             onPlaceOrder={handlePlaceOrder}
+            onNavigate={handleNavigate}
           />
         } />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProductsPage />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+        </Route>
+
         <Route path="/customer-service" element={<CustomerServicePage onNavigate={handleNavigate} />} />
         <Route path="/registry" element={<RegistryPage onNavigate={handleNavigate} />} />
         <Route path="/gift-cards" element={<GiftCardsPage onNavigate={handleNavigate} />} />
@@ -246,14 +240,10 @@ function AppContent() {
             </div>
           </div>
         } />
-        {/* Admin route placeholder - handled by redirect in logic usually or separate layout */}
-        <Route path="/admin" element={<Navigate to="/" />} />
-
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {/* Footer - Hide on auth pages */}
-      {!isAuthPage && (
+      {!isAuthPage && !isAdminPage && (
         <footer className="bg-[#2D3748] text-white mt-12">
           <div className="max-w-[1500px] mx-auto px-4 py-12">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
