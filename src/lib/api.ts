@@ -92,3 +92,55 @@ export async function getOrders(): Promise<Order[]> {
     }
     return response.json();
 }
+
+export interface UploadResult {
+    filename: string;
+    url: string;
+    originalName: string;
+}
+
+export interface UploadResponse {
+    success: boolean;
+    files: UploadResult[];
+}
+
+export async function uploadFile(
+    file: File,
+    onProgress?: (progress: number) => void
+): Promise<UploadResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE}/upload`, {
+        method: 'POST',
+        body: formData,
+    });
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Upload failed' }));
+        throw new Error(error.error || 'Failed to upload file');
+    }
+
+    const result: UploadResponse = await response.json();
+
+    if (!result.success || !result.files.length) {
+        throw new Error('Upload failed');
+    }
+
+    return result.files[0];
+}
+
+export async function uploadFiles(
+    files: File[],
+    onProgress?: (progress: number, currentFile: number, totalFiles: number) => void
+): Promise<UploadResult[]> {
+    const results: UploadResult[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+        const result = await uploadFile(files[i]);
+        results.push(result);
+        onProgress?.((i + 1) / files.length * 100, i + 1, files.length);
+    }
+
+    return results;
+}
