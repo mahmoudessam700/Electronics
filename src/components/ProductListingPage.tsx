@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProductCard, Product } from './ProductCard';
-import { ChevronDown, SlidersHorizontal, Star, ChevronRight } from 'lucide-react';
+import { ChevronDown, SlidersHorizontal, Star, ChevronRight, Loader2 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { Slider } from './ui/slider';
@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from './ui/select';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from './ui/sheet';
-import { allProducts } from '../data/products';
+import { getProducts } from '../lib/api';
 
 interface ProductListingPageProps {
   onProductClick: (product: Product) => void;
@@ -22,44 +22,39 @@ interface ProductListingPageProps {
 }
 
 export function ProductListingPage({ onProductClick, selectedCategory, onNavigate }: ProductListingPageProps) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState('featured');
 
-  // Category mapping for filtering
-  const getCategoryProducts = (category: string | null | undefined) => {
-    if (!category) return allProducts;
-    
-    const categoryLower = category.toLowerCase();
-    
-    // Map categories to product IDs or names
-    if (categoryLower.includes('pc')) {
-      return allProducts.filter(p => p.name.toLowerCase().includes('pc'));
-    } else if (categoryLower.includes('laptop')) {
-      return allProducts.filter(p => p.name.toLowerCase().includes('laptop') || p.name.toLowerCase().includes('stand'));
-    } else if (categoryLower.includes('mice') || categoryLower === 'mouse') {
-      return allProducts.filter(p => p.id.startsWith('mouse-'));
-    } else if (categoryLower.includes('keyboard')) {
-      return allProducts.filter(p => p.id.startsWith('keyboard-') || p.id.startsWith('film-'));
-    } else if (categoryLower.includes('headphone')) {
-      return allProducts.filter(p => p.name.toLowerCase().includes('headphone'));
-    } else if (categoryLower.includes('cable')) {
-      return allProducts.filter(p => 
-        p.id.startsWith('cable-') || 
-        p.id.startsWith('splitter-') || 
-        p.id.startsWith('converter-')
-      );
-    } else if (categoryLower.includes('mouse pad')) {
-      return allProducts.filter(p => p.id.startsWith('pad-'));
-    } else if (categoryLower.includes('storage') || categoryLower.includes('drive')) {
-      return allProducts.filter(p => p.id.startsWith('hd-') || p.id.startsWith('adapter-'));
+  // Fetch products from API
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getProducts({
+          category: selectedCategory || undefined,
+        });
+        setProducts(data as Product[]);
+      } catch (err) {
+        setError('Failed to load products. Please try again.');
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
     }
-    
-    return allProducts;
-  };
+    fetchProducts();
+  }, [selectedCategory]);
 
-  const filteredByCategory = getCategoryProducts(selectedCategory);
+  // Filter products by price range
+  const filteredByCategory = products.filter(
+    p => p.price >= priceRange[0] && p.price <= priceRange[1]
+  );
+
 
   const brands = ['TechBrand', 'AudioPro', 'SmartGear', 'ProTech', 'EliteSound'];
 
@@ -131,9 +126,8 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-4 w-4 ${
-                        i < rating ? 'fill-[#718096] text-[#718096]' : 'fill-none text-[#718096]'
-                      }`}
+                      className={`h-4 w-4 ${i < rating ? 'fill-[#718096] text-[#718096]' : 'fill-none text-[#718096]'
+                        }`}
                     />
                   ))}
                 </div>
@@ -181,14 +175,14 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
       <div className="max-w-[1500px] mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <div className="text-sm text-[#565959] mb-4 flex items-center">
-          <span 
+          <span
             className="hover:text-[#C7511F] cursor-pointer"
             onClick={() => onNavigate('home')}
           >
             Home
           </span>
           <ChevronRight className="h-4 w-4 mx-1" />
-          <span 
+          <span
             className="hover:text-[#C7511F] cursor-pointer"
             onClick={() => onNavigate('search', undefined, null)}
           >
@@ -261,15 +255,31 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
 
           {/* Product Grid */}
           <main className="flex-1">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredByCategory.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onClick={() => onProductClick(product)}
-                />
-              ))}
-            </div>
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-[#718096]" />
+                <span className="ml-2 text-[#565959]">Loading products...</span>
+              </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <p className="text-red-500 mb-4">{error}</p>
+                <Button onClick={() => window.location.reload()}>Try Again</Button>
+              </div>
+            ) : filteredByCategory.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-[#565959]">No products found.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredByCategory.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={() => onProductClick(product)}
+                  />
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
             <div className="flex items-center justify-center gap-2 mt-8">
