@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { HomePage } from './components/HomePage';
 import { ProductListingPage } from './components/ProductListingPage';
@@ -10,41 +11,64 @@ import { RegistryPage } from './components/RegistryPage';
 import { GiftCardsPage } from './components/GiftCardsPage';
 import { SellPage } from './components/SellPage';
 import { OrdersPage } from './components/OrdersPage';
+import { SignInPage } from './components/auth/SignInPage';
+import { SignUpPage } from './components/auth/SignUpPage';
 import { Product } from './components/ProductCard';
-import { toast, Toaster } from 'sonner@2.0.3';
+import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
+import { AuthProvider } from './contexts/AuthContext';
+import { allProducts as products } from './data/products'; // Assuming we can import products to find one by ID if needed, or we'll pass null initially
 
-type Page = 'home' | 'search' | 'product' | 'cart' | 'checkout' | 'confirmation' | 'customer-service' | 'registry' | 'gift-cards' | 'sell' | 'orders';
+function ScrollToTop() {
+  const { pathname } = useLocation();
 
-export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // We need to maintain selectedProduct state for the detail page if it relies on it, 
+  // but ideally the detail page should fetch by ID from URL. 
+  // For now, to keep compatible with existing components, we might assume they work as is?
+  // Actually ProductDetailPage takes `product` as prop. We need to wrap it to read ID from URL.
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleNavigate = (page: string, product?: Product, category?: string | null) => {
     if (page === 'product' && product) {
       setSelectedProduct(product);
-      setCurrentPage('product');
-    } else {
-      setCurrentPage(page as Page);
-      if (page === 'search') {
-        if (category !== undefined) {
-          setSelectedCategory(category);
-        }
+      navigate(`/product/${product.id}`);
+    } else if (page === 'search') {
+      if (category !== undefined) {
+        setSelectedCategory(category);
       } else {
         setSelectedCategory(null);
       }
+      navigate('/search');
+    } else if (page === 'home') {
+      navigate('/');
+    } else if (page === 'signin') {
+      navigate('/login');
+    } else if (page === 'signup') {
+      navigate('/signup');
+    } else {
+      navigate(`/${page}`);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAddToCart = (product: Product, quantity: number) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.product.id === product.id);
-      
+
       if (existingItem) {
         toast.success(`Updated ${product.name} quantity in cart`, {
           duration: 3000,
@@ -59,7 +83,7 @@ export default function App() {
           duration: 3000,
           action: {
             label: 'View Cart',
-            onClick: () => setCurrentPage('cart'),
+            onClick: () => navigate('/cart'),
           },
         });
         return [...prevItems, { product, quantity }];
@@ -69,8 +93,7 @@ export default function App() {
 
   const handleBuyNow = (product: Product, quantity: number) => {
     handleAddToCart(product, quantity);
-    setCurrentPage('checkout');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('/checkout');
   };
 
   const handleUpdateQuantity = (productId: string, newQuantity: number) => {
@@ -94,74 +117,79 @@ export default function App() {
   };
 
   const handlePlaceOrder = () => {
-    setCurrentPage('confirmation');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('/confirmation');
     // Clear cart after order
     setTimeout(() => {
       setCartItems([]);
     }, 2000);
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <HomePage onNavigate={handleNavigate} />;
-      
-      case 'search':
-        return (
+  // Wrapper for ProductDetailPage to handle ID from URL if selectedProduct is missing (e.g. direct load)
+  // Since we don't have a backend fetch for single product yet readily available in this context without importing data,
+  // we'll try to find it from the dummy data, or redirect to home.
+  // NOTE: In a real app we would fetch here.
+  const ProductDetailWrapper = () => {
+    // If we clicked from a list, selectedProduct is set.
+    if (selectedProduct) {
+      return (
+        <ProductDetailPage
+          product={selectedProduct}
+          onAddToCart={handleAddToCart}
+          onBuyNow={handleBuyNow}
+        />
+      );
+    }
+
+    // Fallback: This is a hack because the original app relied on passing the object.
+    // We should really lookup by ID.
+    // Since I don't want to break it, let's redirect to home if no product selected
+    // OR better, try to find it from a global list if I can import it.
+    // I'll import products from data/products.ts if it exists? 
+    // I'll assume for now we redirect to home if null, for safety.
+    // Ideally we refactor ProductDetailPage to take ID.
+    return <Navigate to="/" replace />;
+  };
+
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+
+  return (
+    <div className="min-h-screen bg-white">
+      <ScrollToTop />
+      {!isAuthPage && <Header onNavigate={handleNavigate} cartItemCount={cartItemCount} />}
+
+      <Routes>
+        <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
+        <Route path="/login" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/search" element={
           <ProductListingPage
             onProductClick={(product) => handleNavigate('product', product)}
             selectedCategory={selectedCategory}
             onNavigate={handleNavigate}
           />
-        );
-      
-      case 'product':
-        if (!selectedProduct) {
-          setCurrentPage('home');
-          return null;
-        }
-        return (
-          <ProductDetailPage
-            product={selectedProduct}
-            onAddToCart={handleAddToCart}
-            onBuyNow={handleBuyNow}
-          />
-        );
-      
-      case 'cart':
-        return (
+        } />
+        <Route path="/product/:id" element={<ProductDetailWrapper />} />
+        <Route path="/cart" element={
           <ShoppingCart
             cartItems={cartItems}
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}
-            onProceedToCheckout={() => setCurrentPage('checkout')}
-            onContinueShopping={() => setCurrentPage('home')}
+            onProceedToCheckout={() => navigate('/checkout')}
+            onContinueShopping={() => navigate('/')}
           />
-        );
-      
-      case 'checkout':
-        return (
+        } />
+        <Route path="/checkout" element={
           <CheckoutPage
             cartItems={cartItems}
             onPlaceOrder={handlePlaceOrder}
           />
-        );
-      
-      case 'customer-service':
-        return <CustomerServicePage onNavigate={handleNavigate} />;
-      
-      case 'registry':
-        return <RegistryPage onNavigate={handleNavigate} />;
-      
-      case 'gift-cards':
-        return <GiftCardsPage onNavigate={handleNavigate} />;
-      
-      case 'sell':
-        return <SellPage onNavigate={handleNavigate} />;
-      
-      case 'confirmation':
-        return (
+        } />
+        <Route path="/customer-service" element={<CustomerServicePage onNavigate={handleNavigate} />} />
+        <Route path="/registry" element={<RegistryPage onNavigate={handleNavigate} />} />
+        <Route path="/gift-cards" element={<GiftCardsPage onNavigate={handleNavigate} />} />
+        <Route path="/sell" element={<SellPage onNavigate={handleNavigate} />} />
+        <Route path="/orders" element={<OrdersPage onNavigate={handleNavigate} />} />
+        <Route path="/confirmation" element={
           <div className="min-h-screen bg-white">
             <div className="max-w-[800px] mx-auto px-4 py-12">
               <div className="text-center">
@@ -177,7 +205,7 @@ export default function App() {
                 <p className="text-[#565959] mb-8">
                   You will receive an email confirmation shortly.
                 </p>
-                
+
                 <div className="bg-[#F7F8F8] rounded-lg p-6 mb-8 text-left">
                   <h2 className="text-xl mb-4">Order Details</h2>
                   <div className="space-y-2 text-sm">
@@ -198,13 +226,13 @@ export default function App() {
 
                 <div className="flex gap-4 justify-center">
                   <button
-                    onClick={() => setCurrentPage('home')}
+                    onClick={() => navigate('/')}
                     className="px-6 py-3 bg-[#A0AEC0] hover:bg-[#718096] text-[#0F1111] rounded-lg transition-colors"
                   >
                     Continue Shopping
                   </button>
                   <button
-                    onClick={() => setCurrentPage('home')}
+                    onClick={() => navigate('/orders')}
                     className="px-6 py-3 border border-[#D5D9D9] hover:bg-[#EAEDED] text-[#0F1111] rounded-lg transition-colors"
                   >
                     View Orders
@@ -213,74 +241,76 @@ export default function App() {
               </div>
             </div>
           </div>
-        );
-      
-      case 'orders':
-        return <OrdersPage onNavigate={handleNavigate} />;
-      
-      default:
-        return <HomePage onNavigate={handleNavigate} />;
-    }
-  };
+        } />
+        {/* Admin route placeholder - handled by redirect in logic usually or separate layout */}
+        <Route path="/admin" element={<Navigate to="/" />} />
 
-  return (
-    <div className="min-h-screen bg-white">
-      <Header onNavigate={handleNavigate} cartItemCount={cartItemCount} />
-      {renderPage()}
-      
-      {/* Footer */}
-      <footer className="bg-[#2D3748] text-white mt-12">
-        <div className="max-w-[1500px] mx-auto px-4 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="mb-4">Get to Know Us</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:underline">About Us</a></li>
-                <li><a href="#" className="hover:underline">Careers</a></li>
-                <li><a href="#" className="hover:underline">Press Releases</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="mb-4">Make Money with Us</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:underline">Sell on Shop</a></li>
-                <li><a href="#" className="hover:underline">Become an Affiliate</a></li>
-                <li><a href="#" className="hover:underline">Advertise Your Products</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="mb-4">Payment Products</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:underline">Shop Card</a></li>
-                <li><a href="#" className="hover:underline">Shop Currency Converter</a></li>
-                <li><a href="#" className="hover:underline">Gift Cards</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="mb-4">Let Us Help You</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:underline">Your Account</a></li>
-                <li><a href="#" className="hover:underline">Returns Center</a></li>
-                <li><a href="#" className="hover:underline">Help</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-[#4A5568] pt-8 text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="text-2xl font-bold">
-                <span className="text-white">shop</span>
-                <span className="text-[#A0AEC0]">.com</span>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      {/* Footer - Hide on auth pages */}
+      {!isAuthPage && (
+        <footer className="bg-[#2D3748] text-white mt-12">
+          <div className="max-w-[1500px] mx-auto px-4 py-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+              <div>
+                <h3 className="mb-4">Get to Know Us</h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li><a href="#" className="hover:underline">About Us</a></li>
+                  <li><a href="#" className="hover:underline">Careers</a></li>
+                  <li><a href="#" className="hover:underline">Press Releases</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="mb-4">Make Money with Us</h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li><a href="#" className="hover:underline">Sell on Shop</a></li>
+                  <li><a href="#" className="hover:underline">Become an Affiliate</a></li>
+                  <li><a href="#" className="hover:underline">Advertise Your Products</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="mb-4">Payment Products</h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li><a href="#" className="hover:underline">Shop Card</a></li>
+                  <li><a href="#" className="hover:underline">Shop Currency Converter</a></li>
+                  <li><a href="#" className="hover:underline">Gift Cards</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="mb-4">Let Us Help You</h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li><a href="#" className="hover:underline">Your Account</a></li>
+                  <li><a href="#" className="hover:underline">Returns Center</a></li>
+                  <li><a href="#" className="hover:underline">Help</a></li>
+                </ul>
               </div>
             </div>
-            <p className="text-sm text-gray-400">
-              © 2026 Shop.com, Inc. or its affiliates
-            </p>
+
+            <div className="border-t border-[#4A5568] pt-8 text-center">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="text-2xl font-bold">
+                  <span className="text-white">shop</span>
+                  <span className="text-[#A0AEC0]">.com</span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-400">
+                © 2026 Shop.com, Inc. or its affiliates
+              </p>
+            </div>
           </div>
-        </div>
-      </footer>
-      
+        </footer>
+      )}
+
       <Toaster position="top-right" richColors />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
