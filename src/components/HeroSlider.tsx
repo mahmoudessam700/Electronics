@@ -110,7 +110,7 @@ export function HeroSlider({ onNavigate }: HeroSliderProps) {
       <Button
         variant="ghost"
         size="icon"
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/100 text-[#0F1111] h-12 w-12 rounded-full shadow-lg"
+        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/100 text-[#0F1111] h-12 w-12 rounded-full shadow-lg"
         onClick={goToPrevious}
       >
         <ChevronLeft className="h-6 w-6" />
@@ -118,7 +118,7 @@ export function HeroSlider({ onNavigate }: HeroSliderProps) {
       <Button
         variant="ghost"
         size="icon"
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/100 text-[#0F1111] h-12 w-12 rounded-full shadow-lg"
+        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/100 text-[#0F1111] h-12 w-12 rounded-full shadow-lg"
         onClick={goToNext}
       >
         <ChevronRight className="h-6 w-6" />
@@ -131,8 +131,8 @@ export function HeroSlider({ onNavigate }: HeroSliderProps) {
             key={index}
             onClick={() => goToSlide(index)}
             className={`h-2 rounded-full transition-all ${index === currentSlide
-                ? 'bg-[#718096] w-8'
-                : 'bg-white/50 w-2 hover:bg-white/80'
+              ? 'bg-[#718096] w-8'
+              : 'bg-white/50 w-2 hover:bg-white/80'
               }`}
           />
         ))}
