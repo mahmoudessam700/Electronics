@@ -41,6 +41,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+        // Check if email is verified
+        if (!user.emailVerified) {
+            return res.status(401).json({ error: 'Please verify your email address before signing in. Check your inbox for the verification link.' });
+        }
+
         const token = jwt.sign(
             { userId: user.id, email: user.email, role: user.role },
             JWT_SECRET,

@@ -67,9 +67,14 @@ model User {
   email     String   @unique
   password  String
   name      String?
+  phone     String?
   role      Role     @default(CUSTOMER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  emailVerified           Boolean   @default(false)
+  emailVerificationToken  String?   @unique
+  emailVerificationExpires DateTime?
   
   resetPasswordToken   String? @unique
   resetPasswordExpires DateTime?

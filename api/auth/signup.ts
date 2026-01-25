@@ -1,12 +1,10 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { serialize } from 'cookie';
-import { sendWelcomeEmail } from '../lib/mail';
+import crypto from 'crypto';
+import { sendEmailVerificationEmail } from '../lib/mail';
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Set CORS headers
@@ -23,10 +21,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-        const { email, password, name } = req.body;
+        const { email, password, name, phone } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
+        // Validate required fields
+        if (!email || !password || !name || !phone) {
+            return res.status(400).json({ error: 'All fields are required: name, email, phone, and password' });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: 'Please enter a valid email address' });
+        }
+
+        // Validate phone format (basic validation)
+        const phoneRegex = /^[\+]?[\d\s\-\(\)]{8,}$/;
+        if (!phoneRegex.test(phone)) {
+            return res.status(400).json({ error: 'Please enter a valid phone number' });
         }
 
         // Check if user exists
@@ -35,58 +46,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
 
         if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' });
+            return res.status(400).json({ error: 'An account with this email already exists' });
         }
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create user
-        // Determine role: if email contains "admin" (for demo simplicity) or is first user, make admin
-        // In production, this logic should be stricter or manually set via DB
+        // Generate email verification token
+        const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+        const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+        // Determine role
         const isFirstUser = (await prisma.user.count()) === 0;
         const role = isFirstUser || email.includes('admin') ? 'ADMIN' : 'CUSTOMER';
 
+        // Create user (not verified yet)
         const user = await prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
                 name,
+                phone,
                 role,
+                emailVerified: false,
+                emailVerificationToken,
+                emailVerificationExpires,
             },
         });
 
-        // Create token
-        const token = jwt.sign(
-            { userId: user.id, email: user.email, role: user.role },
-            JWT_SECRET,
-            { expiresIn: '7d' }
-        );
-
-        // Send welcome email
-        await sendWelcomeEmail(user.email, user.name || 'Customer');
-
-        // Set cookie
-        res.setHeader(
-            'Set-Cookie',
-            serialize('auth_token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 60 * 60 * 24 * 7, // 7 days
-                path: '/',
-            })
-        );
+        // Send verification email
+        try {
+            await sendEmailVerificationEmail(user.email, user.name || 'Customer', emailVerificationToken);
+        } catch (emailError) {
+            console.error('Failed to send verification email:', emailError);
+            // Don't fail the signup, just log it
+        }
 
         return res.status(201).json({
             success: true,
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-            },
-            token // Return token for client-side storage if needed (optional with cookies)
+            message: 'Account created successfully! Please check your email to verify your account.',
+            requiresVerification: true,
         });
     } catch (error) {
         console.error('Signup error:', error);

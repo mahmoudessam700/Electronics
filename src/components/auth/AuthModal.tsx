@@ -13,7 +13,6 @@ interface AuthModalProps {
 
 export function AuthModal({ children, defaultView = 'signin', isOpen, onOpenChange }: AuthModalProps) {
     const [view, setView] = useState<'signin' | 'signup'>(defaultView);
-    // If controlled, use props, else local state (though mostly uncontrolled trigger via children)
     const [internalOpen, setInternalOpen] = useState(false);
 
     const isControlled = isOpen !== undefined;
@@ -31,12 +30,16 @@ export function AuthModal({ children, defaultView = 'signin', isOpen, onOpenChan
         <Dialog open={open} onOpenChange={(val) => {
             setOpen(val);
             if (!val) {
-                // Reset view to default when closing, with a slight delay
                 setTimeout(() => setView(defaultView), 200);
             }
         }}>
             {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-            <DialogContent className="sm:max-w-[425px] bg-white text-[#0F1111] p-0 overflow-hidden">
+            <DialogContent
+                className="sm:max-w-[360px] bg-white text-[#0F1111] p-0 overflow-hidden rounded-xl shadow-2xl border-0"
+                style={{
+                    background: 'linear-gradient(180deg, #f7f8fa 0%, #ffffff 100%)',
+                }}
+            >
                 <VisuallyHidden>
                     <DialogTitle>{view === 'signin' ? 'Sign In' : 'Create Account'}</DialogTitle>
                     <DialogDescription>
@@ -44,7 +47,15 @@ export function AuthModal({ children, defaultView = 'signin', isOpen, onOpenChan
                     </DialogDescription>
                 </VisuallyHidden>
 
-                <div className="p-8 max-h-[90vh] overflow-y-auto">
+                {/* Modern Header Accent */}
+                <div
+                    className="h-1.5 w-full"
+                    style={{
+                        background: 'linear-gradient(90deg, #FFD814 0%, #F7CA00 50%, #ff9900 100%)',
+                    }}
+                />
+
+                <div className="p-6 max-h-[85vh] overflow-y-auto">
                     {view === 'signin' ? (
                         <SignInForm onSuccess={handleSuccess} onSwitchToSignUp={handleSwitchToSignUp} />
                     ) : (
