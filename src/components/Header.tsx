@@ -2,14 +2,14 @@ import { Search, ShoppingCart, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription, SheetClose } from './ui/sheet';
-import { useState } from 'react';
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from './ui/hover-card';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { AuthModal } from './auth/AuthModal';
 
 interface HeaderProps {
   onNavigate: (page: string, product?: any, category?: string) => void;
@@ -55,13 +55,16 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                       </div>
                     ) : (
                       <SheetClose asChild>
-                        <Button
-                          variant="ghost"
-                          className="justify-start font-bold"
-                          onClick={() => navigate('/login')}
-                        >
-                          Sign In
-                        </Button>
+                        <div className="w-full">
+                          <AuthModal defaultView="signin">
+                            <Button
+                              variant="ghost"
+                              className="justify-start font-bold w-full"
+                            >
+                              Sign In
+                            </Button>
+                          </AuthModal>
+                        </div>
                       </SheetClose>
                     )}
                     <SheetClose asChild>
@@ -176,17 +179,31 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
             {/* Account & Orders (Desktop) */}
             <div className="hidden lg:flex items-center gap-4">
               <HoverCard openDelay={200} closeDelay={150}>
-                <HoverCardTrigger>
-                  <button
-                    className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1"
-                    onClick={() => !user && navigate('/login')}
-                  >
-                    <span className="text-xs">Hello, {user ? (user.name || user.email) : 'sign in'}</span>
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm font-bold">Account & Lists</span>
-                      <ChevronDown className="h-3 w-3" />
+                <HoverCardTrigger asChild>
+                  {user ? (
+                    <button
+                      className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1"
+                      onClick={() => navigate('/account')}
+                    >
+                      <span className="text-xs">Hello, {user.name || user.email}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-bold">Account & Lists</span>
+                        <ChevronDown className="h-3 w-3" />
+                      </div>
+                    </button>
+                  ) : (
+                    <div className="cursor-pointer">
+                      <AuthModal defaultView="signin">
+                        <button className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1 text-left">
+                          <span className="text-xs">Hello, sign in</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm font-bold">Account & Lists</span>
+                            <ChevronDown className="h-3 w-3" />
+                          </div>
+                        </button>
+                      </AuthModal>
                     </div>
-                  </button>
+                  )}
                 </HoverCardTrigger>
                 <HoverCardContent className="w-80">
                   <div className="flex flex-col gap-4">
@@ -206,12 +223,13 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                         </button>
                       </>
                     ) : (
-                      <Button
-                        className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111]"
-                        onClick={() => navigate('/login')}
-                      >
-                        Sign in
-                      </Button>
+                      <AuthModal defaultView="signin">
+                        <Button
+                          className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] w-full"
+                        >
+                          Sign in
+                        </Button>
+                      </AuthModal>
                     )}
 
                     {user?.role === 'ADMIN' && (
@@ -307,19 +325,6 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                     <SheetClose asChild key={category.name}>
                       <button
                         onClick={() => {
-                          onNavigate('search', undefined, category.name); // Using onNavigate via prop for complex state logic if needed, or navigate directly? 
-                          // App.tsx handleNavigate does specific logic 'if page===search setSelectedCategory...'. 
-                          // It's better to navigate to /search?category=... but simpler to just call onNavigate for now to trigger App.tsx logic if we pass it down.
-                          // But I am rewriting Header to use navigate directly... 
-                          // I should probably manually trigger the navigation to URL.
-                          // But 'setSelectedCategory' state in App.tsx is used by ProductListingPage.
-                          // If I navigate to /search, the state is cleared/defaulted in App.tsx unless I pass state.
-                          // App.tsx: 
-                          // } else if (page === 'search') {
-                          //    if (category !== undefined) setSelectedCategory(category); ... navigate('/search')
-
-                          // So if I call navigate('/search'), selectedCategory is not updated in App.tsx state!
-                          // This means I MUST call onNavigate prop if I want to update App's state.
                           onNavigate('search', undefined, category.name);
                         }}
                         className="text-left pl-6 pr-2 py-2 hover:bg-[#EAEDED] rounded text-[#0F1111] flex items-center gap-3"
