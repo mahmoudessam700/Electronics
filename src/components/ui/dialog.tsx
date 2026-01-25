@@ -49,6 +49,7 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
+  style,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content>) {
   return (
@@ -65,6 +66,7 @@ function DialogContent({
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
+          ...style,
         }}
         {...props}
       >
