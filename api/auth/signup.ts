@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { serialize } from 'cookie';
+import { sendWelcomeEmail } from '../lib/mail';
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
@@ -61,6 +62,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             JWT_SECRET,
             { expiresIn: '7d' }
         );
+
+        // Send welcome email
+        await sendWelcomeEmail(user.email, user.name || 'Customer');
 
         // Set cookie
         res.setHeader(

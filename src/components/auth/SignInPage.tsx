@@ -92,7 +92,12 @@ export function SignInPage() {
                             />
                         </div>
                         <div>
-                            <Label htmlFor="password">Password</Label>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="password">Password</Label>
+                                <Link to="/forgot-password" className="text-sm font-medium text-[#007185] hover:underline">
+                                    Forgot your password?
+                                </Link>
+                            </div>
                             <Input
                                 id="password"
                                 type="password"

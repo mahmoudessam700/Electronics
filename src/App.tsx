@@ -13,6 +13,8 @@ import { SellPage } from './components/SellPage';
 import { OrdersPage } from './components/OrdersPage';
 import { SignInPage } from './components/auth/SignInPage';
 import { SignUpPage } from './components/auth/SignUpPage';
+import { ForgotPasswordPage } from './components/auth/ForgotPasswordPage';
+import { ResetPasswordPage } from './components/auth/ResetPasswordPage';
 import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
@@ -161,6 +163,8 @@ function AppContent() {
         <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
         <Route path="/login" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/search" element={
           <ProductListingPage
             onProductClick={(product) => handleNavigate('product', product)}
