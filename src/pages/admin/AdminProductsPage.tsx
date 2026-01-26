@@ -94,7 +94,7 @@ export function AdminProductsPage() {
                                         product.subcategoryName || product.category || '-'
                                     )}
                                 </td>
-                                <td className="p-4">${product.price.toFixed(2)}</td>
+                                <td className="p-4">E£{product.price.toFixed(2)}</td>
                                 <td className="p-4">
                                     {product.inStock ? (
                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">

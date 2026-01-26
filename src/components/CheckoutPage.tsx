@@ -34,27 +34,24 @@ export function CheckoutPage({ cartItems, onPlaceOrder }: CheckoutPageProps) {
   const StepIndicator = () => (
     <div className="flex items-center justify-center gap-4 mb-8">
       <div className={`flex items-center gap-2 ${step >= 1 ? 'text-[#718096]' : 'text-[#565959]'}`}>
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-          step >= 1 ? 'bg-[#718096] text-white' : 'bg-[#EAEDED] text-[#565959]'
-        }`}>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-[#718096] text-white' : 'bg-[#EAEDED] text-[#565959]'
+          }`}>
           {step > 1 ? '✓' : '1'}
         </div>
         <span className="text-sm hidden sm:inline">Shipping</span>
       </div>
       <ChevronRight className="h-4 w-4 text-[#565959]" />
       <div className={`flex items-center gap-2 ${step >= 2 ? 'text-[#718096]' : 'text-[#565959]'}`}>
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-          step >= 2 ? 'bg-[#718096] text-white' : 'bg-[#EAEDED] text-[#565959]'
-        }`}>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-[#718096] text-white' : 'bg-[#EAEDED] text-[#565959]'
+          }`}>
           {step > 2 ? '✓' : '2'}
         </div>
         <span className="text-sm hidden sm:inline">Payment</span>
       </div>
       <ChevronRight className="h-4 w-4 text-[#565959]" />
       <div className={`flex items-center gap-2 ${step >= 3 ? 'text-[#718096]' : 'text-[#565959]'}`}>
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-          step >= 3 ? 'bg-[#718096] text-white' : 'bg-[#EAEDED] text-[#565959]'
-        }`}>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-[#718096] text-white' : 'bg-[#EAEDED] text-[#565959]'
+          }`}>
           3
         </div>
         <span className="text-sm hidden sm:inline">Review</span>
@@ -311,7 +308,7 @@ export function CheckoutPage({ cartItems, onPlaceOrder }: CheckoutPageProps) {
                                   <p className="font-medium">FREE Delivery</p>
                                   <p className="text-sm text-[#565959]">Arrives: Jan 30 - Feb 2</p>
                                 </div>
-                                <span className="font-medium">$0.00</span>
+                                <span className="font-medium">E£0.00</span>
                               </div>
                             </Label>
                           </div>
@@ -324,7 +321,7 @@ export function CheckoutPage({ cartItems, onPlaceOrder }: CheckoutPageProps) {
                                   <p className="font-medium">Standard Delivery</p>
                                   <p className="text-sm text-[#565959]">Arrives: Jan 28 - Jan 30</p>
                                 </div>
-                                <span className="font-medium">$4.99</span>
+                                <span className="font-medium">E£4.99</span>
                               </div>
                             </Label>
                           </div>
@@ -337,7 +334,7 @@ export function CheckoutPage({ cartItems, onPlaceOrder }: CheckoutPageProps) {
                                   <p className="font-medium">Express Delivery</p>
                                   <p className="text-sm text-[#565959]">Arrives: Tomorrow</p>
                                 </div>
-                                <span className="font-medium">$9.99</span>
+                                <span className="font-medium">E£9.99</span>
                               </div>
                             </Label>
                           </div>
@@ -363,7 +360,7 @@ export function CheckoutPage({ cartItems, onPlaceOrder }: CheckoutPageProps) {
                               <p className="text-sm text-[#565959]">Qty: {item.quantity}</p>
                             </div>
                             <div className="text-right">
-                              <p className="font-medium">${(item.product.price * item.quantity).toFixed(2)}</p>
+                              <p className="font-medium">E£{(item.product.price * item.quantity).toFixed(2)}</p>
                             </div>
                           </div>
                         ))}
@@ -400,19 +397,19 @@ export function CheckoutPage({ cartItems, onPlaceOrder }: CheckoutPageProps) {
                 <div className="space-y-2 text-sm mb-4">
                   <div className="flex items-center justify-between">
                     <span>Items ({itemCount}):</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>E£{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Shipping & handling:</span>
-                    <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+                    <span>{shipping === 0 ? 'FREE' : `E£${shipping.toFixed(2)}`}</span>
                   </div>
                   <div className="flex items-center justify-between pb-2 border-b border-[#D5D9D9]">
                     <span>Estimated tax:</span>
-                    <span>${tax.toFixed(2)}</span>
+                    <span>E£{tax.toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between pt-2 text-lg text-[#C7511F]">
                     <span>Order total:</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>E£{total.toFixed(2)}</span>
                   </div>
                 </div>
 

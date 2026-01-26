@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, Package } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface Order {
     id: string;
@@ -70,7 +70,7 @@ export function AdminOrdersPage() {
                                 <td className="p-4 font-medium">{order.orderNumber}</td>
                                 <td className="p-4">{order.customerEmail}</td>
                                 <td className="p-4">{new Date(order.createdAt).toLocaleDateString()}</td>
-                                <td className="p-4">${order.totalAmount.toFixed(2)}</td>
+                                <td className="p-4">E£{order.totalAmount.toFixed(2)}</td>
                                 <td className="p-4">
                                     <select
                                         value={order.status}

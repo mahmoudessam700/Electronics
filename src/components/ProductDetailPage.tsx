@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Star, MapPin, ShieldCheck, TruckIcon, RefreshCw, Heart, Share2, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { Product } from './ProductCard';
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import {
   Select,
   SelectContent,
@@ -179,8 +178,8 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
                     <Star
                       key={i}
                       className={`h-4 w-4 ${i < Math.floor(product.rating)
-                          ? 'fill-[#718096] text-[#718096]'
-                          : 'fill-none text-[#718096]'
+                        ? 'fill-[#718096] text-[#718096]'
+                        : 'fill-none text-[#718096]'
                         }`}
                     />
                   ))}
@@ -235,7 +234,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
               {/* Location */}
               <div className="flex items-center gap-2 text-sm text-[#007185] hover:text-[#C7511F] cursor-pointer">
                 <MapPin className="h-4 w-4" />
-                <span>Deliver to New York 10001</span>
+                <span>Deliver to Cairo, Egypt</span>
               </div>
             </div>
 
@@ -309,7 +308,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
               {/* Location */}
               <div className="flex items-center gap-2 text-sm text-[#007185] hover:text-[#C7511F] cursor-pointer mb-4">
                 <MapPin className="h-4 w-4" />
-                <span>Deliver to New York 10001</span>
+                <span>Deliver to Cairo, Egypt</span>
               </div>
 
               {/* Stock */}
@@ -317,7 +316,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
 
               {/* Quantity Selector */}
               <div className="mb-4">
-                <Select value={quantity.toString()} onValueChange={(val) => setQuantity(parseInt(val))}>
+                <Select value={quantity.toString()} onValueChange={(val: string) => setQuantity(parseInt(val))}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Quantity" />
                   </SelectTrigger>
@@ -412,8 +411,8 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
                     <Star
                       key={i}
                       className={`h-6 w-6 ${i < Math.floor(product.rating)
-                          ? 'fill-[#718096] text-[#718096]'
-                          : 'fill-none text-[#718096]'
+                        ? 'fill-[#718096] text-[#718096]'
+                        : 'fill-none text-[#718096]'
                         }`}
                     />
                   ))}
@@ -463,8 +462,8 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
                           <Star
                             key={i}
                             className={`h-4 w-4 ${i < review.rating
-                                ? 'fill-[#718096] text-[#718096]'
-                                : 'fill-none text-[#718096]'
+                              ? 'fill-[#718096] text-[#718096]'
+                              : 'fill-none text-[#718096]'
                               }`}
                           />
                         ))}

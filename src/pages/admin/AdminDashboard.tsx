@@ -4,7 +4,7 @@ import { Package, ShoppingCart, DollarSign, Users } from 'lucide-react';
 export function AdminDashboard() {
     // This would fetch real stats from an API in a real app
     const stats = [
-        { title: 'Total Revenue', value: '$12,345', icon: DollarSign, color: 'text-green-600' },
+        { title: 'Total Revenue', value: 'E£12,345', icon: DollarSign, color: 'text-green-600' },
         { title: 'Orders', value: '+25', icon: ShoppingCart, color: 'text-blue-600' },
         { title: 'Products', value: '142', icon: Package, color: 'text-purple-600' },
         { title: 'Active Users', value: '+573', icon: Users, color: 'text-orange-600' },
@@ -58,7 +58,7 @@ export function AdminDashboard() {
                                     <p className="text-sm font-medium leading-none">Olivia Martin</p>
                                     <p className="text-xs text-muted-foreground">olivia.martin@email.com</p>
                                 </div>
-                                <div className="ml-auto font-medium">+$1,999.00</div>
+                                <div className="ml-auto font-medium">+E£1,999.00</div>
                             </div>
                             <div className="flex items-center">
                                 <span className="relative flex h-9 w-9 shrink-0 overflow-hidden rounded-full bg-gray-100 items-center justify-center">
@@ -68,7 +68,7 @@ export function AdminDashboard() {
                                     <p className="text-sm font-medium leading-none">Jackson Lee</p>
                                     <p className="text-xs text-muted-foreground">jackson.lee@email.com</p>
                                 </div>
-                                <div className="ml-auto font-medium">+$39.00</div>
+                                <div className="ml-auto font-medium">+E£39.00</div>
                             </div>
                         </div>
                     </CardContent>

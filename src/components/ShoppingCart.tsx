@@ -79,7 +79,7 @@ export function ShoppingCart({
                       <h3 className="text-lg mb-2 hover:text-[#C7511F] cursor-pointer">
                         {item.product.name}
                       </h3>
-                      
+
                       {/* Stock Status */}
                       <p className="text-sm text-[#007600] mb-2">In Stock</p>
 
@@ -153,7 +153,7 @@ export function ShoppingCart({
                     {/* Price */}
                     <div className="flex-shrink-0 text-right">
                       <div className="flex items-baseline gap-1">
-                        <span className="text-sm">$</span>
+                        <span className="text-sm">E£</span>
                         <span className="text-2xl">
                           {Math.floor(item.product.price)}
                         </span>
@@ -163,7 +163,7 @@ export function ShoppingCart({
                       </div>
                       {item.product.originalPrice && (
                         <p className="text-sm text-[#565959] line-through">
-                          ${item.product.originalPrice.toFixed(2)}
+                          E£{item.product.originalPrice.toFixed(2)}
                         </p>
                       )}
                     </div>
@@ -179,7 +179,7 @@ export function ShoppingCart({
                   Subtotal ({itemCount} items):
                 </span>
                 <span className="text-2xl">
-                  ${subtotal.toFixed(2)}
+                  E£{subtotal.toFixed(2)}
                 </span>
               </div>
               <Button
@@ -206,7 +206,7 @@ export function ShoppingCart({
                   Subtotal ({itemCount} items):
                 </span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-sm">$</span>
+                  <span className="text-sm">E£</span>
                   <span className="text-2xl">
                     {Math.floor(subtotal)}
                   </span>
@@ -254,7 +254,7 @@ export function ShoppingCart({
                     <p className="text-sm line-clamp-2 hover:text-[#C7511F] cursor-pointer mb-1">
                       Premium Carrying Case
                     </p>
-                    <p className="text-sm">$19.99</p>
+                    <p className="text-sm">E£19.99</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -269,7 +269,7 @@ export function ShoppingCart({
                     <p className="text-sm line-clamp-2 hover:text-[#C7511F] cursor-pointer mb-1">
                       USB-C Fast Charging Cable
                     </p>
-                    <p className="text-sm">$12.99</p>
+                    <p className="text-sm">E£12.99</p>
                   </div>
                 </div>
               </div>
