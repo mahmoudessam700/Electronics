@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '../ui/dialog';
 import { SignInForm } from './SignInForm';
 import { SignUpForm } from './SignUpForm';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface AuthModalProps {
@@ -18,6 +18,13 @@ export function AuthModal({ children, defaultView = 'signin', isOpen, onOpenChan
     const isControlled = isOpen !== undefined;
     const open = isControlled ? isOpen : internalOpen;
     const setOpen = isControlled ? onOpenChange! : setInternalOpen;
+
+    // Sync view with defaultView prop when opening
+    useEffect(() => {
+        if (open) {
+            setView(defaultView);
+        }
+    }, [open, defaultView]);
 
     const handleSwitchToSignUp = () => setView('signup');
     const handleSwitchToSignIn = () => setView('signin');

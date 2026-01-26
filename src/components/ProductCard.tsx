@@ -12,6 +12,9 @@ export interface Product {
   image: string;
   isPrime?: boolean;
   deliveryDate?: string;
+  category?: string;
+  categoryId?: string;
+  supplierId?: string;
 }
 
 interface ProductCardProps {
@@ -20,12 +23,12 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onClick }: ProductCardProps) {
-  const discount = product.originalPrice 
+  const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
   return (
-    <Card 
+    <Card
       className="group cursor-pointer hover:shadow-lg transition-shadow duration-200 border-[#D5D9D9]"
       onClick={onClick}
     >
@@ -52,11 +55,10 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-4 w-4 ${
-                    i < Math.floor(product.rating)
+                  className={`h-4 w-4 ${i < Math.floor(product.rating)
                       ? 'fill-[#718096] text-[#718096]'
                       : 'fill-none text-[#718096]'
-                  }`}
+                    }`}
                 />
               ))}
             </div>
