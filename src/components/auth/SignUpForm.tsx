@@ -147,7 +147,7 @@ export function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 className="mt-1 h-10"
-                                placeholder="John Doe"
+                                placeholder="Mohamed Ahmed"
                             />
                         </div>
                         <div>
@@ -205,10 +205,10 @@ export function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
                                     id="address"
                                     type="text"
                                     required
+                                    readOnly
                                     value={address}
-                                    onChange={(e) => setAddress(e.target.value)}
-                                    className="h-10 flex-1"
-                                    placeholder="Enter your street address"
+                                    className="h-10 flex-1 bg-gray-50 cursor-not-allowed"
+                                    placeholder="Click the pin to detect your address"
                                 />
                                 <Button
                                     type="button"
