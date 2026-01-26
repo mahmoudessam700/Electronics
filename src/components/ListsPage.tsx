@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Trash2, Heart, Loader2, ArrowRight, Sparkles, Bell, Share2 } from 'lucide-react';
-import { Button } from './ui/button';
+import { Heart, Trash2, Loader2, ArrowRight, Bell, Share2, Lightbulb, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ListItem {
@@ -61,178 +60,395 @@ export function ListsPage({ onNavigate, onAddToCart }: ListsPageProps) {
         }
     };
 
-    const handleAddToCart = (item: ListItem) => {
-        onAddToCart(item);
-    };
-
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-rose-50/50 via-white to-pink-50/50 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="relative">
-                        <div className="w-16 h-16 rounded-full border-4 border-rose-100"></div>
-                        <Loader2 className="h-16 w-16 animate-spin text-rose-400 absolute inset-0" />
-                    </div>
-                    <p className="text-gray-400 font-medium">Loading your wishlist...</p>
+            <div style={{
+                minHeight: '100vh',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
+            }}>
+                <div style={{ textAlign: 'center' }}>
+                    <Loader2 style={{ width: 48, height: 48, color: '#ffffff', animation: 'spin 1s linear infinite' }} />
+                    <p style={{ color: 'rgba(255,255,255,0.8)', marginTop: 16, fontWeight: 500 }}>Loading your wishlist...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-rose-50/50 via-white to-pink-50/50">
-            <div className="max-w-5xl mx-auto px-4 md:px-8 py-12">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-200">
-                                <Heart className="h-6 w-6 text-white fill-white" />
-                            </div>
-                            <h1 className="text-4xl font-black text-[#0F1111] tracking-tight">Your Wishlist</h1>
-                        </div>
-                        <p className="text-gray-500 text-lg font-medium pl-15">Items you've saved for later</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <button className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all text-gray-500 hover:text-[#0F1111]">
-                            <Bell className="h-4 w-4" />
-                            <span className="font-bold text-sm">Price Alerts</span>
-                        </button>
-                        <button className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all text-gray-500 hover:text-[#0F1111]">
-                            <Share2 className="h-4 w-4" />
-                            <span className="font-bold text-sm">Share List</span>
-                        </button>
-                    </div>
+        <div style={{ minHeight: '100vh', backgroundColor: '#ffffff', fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            {/* Hero Header */}
+            <div style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '60px 24px 80px',
+                textAlign: 'center',
+                position: 'relative'
+            }}>
+                {/* Heart Icon with Glassmorphism */}
+                <div style={{
+                    width: 72,
+                    height: 72,
+                    background: 'rgba(255,255,255,0.2)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 24px'
+                }}>
+                    <Heart style={{ width: 32, height: 32, color: '#ffffff', fill: '#ffffff' }} />
                 </div>
 
-                {/* Stats Bar */}
-                {items.length > 0 && (
-                    <div className="grid grid-cols-3 gap-4 mb-10">
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-                            <p className="text-3xl font-black text-[#0F1111]">{items.length}</p>
-                            <p className="text-sm text-gray-400 font-medium mt-1">Saved Items</p>
-                        </div>
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-                            <p className="text-3xl font-black text-[#0F1111]">
-                                E£{items.reduce((sum, item) => sum + item.price, 0).toLocaleString()}
+                <h1 style={{
+                    fontSize: 42,
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    margin: 0,
+                    letterSpacing: '-0.02em'
+                }}>
+                    Your Wishlist
+                </h1>
+                <p style={{
+                    fontSize: 18,
+                    color: 'rgba(255,255,255,0.8)',
+                    margin: '12px 0 0',
+                    fontWeight: 400
+                }}>
+                    Curate your perfect collection
+                </p>
+            </div>
+
+            {/* Main Content */}
+            <div style={{
+                maxWidth: 1280,
+                margin: '-40px auto 0',
+                padding: '0 24px 60px',
+                position: 'relative',
+                zIndex: 10
+            }}>
+                {/* Content Card */}
+                <div style={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: 24,
+                    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)',
+                    padding: 32,
+                    minHeight: 400
+                }}>
+                    {/* Section Header */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: 32,
+                        flexWrap: 'wrap',
+                        gap: 16
+                    }}>
+                        <div>
+                            <h2 style={{ fontSize: 24, fontWeight: 600, color: '#18181b', margin: 0 }}>Saved Items</h2>
+                            <p style={{ fontSize: 14, color: '#71717a', margin: '4px 0 0' }}>
+                                {items.length} {items.length === 1 ? 'item' : 'items'} saved
                             </p>
-                            <p className="text-sm text-gray-400 font-medium mt-1">Total Value</p>
                         </div>
-                        <div className="bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl p-6 shadow-lg shadow-emerald-200 text-center text-white">
-                            <p className="text-3xl font-black">
-                                E£{items.reduce((sum, item) => sum + ((item.originalPrice || item.price) - item.price), 0).toLocaleString()}
-                            </p>
-                            <p className="text-sm font-medium mt-1 opacity-90">You'll Save</p>
+                        <div style={{ display: 'flex', gap: 12 }}>
+                            <button style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8,
+                                padding: '10px 20px',
+                                backgroundColor: '#ffffff',
+                                border: '1px solid #e4e4e7',
+                                borderRadius: 999,
+                                cursor: 'pointer',
+                                fontSize: 14,
+                                fontWeight: 500,
+                                color: '#18181b',
+                                transition: 'all 0.2s'
+                            }}>
+                                <Bell style={{ width: 16, height: 16 }} />
+                                Price Alerts
+                            </button>
+                            <button style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8,
+                                padding: '10px 20px',
+                                backgroundColor: '#ffffff',
+                                border: '1px solid #e4e4e7',
+                                borderRadius: 999,
+                                cursor: 'pointer',
+                                fontSize: 14,
+                                fontWeight: 500,
+                                color: '#18181b',
+                                transition: 'all 0.2s'
+                            }}>
+                                <Share2 style={{ width: 16, height: 16 }} />
+                                Share
+                            </button>
                         </div>
                     </div>
-                )}
 
-                {items.length > 0 ? (
-                    <div className="space-y-5">
-                        {items.map((item, index) => (
-                            <div
-                                key={item.id}
-                                className={`bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden hover:shadow-[0_20px_50px_rgb(0,0,0,0.08)] transition-all duration-300 group ${removingId === item.productId ? 'opacity-50 scale-98' : ''
-                                    }`}
-                                style={{ animationDelay: `${index * 50}ms` }}
-                            >
-                                <div className="flex flex-col md:flex-row items-stretch">
-                                    {/* Product Image */}
+                    {items.length > 0 ? (
+                        /* Product Grid - 4 columns */
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                            gap: 24
+                        }}>
+                            {items.map((item) => {
+                                const onSale = item.originalPrice && item.originalPrice > item.price;
+                                const savings = onSale ? item.originalPrice! - item.price : 0;
+
+                                return (
                                     <div
-                                        className="md:w-56 h-48 md:h-auto bg-gradient-to-br from-gray-50 to-white flex-shrink-0 p-6 flex items-center justify-center cursor-pointer group-hover:bg-gray-50 transition-colors"
+                                        key={item.id}
+                                        style={{
+                                            position: 'relative',
+                                            backgroundColor: '#ffffff',
+                                            border: '2px solid #f4f4f5',
+                                            borderRadius: 24,
+                                            overflow: 'hidden',
+                                            transition: 'all 0.3s',
+                                            cursor: 'pointer'
+                                        }}
+                                        className="wishlist-card"
                                         onClick={() => onNavigate('product', item)}
                                     >
-                                        <img
-                                            src={item.image}
-                                            alt={item.name}
-                                            className="max-w-full max-h-40 object-contain group-hover:scale-110 transition-transform duration-300"
-                                        />
-                                    </div>
-
-                                    {/* Content */}
-                                    <div className="flex-1 p-8 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex items-start justify-between gap-4 mb-4">
-                                                <h3
-                                                    className="text-xl font-bold text-[#0F1111] group-hover:text-[#007185] cursor-pointer transition-colors line-clamp-2 flex-1"
-                                                    onClick={() => onNavigate('product', item)}
-                                                >
-                                                    {item.name}
-                                                </h3>
-                                                <button
-                                                    onClick={() => handleRemove(item.productId)}
-                                                    disabled={removingId === item.productId}
-                                                    className="p-3 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
-                                                >
-                                                    {removingId === item.productId ? (
-                                                        <Loader2 className="h-5 w-5 animate-spin" />
-                                                    ) : (
-                                                        <Trash2 className="h-5 w-5" />
-                                                    )}
-                                                </button>
+                                        {/* Sale Badge */}
+                                        {onSale && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: 12,
+                                                left: 12,
+                                                background: 'linear-gradient(135deg, #dc2626 0%, #e11d48 100%)',
+                                                color: '#ffffff',
+                                                padding: '6px 14px',
+                                                borderRadius: 999,
+                                                fontSize: 12,
+                                                fontWeight: 500,
+                                                zIndex: 10,
+                                                boxShadow: '0 4px 14px rgba(220, 38, 38, 0.4)'
+                                            }}>
+                                                On Sale
                                             </div>
+                                        )}
 
-                                            <div className="flex items-center gap-4 mb-2">
-                                                <span className="text-3xl font-black text-[#0F1111]">E£{item.price.toLocaleString()}</span>
+                                        {/* Remove Button */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRemove(item.productId);
+                                            }}
+                                            disabled={removingId === item.productId}
+                                            style={{
+                                                position: 'absolute',
+                                                top: 12,
+                                                right: 12,
+                                                width: 36,
+                                                height: 36,
+                                                backgroundColor: 'rgba(255,255,255,0.95)',
+                                                backdropFilter: 'blur(8px)',
+                                                border: 'none',
+                                                borderRadius: '50%',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                zIndex: 10,
+                                                opacity: 0,
+                                                transition: 'all 0.3s',
+                                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                                            }}
+                                            className="remove-btn"
+                                        >
+                                            {removingId === item.productId ? (
+                                                <Loader2 style={{ width: 16, height: 16, color: '#71717a', animation: 'spin 1s linear infinite' }} />
+                                            ) : (
+                                                <Trash2 style={{ width: 16, height: 16, color: '#71717a' }} />
+                                            )}
+                                        </button>
+
+                                        {/* Image Container */}
+                                        <div style={{
+                                            aspectRatio: '1',
+                                            background: 'linear-gradient(135deg, #fafafa 0%, #f4f4f5 100%)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: 20,
+                                            overflow: 'hidden'
+                                        }}>
+                                            <img
+                                                src={item.image}
+                                                alt={item.name}
+                                                style={{
+                                                    maxWidth: '100%',
+                                                    maxHeight: '100%',
+                                                    objectFit: 'contain',
+                                                    transition: 'transform 0.5s'
+                                                }}
+                                                className="product-image"
+                                            />
+                                        </div>
+
+                                        {/* Product Details */}
+                                        <div style={{ padding: 20 }}>
+                                            <h3 style={{
+                                                fontSize: 15,
+                                                fontWeight: 500,
+                                                color: '#18181b',
+                                                margin: '0 0 12px',
+                                                lineHeight: 1.4,
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden'
+                                            }}>
+                                                {item.name}
+                                            </h3>
+
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                <span style={{ fontSize: 20, fontWeight: 600, color: '#18181b' }}>
+                                                    E£{item.price.toLocaleString()}
+                                                </span>
                                                 {item.originalPrice && item.originalPrice > item.price && (
-                                                    <>
-                                                        <span className="text-lg text-gray-400 line-through font-medium">E£{item.originalPrice.toLocaleString()}</span>
-                                                        <span className="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs font-black">
-                                                            {Math.round((1 - item.price / item.originalPrice) * 100)}% OFF
-                                                        </span>
-                                                    </>
+                                                    <span style={{ fontSize: 14, color: '#a1a1aa', textDecoration: 'line-through' }}>
+                                                        E£{item.originalPrice.toLocaleString()}
+                                                    </span>
                                                 )}
                                             </div>
 
-                                            <p className="text-xs text-gray-400 font-medium">
-                                                Added {new Date(item.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                                            </p>
-                                        </div>
+                                            {onSale && (
+                                                <div style={{
+                                                    marginTop: 8,
+                                                    fontSize: 13,
+                                                    fontWeight: 500,
+                                                    color: '#16a34a'
+                                                }}>
+                                                    Save E£{savings.toLocaleString()}
+                                                </div>
+                                            )}
 
-                                        <div className="flex items-center gap-3 mt-6">
-                                            <Button
-                                                onClick={() => handleAddToCart(item)}
-                                                className="flex-1 md:flex-none bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-black h-14 px-10 rounded-2xl shadow-lg shadow-amber-200 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3"
+                                            {/* Add to Cart Button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onAddToCart(item);
+                                                }}
+                                                style={{
+                                                    width: '100%',
+                                                    marginTop: 16,
+                                                    padding: '12px 20px',
+                                                    backgroundColor: '#18181b',
+                                                    color: '#ffffff',
+                                                    border: 'none',
+                                                    borderRadius: 12,
+                                                    cursor: 'pointer',
+                                                    fontSize: 14,
+                                                    fontWeight: 600,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: 8,
+                                                    transition: 'all 0.2s'
+                                                }}
                                             >
-                                                <ShoppingCart className="h-5 w-5" />
+                                                <ShoppingCart style={{ width: 16, height: 16 }} />
                                                 Add to Cart
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => onNavigate('product', item)}
-                                                className="h-14 px-8 rounded-2xl border-gray-200 hover:bg-gray-50 font-bold"
-                                            >
-                                                View Details
-                                            </Button>
+                                            </button>
                                         </div>
                                     </div>
-                                </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        /* Empty State */
+                        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+                            {/* Heart Icon */}
+                            <div style={{
+                                width: 120,
+                                height: 120,
+                                background: 'linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%)',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 32px'
+                            }}>
+                                <Heart style={{ width: 48, height: 48, color: '#a1a1aa' }} />
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="bg-white rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-16 md:p-24 text-center">
-                        <div className="w-32 h-32 bg-gradient-to-br from-rose-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-                            <Heart className="h-14 w-14 text-rose-300" />
+
+                            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#18181b', margin: '0 0 12px' }}>
+                                Your wishlist is empty
+                            </h2>
+                            <p style={{ fontSize: 16, color: '#71717a', margin: '0 0 32px', maxWidth: 400, marginLeft: 'auto', marginRight: 'auto' }}>
+                                Start adding items you love by clicking the heart icon on any product. We'll keep them safe for you here.
+                            </p>
+
+                            {/* Tip Card */}
+                            <div style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 12,
+                                backgroundColor: '#fef9c3',
+                                padding: '14px 24px',
+                                borderRadius: 16,
+                                marginBottom: 32
+                            }}>
+                                <Lightbulb style={{ width: 20, height: 20, color: '#ca8a04' }} />
+                                <span style={{ fontSize: 14, fontWeight: 500, color: '#854d0e' }}>
+                                    Get notified when your saved items go on sale!
+                                </span>
+                            </div>
+
+                            <div>
+                                <button
+                                    onClick={() => onNavigate('home')}
+                                    style={{
+                                        padding: '16px 32px',
+                                        backgroundColor: '#18181b',
+                                        color: '#ffffff',
+                                        border: 'none',
+                                        borderRadius: 999,
+                                        cursor: 'pointer',
+                                        fontSize: 16,
+                                        fontWeight: 600,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: 10,
+                                        transition: 'all 0.2s',
+                                        boxShadow: '0 4px 14px rgba(24, 24, 27, 0.25)'
+                                    }}
+                                >
+                                    Explore Products
+                                    <ArrowRight style={{ width: 18, height: 18 }} />
+                                </button>
+                            </div>
                         </div>
-                        <h2 className="text-3xl font-black text-[#0F1111] mb-4">Your wishlist is empty</h2>
-                        <p className="text-gray-400 max-w-md mx-auto font-medium mb-4">
-                            Start adding items you love by clicking the heart icon on any product. We'll keep them safe for you here.
-                        </p>
-                        <div className="flex items-center justify-center gap-2 text-rose-400 mb-10">
-                            <Sparkles className="h-4 w-4" />
-                            <span className="text-sm font-bold">Get notified when your saved items go on sale!</span>
-                        </div>
-                        <Button
-                            className="bg-[#0F1111] hover:bg-[#2D3748] text-white h-14 px-12 rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-3 mx-auto"
-                            onClick={() => onNavigate('home')}
-                        >
-                            Explore Products
-                            <ArrowRight className="h-5 w-5" />
-                        </Button>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
+
+            {/* CSS for hover effects */}
+            <style>{`
+        .wishlist-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+          border-color: #e4e4e7;
+        }
+        .wishlist-card:hover .remove-btn {
+          opacity: 1;
+        }
+        .wishlist-card:hover .product-image {
+          transform: scale(1.1);
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
         </div>
     );
 }
