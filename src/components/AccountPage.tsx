@@ -130,268 +130,445 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#F0F4F8] flex items-center justify-center" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-                <Loader2 className="h-10 w-10 animate-spin text-[#333C4D]" />
+            <div style={{
+                minHeight: '100vh',
+                backgroundColor: '#f3f4f6',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
+            }}>
+                <Loader2 style={{ width: 40, height: 40, animation: 'spin 1s linear infinite', color: '#374151' }} />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#F0F4F8]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
             {/* Header */}
-            <div className="bg-white">
-                <div className="max-w-6xl mx-auto px-6 py-6">
-                    <h1 className="text-2xl font-bold text-[#000000]">Your Account</h1>
-                    <p className="text-[#666666] text-sm mt-1">Control your profile, security, and preferences</p>
+            <div style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e5e7eb' }}>
+                <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px 0' }}>
+                    <h1 style={{ fontSize: 24, fontWeight: 700, color: '#000000', margin: 0 }}>Your Account</h1>
+                    <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>Control your profile, security, and preferences</p>
 
                     {/* Navigation Tabs */}
-                    <div className="flex gap-6 mt-6 border-b border-[#E5E7EB]">
+                    <div style={{ display: 'flex', gap: 24, marginTop: 24, borderBottom: '1px solid #e5e7eb' }}>
                         <button
                             onClick={() => onNavigate('orders')}
-                            className="pb-3 px-1 border-b-2 border-transparent text-[#666666] hover:text-[#000000] transition-colors text-sm font-medium flex items-center gap-2"
+                            style={{
+                                padding: '12px 4px',
+                                border: 'none',
+                                background: 'none',
+                                cursor: 'pointer',
+                                fontSize: 14,
+                                fontWeight: 500,
+                                color: '#6b7280',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8
+                            }}
                         >
-                            <Package className="w-4 h-4" />
+                            <Package style={{ width: 16, height: 16 }} />
                             Orders
                         </button>
                         <button
                             onClick={() => onNavigate('lists')}
-                            className="pb-3 px-1 border-b-2 border-transparent text-[#666666] hover:text-[#000000] transition-colors text-sm font-medium flex items-center gap-2"
+                            style={{
+                                padding: '12px 4px',
+                                border: 'none',
+                                background: 'none',
+                                cursor: 'pointer',
+                                fontSize: 14,
+                                fontWeight: 500,
+                                color: '#6b7280',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8
+                            }}
                         >
-                            <List className="w-4 h-4" />
+                            <List style={{ width: 16, height: 16 }} />
                             Lists
                         </button>
-                        <button className="pb-3 px-1 border-b-2 border-[#000000] text-[#000000] text-sm font-semibold flex items-center gap-2">
+                        <button
+                            style={{
+                                padding: '12px 4px',
+                                border: 'none',
+                                borderBottom: '2px solid #000000',
+                                background: 'none',
+                                cursor: 'pointer',
+                                fontSize: 14,
+                                fontWeight: 600,
+                                color: '#000000',
+                                marginBottom: -1
+                            }}
+                        >
                             A
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* User Info Bar - Navy Slate Background */}
-            <div className="bg-[#333C4D]">
-                <div className="max-w-6xl mx-auto px-6 py-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#4A5568] rounded-full flex items-center justify-center overflow-hidden">
-                            {formData.image ? (
-                                <img src={formData.image} alt="Avatar" className="w-full h-full object-cover" />
-                            ) : (
-                                <User className="w-5 h-5 text-white" />
-                            )}
-                        </div>
-                        <div>
-                            <div className="font-semibold text-white">{formData.name || 'Admin'}</div>
-                            <div className="text-sm text-[#B0B3B8]">{formData.email}</div>
-                        </div>
+            {/* User Info Bar - Dark Navy */}
+            <div style={{ backgroundColor: '#374151' }}>
+                <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                        width: 40,
+                        height: 40,
+                        backgroundColor: '#4b5563',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden'
+                    }}>
+                        {formData.image ? (
+                            <img src={formData.image} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                            <User style={{ width: 20, height: 20, color: '#ffffff' }} />
+                        )}
+                    </div>
+                    <div>
+                        <div style={{ fontWeight: 600, color: '#ffffff', fontSize: 14 }}>{formData.name || 'Admin'}</div>
+                        <div style={{ fontSize: 13, color: '#9ca3af' }}>{formData.email}</div>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-6xl mx-auto px-6 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: 24 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 24 }}>
                     {/* Sidebar */}
-                    <div className="lg:col-span-1">
-                        <nav className="bg-white rounded-xl overflow-hidden shadow-sm">
+                    <div>
+                        <nav style={{ backgroundColor: '#ffffff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
                             <button
                                 onClick={() => setActiveTab('personal')}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all ${activeTab === 'personal'
-                                        ? 'bg-white text-[#000000] border-l-4 border-[#333C4D]'
-                                        : 'text-[#666666] hover:bg-gray-50'
-                                    }`}
+                                style={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '14px 16px',
+                                    border: 'none',
+                                    borderLeft: activeTab === 'personal' ? '4px solid #374151' : '4px solid transparent',
+                                    background: activeTab === 'personal' ? '#f9fafb' : '#ffffff',
+                                    cursor: 'pointer',
+                                    textAlign: 'left'
+                                }}
                             >
-                                <div className="flex items-center gap-3">
-                                    <User className="w-5 h-5" />
-                                    <span className="font-medium text-sm">Personal Data</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <User style={{ width: 20, height: 20, color: '#374151' }} />
+                                    <span style={{ fontWeight: 500, fontSize: 14, color: '#000000' }}>Personal Data</span>
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-[#999999]" />
+                                <ChevronRight style={{ width: 16, height: 16, color: '#9ca3af' }} />
                             </button>
 
                             <button
                                 onClick={() => setActiveTab('security')}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all border-t border-[#F3F4F6] ${activeTab === 'security'
-                                        ? 'bg-white text-[#000000] border-l-4 border-[#333C4D]'
-                                        : 'text-[#666666] hover:bg-gray-50'
-                                    }`}
+                                style={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '14px 16px',
+                                    border: 'none',
+                                    borderTop: '1px solid #f3f4f6',
+                                    borderLeft: activeTab === 'security' ? '4px solid #374151' : '4px solid transparent',
+                                    background: activeTab === 'security' ? '#f9fafb' : '#ffffff',
+                                    cursor: 'pointer',
+                                    textAlign: 'left'
+                                }}
                             >
-                                <div className="flex items-center gap-3">
-                                    <Shield className="w-5 h-5" />
-                                    <span className="font-medium text-sm">Security</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <Shield style={{ width: 20, height: 20, color: '#374151' }} />
+                                    <span style={{ fontWeight: 500, fontSize: 14, color: '#6b7280' }}>Security</span>
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-[#999999]" />
+                                <ChevronRight style={{ width: 16, height: 16, color: '#9ca3af' }} />
                             </button>
 
                             <button
                                 onClick={() => setActiveTab('addresses')}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all border-t border-[#F3F4F6] ${activeTab === 'addresses'
-                                        ? 'bg-white text-[#000000] border-l-4 border-[#333C4D]'
-                                        : 'text-[#666666] hover:bg-gray-50'
-                                    }`}
+                                style={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '14px 16px',
+                                    border: 'none',
+                                    borderTop: '1px solid #f3f4f6',
+                                    borderLeft: activeTab === 'addresses' ? '4px solid #374151' : '4px solid transparent',
+                                    background: activeTab === 'addresses' ? '#f9fafb' : '#ffffff',
+                                    cursor: 'pointer',
+                                    textAlign: 'left'
+                                }}
                             >
-                                <div className="flex items-center gap-3">
-                                    <MapPin className="w-5 h-5" />
-                                    <span className="font-medium text-sm">My Addresses</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <MapPin style={{ width: 20, height: 20, color: '#374151' }} />
+                                    <span style={{ fontWeight: 500, fontSize: 14, color: '#6b7280' }}>My Addresses</span>
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-[#999999]" />
+                                <ChevronRight style={{ width: 16, height: 16, color: '#9ca3af' }} />
                             </button>
 
                             <button
                                 onClick={() => setActiveTab('professional')}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all border-t border-[#F3F4F6] ${activeTab === 'professional'
-                                        ? 'bg-white text-[#000000] border-l-4 border-[#333C4D]'
-                                        : 'text-[#666666] hover:bg-gray-50'
-                                    }`}
+                                style={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '14px 16px',
+                                    border: 'none',
+                                    borderTop: '1px solid #f3f4f6',
+                                    borderLeft: activeTab === 'professional' ? '4px solid #374151' : '4px solid transparent',
+                                    background: activeTab === 'professional' ? '#f9fafb' : '#ffffff',
+                                    cursor: 'pointer',
+                                    textAlign: 'left'
+                                }}
                             >
-                                <div className="flex items-center gap-3">
-                                    <User className="w-5 h-5" />
-                                    <span className="font-medium text-sm">Professional Profile</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <User style={{ width: 20, height: 20, color: '#374151' }} />
+                                    <span style={{ fontWeight: 500, fontSize: 14, color: '#6b7280' }}>Professional Profile</span>
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-[#999999]" />
+                                <ChevronRight style={{ width: 16, height: 16, color: '#9ca3af' }} />
                             </button>
                         </nav>
                     </div>
 
                     {/* Main Content Area */}
-                    <div className="lg:col-span-3 space-y-6">
-                        {/* Complete Your Profile - Navy Slate Background */}
-                        <div className="bg-[#333C4D] rounded-xl p-6">
-                            <h3 className="font-semibold text-lg text-white mb-2">Complete Your Profile</h3>
-                            <p className="text-[#B0B3B8] text-sm mb-5">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                        {/* Complete Your Profile - Dark Card */}
+                        <div style={{
+                            backgroundColor: '#374151',
+                            borderRadius: 12,
+                            padding: 24,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                        }}>
+                            <h3 style={{ fontWeight: 600, fontSize: 18, color: '#ffffff', margin: 0, marginBottom: 8 }}>Complete Your Profile</h3>
+                            <p style={{ fontSize: 14, color: '#9ca3af', margin: 0, marginBottom: 20 }}>
                                 Completing your profile items unlocks premium discounts and faster checkout experiences.
                             </p>
-                            <div className="flex items-center gap-4">
-                                <div className="flex-1 bg-[#4A5568] rounded-full h-2 overflow-hidden">
-                                    <div className="bg-white h-full rounded-full transition-all" style={{ width: '65%' }}></div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                                <div style={{ flex: 1, backgroundColor: '#4b5563', borderRadius: 999, height: 8, overflow: 'hidden' }}>
+                                    <div style={{ backgroundColor: '#ffffff', height: '100%', width: '65%', borderRadius: 999 }}></div>
                                 </div>
-                                <span className="font-bold text-lg text-white">65%</span>
+                                <span style={{ fontWeight: 700, fontSize: 18, color: '#ffffff' }}>65%</span>
                             </div>
-                            <p className="text-sm text-[#B0B3B8] mt-2">Completed</p>
+                            <p style={{ fontSize: 13, color: '#9ca3af', margin: 0, marginTop: 8 }}>Completed</p>
                         </div>
 
                         {/* Message Alert */}
                         {message && (
-                            <div className={`p-4 rounded-xl font-medium text-sm ${message.type === 'success'
-                                    ? 'bg-green-50 text-green-800 border border-green-200'
-                                    : 'bg-red-50 text-red-800 border border-red-200'
-                                }`}>
+                            <div style={{
+                                padding: 16,
+                                borderRadius: 12,
+                                fontWeight: 500,
+                                fontSize: 14,
+                                backgroundColor: message.type === 'success' ? '#ecfdf5' : '#fef2f2',
+                                color: message.type === 'success' ? '#065f46' : '#991b1b',
+                                border: `1px solid ${message.type === 'success' ? '#a7f3d0' : '#fecaca'}`
+                            }}>
                                 {message.text}
                             </div>
                         )}
 
                         {/* Profile Details */}
-                        <div className="bg-white rounded-xl p-6 shadow-sm">
-                            <div className="border-b border-[#F3F4F6] pb-4 mb-6">
-                                <h2 className="text-lg font-semibold text-[#000000]">Profile Details</h2>
-                                <p className="text-[#666666] text-sm mt-1">Update your public information and avatar</p>
+                        <div style={{ backgroundColor: '#ffffff', borderRadius: 12, padding: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                            <div style={{ borderBottom: '1px solid #f3f4f6', paddingBottom: 16, marginBottom: 24 }}>
+                                <h2 style={{ fontSize: 18, fontWeight: 600, color: '#000000', margin: 0 }}>Profile Details</h2>
+                                <p style={{ fontSize: 14, color: '#6b7280', margin: 0, marginTop: 4 }}>Update your public information and avatar</p>
                             </div>
 
-                            <div className="space-y-6">
-                                {/* Avatar Upload - Circular with Camera Icon */}
-                                <div className="flex flex-col items-center py-4">
-                                    <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                                        {/* Avatar Container */}
-                                        <div className="w-28 h-28 rounded-full overflow-hidden bg-[#E5E7EB] flex items-center justify-center relative">
-                                            {formData.image ? (
-                                                <img
-                                                    src={formData.image}
-                                                    alt="Avatar"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <User className="w-14 h-14 text-[#9CA3AF]" />
-                                            )}
-
-                                            {/* Loading State */}
-                                            {uploading && (
-                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
-                                                    <Loader2 className="w-8 h-8 text-white animate-spin" />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Camera Button - Blue Circle */}
-                                        <div className="absolute bottom-0 right-0 w-9 h-9 bg-[#4F46E5] rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#4338CA] transition-colors">
-                                            <Camera className="w-4 h-4 text-white" />
-                                        </div>
-
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleAvatarUpload}
-                                            className="hidden"
-                                            ref={fileInputRef}
-                                        />
+                            {/* Avatar Upload */}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 16, paddingBottom: 32 }}>
+                                <div
+                                    style={{ position: 'relative', cursor: 'pointer' }}
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    <div style={{
+                                        width: 100,
+                                        height: 100,
+                                        borderRadius: '50%',
+                                        backgroundColor: '#e5e7eb',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        overflow: 'hidden'
+                                    }}>
+                                        {formData.image ? (
+                                            <img src={formData.image} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <User style={{ width: 48, height: 48, color: '#9ca3af' }} />
+                                        )}
+                                        {uploading && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                inset: 0,
+                                                backgroundColor: 'rgba(0,0,0,0.5)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                borderRadius: '50%'
+                                            }}>
+                                                <Loader2 style={{ width: 32, height: 32, color: '#ffffff', animation: 'spin 1s linear infinite' }} />
+                                            </div>
+                                        )}
                                     </div>
 
-                                    {/* Upload Instructions */}
-                                    <p className="text-sm text-[#666666] mt-4">Click the camera icon to upload your avatar</p>
-                                    <p className="text-xs text-[#9CA3AF]">JPG, PNG or GIF. Max size 5MB</p>
+                                    {/* Camera Button */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        right: 0,
+                                        width: 32,
+                                        height: 32,
+                                        backgroundColor: '#374151',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '2px solid #ffffff',
+                                        cursor: 'pointer'
+                                    }}>
+                                        <Camera style={{ width: 14, height: 14, color: '#ffffff' }} />
+                                    </div>
+
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleAvatarUpload}
+                                        style={{ display: 'none' }}
+                                        ref={fileInputRef}
+                                    />
                                 </div>
 
+                                <p style={{ fontSize: 14, color: '#6b7280', marginTop: 16, marginBottom: 0 }}>Click the camera icon to upload your avatar</p>
+                            </div>
+
+                            {/* Form Fields */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                                 {/* Full Name */}
                                 <div>
-                                    <label className="block text-sm font-medium text-[#000000] mb-2">
+                                    <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#000000', marginBottom: 8 }}>
                                         Full Name
                                     </label>
-                                    <div className="flex items-center gap-3 px-4 py-3 bg-white border border-[#E5E7EB] rounded-lg focus-within:ring-2 focus-within:ring-[#4F46E5] focus-within:border-[#4F46E5] transition-all">
-                                        <User className="w-5 h-5 text-[#9CA3AF]" />
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 12,
+                                        padding: '12px 16px',
+                                        backgroundColor: '#ffffff',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: 8
+                                    }}>
+                                        <User style={{ width: 20, height: 20, color: '#9ca3af' }} />
                                         <input
                                             type="text"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            className="flex-1 bg-transparent outline-none text-[#000000] text-sm"
                                             placeholder="Enter your full name"
+                                            style={{
+                                                flex: 1,
+                                                border: 'none',
+                                                outline: 'none',
+                                                fontSize: 14,
+                                                color: '#000000',
+                                                backgroundColor: 'transparent'
+                                            }}
                                         />
                                     </div>
                                 </div>
 
                                 {/* Account Email */}
                                 <div>
-                                    <label className="block text-sm font-medium text-[#000000] mb-2">
+                                    <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#000000', marginBottom: 8 }}>
                                         Account Email
                                     </label>
-                                    <div className="flex items-center gap-3 px-4 py-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg">
-                                        <Mail className="w-5 h-5 text-[#9CA3AF]" />
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 12,
+                                        padding: '12px 16px',
+                                        backgroundColor: '#f9fafb',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: 8
+                                    }}>
+                                        <Mail style={{ width: 20, height: 20, color: '#9ca3af' }} />
                                         <input
                                             type="email"
                                             value={formData.email}
                                             disabled
-                                            className="flex-1 bg-transparent outline-none text-[#6B7280] text-sm"
+                                            style={{
+                                                flex: 1,
+                                                border: 'none',
+                                                outline: 'none',
+                                                fontSize: 14,
+                                                color: '#6b7280',
+                                                backgroundColor: 'transparent'
+                                            }}
                                         />
                                     </div>
                                 </div>
 
-                                {/* Phone Connectivity */}
+                                {/* Phone */}
                                 <div>
-                                    <label className="block text-sm font-medium text-[#000000] mb-2">
+                                    <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#000000', marginBottom: 8 }}>
                                         Phone Connectivity
                                     </label>
-                                    <div className="flex items-center gap-3 px-4 py-3 bg-white border border-[#E5E7EB] rounded-lg focus-within:ring-2 focus-within:ring-[#4F46E5] focus-within:border-[#4F46E5] transition-all">
-                                        <Phone className="w-5 h-5 text-[#9CA3AF]" />
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 12,
+                                        padding: '12px 16px',
+                                        backgroundColor: '#ffffff',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: 8
+                                    }}>
+                                        <Phone style={{ width: 20, height: 20, color: '#9ca3af' }} />
                                         <input
                                             type="tel"
                                             value={formData.phone}
                                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            className="flex-1 bg-transparent outline-none text-[#000000] text-sm"
                                             placeholder="+20 123 456 7890"
+                                            style={{
+                                                flex: 1,
+                                                border: 'none',
+                                                outline: 'none',
+                                                fontSize: 14,
+                                                color: '#000000',
+                                                backgroundColor: 'transparent'
+                                            }}
                                         />
                                     </div>
                                 </div>
 
                                 {/* Delivery Location */}
                                 <div>
-                                    <label className="block text-sm font-medium text-[#000000] mb-2">
+                                    <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#000000', marginBottom: 8 }}>
                                         Delivery Location
                                     </label>
-                                    <div className="space-y-3">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                         <button
                                             onClick={handleDetectLocation}
                                             disabled={detecting}
-                                            className="px-4 py-2.5 bg-[#333C4D] text-white rounded-lg hover:bg-[#2D3748] transition-colors flex items-center gap-2 font-medium text-sm disabled:opacity-50"
+                                            style={{
+                                                padding: '10px 16px',
+                                                backgroundColor: '#374151',
+                                                color: '#ffffff',
+                                                border: 'none',
+                                                borderRadius: 8,
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 8,
+                                                fontWeight: 500,
+                                                fontSize: 14,
+                                                width: 'fit-content',
+                                                opacity: detecting ? 0.5 : 1
+                                            }}
                                         >
                                             {detecting ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
                                             ) : (
-                                                <MapPin className="w-4 h-4" />
+                                                <MapPin style={{ width: 16, height: 16 }} />
                                             )}
                                             Auto-Detect Address
                                         </button>
@@ -399,13 +576,33 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                         <textarea
                                             value={formData.address}
                                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                            className="w-full px-4 py-3 bg-white border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] outline-none resize-none transition-all text-[#000000] text-sm"
-                                            rows={3}
                                             placeholder="Detect your address using the button..."
+                                            rows={3}
+                                            style={{
+                                                padding: 16,
+                                                backgroundColor: '#ffffff',
+                                                border: '1px solid #e5e7eb',
+                                                borderRadius: 8,
+                                                resize: 'none',
+                                                outline: 'none',
+                                                fontSize: 14,
+                                                color: '#000000',
+                                                fontFamily: 'inherit'
+                                            }}
                                         />
 
                                         {/* Map Placeholder */}
-                                        <div className="bg-[#F9FAFB] rounded-xl border-2 border-dashed border-[#E5E7EB] h-64 flex flex-col items-center justify-center overflow-hidden">
+                                        <div style={{
+                                            backgroundColor: '#f9fafb',
+                                            borderRadius: 12,
+                                            border: '2px dashed #e5e7eb',
+                                            height: 240,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            overflow: 'hidden'
+                                        }}>
                                             {formData.latitude && formData.longitude ? (
                                                 <iframe
                                                     width="100%"
@@ -413,16 +610,24 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                                     frameBorder="0"
                                                     scrolling="no"
                                                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${formData.longitude - 0.005}%2C${formData.latitude - 0.005}%2C${formData.longitude + 0.005}%2C${formData.latitude + 0.005}&layer=mapnik&marker=${formData.latitude}%2C${formData.longitude}`}
-                                                    style={{ border: 0 }}
-                                                    className="rounded-lg"
+                                                    style={{ border: 0, borderRadius: 10 }}
                                                 />
                                             ) : (
-                                                <div className="text-center p-6">
-                                                    <div className="w-14 h-14 bg-[#E5E7EB] rounded-full flex items-center justify-center mx-auto mb-3">
-                                                        <MapPin className="w-7 h-7 text-[#9CA3AF]" />
+                                                <div style={{ textAlign: 'center', padding: 24 }}>
+                                                    <div style={{
+                                                        width: 56,
+                                                        height: 56,
+                                                        backgroundColor: '#e5e7eb',
+                                                        borderRadius: '50%',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        margin: '0 auto 12px'
+                                                    }}>
+                                                        <MapPin style={{ width: 28, height: 28, color: '#9ca3af' }} />
                                                     </div>
-                                                    <p className="text-[#6B7280] font-medium">Map Unavailable</p>
-                                                    <p className="text-sm text-[#9CA3AF] mt-1">Click detect location to see your address on the map</p>
+                                                    <p style={{ fontWeight: 500, color: '#6b7280', margin: 0 }}>Map Unavailable</p>
+                                                    <p style={{ fontSize: 13, color: '#9ca3af', margin: '4px 0 0' }}>Click detect location to see your address on the map</p>
                                                 </div>
                                             )}
                                         </div>
@@ -430,16 +635,29 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                 </div>
 
                                 {/* Save Button */}
-                                <div className="pt-4">
+                                <div style={{ paddingTop: 16 }}>
                                     <button
                                         onClick={handleSave}
                                         disabled={saving}
-                                        className="px-6 py-3 bg-[#333C4D] text-white rounded-lg hover:bg-[#2D3748] transition-colors font-medium text-sm flex items-center gap-2 disabled:opacity-50"
+                                        style={{
+                                            padding: '12px 24px',
+                                            backgroundColor: '#374151',
+                                            color: '#ffffff',
+                                            border: 'none',
+                                            borderRadius: 8,
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 8,
+                                            fontWeight: 500,
+                                            fontSize: 14,
+                                            opacity: saving ? 0.5 : 1
+                                        }}
                                     >
                                         {saving ? (
-                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
                                         ) : (
-                                            <Save className="w-4 h-4" />
+                                            <Save style={{ width: 16, height: 16 }} />
                                         )}
                                         Save Account Details
                                     </button>
