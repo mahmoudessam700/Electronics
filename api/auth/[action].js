@@ -101,8 +101,7 @@ module.exports = async (req, res) => {
     } catch (error) {
         console.error('JS Auth Handler Error:', error);
         res.status(500).json({
-            error: 'Internal server error',
-            details: error.message
+            error: `System Error: ${error.message}`
         });
     }
 };
