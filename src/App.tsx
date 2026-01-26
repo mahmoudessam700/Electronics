@@ -11,6 +11,8 @@ import { RegistryPage } from './components/RegistryPage';
 import { GiftCardsPage } from './components/GiftCardsPage';
 import { SellPage } from './components/SellPage';
 import { OrdersPage } from './components/OrdersPage';
+import { AccountPage } from './components/AccountPage';
+import { ListsPage } from './components/ListsPage';
 import { SignInPage } from './components/auth/SignInPage';
 import { SignUpPage } from './components/auth/SignUpPage';
 import { ForgotPasswordPage } from './components/auth/ForgotPasswordPage';
@@ -197,6 +199,8 @@ function AppContent() {
         <Route path="/gift-cards" element={<GiftCardsPage onNavigate={handleNavigate} />} />
         <Route path="/sell" element={<SellPage onNavigate={handleNavigate} />} />
         <Route path="/orders" element={<OrdersPage onNavigate={handleNavigate} />} />
+        <Route path="/account" element={<AccountPage onNavigate={handleNavigate} />} />
+        <Route path="/lists" element={<ListsPage onNavigate={handleNavigate} onAddToCart={handleAddToCart} />} />
         <Route path="/confirmation" element={
           <div className="min-h-screen bg-white">
             <div className="max-w-[800px] mx-auto px-4 py-12">
@@ -284,9 +288,9 @@ function AppContent() {
               <div>
                 <h3 className="mb-4">Let Us Help You</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><a href="#" className="hover:underline">Your Account</a></li>
-                  <li><a href="#" className="hover:underline">Returns Center</a></li>
-                  <li><a href="#" className="hover:underline">Help</a></li>
+                  <li><button onClick={() => handleNavigate('account')} className="hover:underline">Your Account</button></li>
+                  <li><button onClick={() => handleNavigate('orders')} className="hover:underline">Returns Center</button></li>
+                  <li><button onClick={() => handleNavigate('customer-service')} className="hover:underline">Help</button></li>
                 </ul>
               </div>
             </div>

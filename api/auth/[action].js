@@ -12,7 +12,7 @@ const pool = new Pool({
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -53,9 +53,33 @@ module.exports = async (req, res) => {
             if (!token) return res.status(401).json({ error: 'Unauthorized' });
 
             const decoded = jwt.verify(token, JWT_SECRET);
-            const { rows } = await pool.query('SELECT id, email, name, role FROM "User" WHERE id = $1', [decoded.userId]);
+            const { rows } = await pool.query('SELECT id, email, name, phone, address, latitude, longitude, role FROM "User" WHERE id = $1', [decoded.userId]);
             if (!rows[0]) return res.status(404).json({ error: 'User not found' });
             return res.status(200).json({ user: rows[0] });
+        }
+
+        if (actionName === 'update-profile') {
+            const authHeader = req.headers.authorization;
+            const token = authHeader?.split(' ')[1];
+            if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+            const decoded = jwt.verify(token, JWT_SECRET);
+            const { name, phone, address, latitude, longitude } = req.body;
+
+            const { rows } = await pool.query(`
+                UPDATE "User"
+                SET name = COALESCE($2, name),
+                    phone = COALESCE($3, phone),
+                    address = COALESCE($4, address),
+                    latitude = COALESCE($5, latitude),
+                    longitude = COALESCE($6, longitude),
+                    "updatedAt" = NOW()
+                WHERE id = $1
+                RETURNING id, email, name, phone, address, latitude, longitude, role
+            `, [decoded.userId, name, phone, address, latitude, longitude]);
+
+            if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
+            return res.json({ success: true, user: rows[0] });
         }
 
         return res.status(501).json({ error: 'Action not implemented: ' + actionName });
