@@ -314,6 +314,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                 isOpen={isAuthModalOpen}
                 onOpenChange={setIsAuthModalOpen}
                 defaultView={authView}
+              />
 
               <button
                 onClick={() => navigate('/cart')}
