@@ -104,9 +104,6 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                     <Button variant="ghost" className="justify-start">
                       Account & Lists
                     </Button>
-                    <Button variant="ghost" className="justify-start">
-                      Returns & Orders
-                    </Button>
                     <SheetClose asChild>
                       <Button
                         variant="ghost"
@@ -317,9 +314,6 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                 isOpen={isAuthModalOpen}
                 onOpenChange={setIsAuthModalOpen}
                 defaultView={authView}
-              />
-
-              />
 
               <button
                 onClick={() => navigate('/cart')}
