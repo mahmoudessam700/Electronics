@@ -1,10 +1,32 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sendEmailVerificationEmail } from '../lib/mail';
 
-const prisma = new PrismaClient();
+// Lazy initialization of Prisma
+let prisma: PrismaClient | null = null;
+
+function getPrisma(): PrismaClient | null {
+    if (!prisma) {
+        try {
+            const connectionString = process.env.DATABASE_URL;
+            if (!connectionString) {
+                console.error('DATABASE_URL not set');
+                return null;
+            }
+            const pool = new Pool({ connectionString });
+            const adapter = new PrismaPg(pool);
+            prisma = new PrismaClient({ adapter });
+        } catch (e) {
+            console.error('Failed to initialize Prisma:', e);
+            return null;
+        }
+    }
+    return prisma;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Set CORS headers
@@ -18,6 +40,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const db = getPrisma();
+    if (!db) {
+        return res.status(500).json({ error: 'Database unavailable' });
     }
 
     try {
@@ -41,7 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         // Check if user exists
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await db.user.findUnique({
             where: { email },
         });
 
@@ -57,11 +84,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
         // Determine role
-        const isFirstUser = (await prisma.user.count()) === 0;
+        const isFirstUser = (await db.user.count()) === 0;
         const role = isFirstUser || email.includes('admin') ? 'ADMIN' : 'CUSTOMER';
 
         // Create user (not verified yet)
-        const user = await prisma.user.create({
+        const user = await db.user.create({
             data: {
                 email,
                 password: hashedPassword,

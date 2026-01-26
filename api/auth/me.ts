@@ -1,9 +1,32 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
+
+// Lazy initialization of Prisma
+let prisma: PrismaClient | null = null;
+
+function getPrisma(): PrismaClient | null {
+    if (!prisma) {
+        try {
+            const connectionString = process.env.DATABASE_URL;
+            if (!connectionString) {
+                console.error('DATABASE_URL not set');
+                return null;
+            }
+            const pool = new Pool({ connectionString });
+            const adapter = new PrismaPg(pool);
+            prisma = new PrismaClient({ adapter });
+        } catch (e) {
+            console.error('Failed to initialize Prisma:', e);
+            return null;
+        }
+    }
+    return prisma;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,6 +35,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
+    }
+
+    const db = getPrisma();
+    if (!db) {
+        return res.status(500).json({ error: 'Database unavailable' });
     }
 
     try {
@@ -24,7 +52,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const decoded = jwt.verify(token, JWT_SECRET) as any;
 
-        const user = await prisma.user.findUnique({
+        const user = await db.user.findUnique({
             where: { id: decoded.userId },
             select: {
                 id: true,
