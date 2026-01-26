@@ -74,7 +74,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
       {/* Main Content */}
       <div className="max-w-[1500px] mx-auto px-4 py-8 space-y-8">
 
-        {/* Premium Department Grid (Shows Categories & Subcategories) */}
+        {/* Premium Department Grid (Multi-Item Cards) */}
         {categories.length > 0 && (
           <section className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-2 border-b border-gray-200 pb-4">
@@ -88,51 +88,16 @@ export function HomePage({ onNavigate }: HomePageProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {categories.slice(0, 4).map((category) => (
-                <div
+              {categories.slice(0, 8).map((category) => (
+                <CategoryCard
                   key={category.id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col group hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-                >
-                  {/* Category Header with Image */}
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={category.image || 'https://via.placeholder.com/400?text=Category'}
-                      alt={category.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <div className="absolute bottom-4 left-4">
-                      <h3 className="text-xl font-bold text-white">{category.name}</h3>
-                    </div>
-                  </div>
-
-                  {/* Subcategories List */}
-                  <div className="p-5 flex-1 flex flex-col">
-                    <div className="space-y-3 mb-6">
-                      {category.children && category.children.length > 0 ? (
-                        category.children.slice(0, 5).map((sub) => (
-                          <button
-                            key={sub.id}
-                            onClick={() => onNavigate('search', undefined, sub.name)}
-                            className="flex items-center gap-2 text-sm text-[#565959] hover:text-[#0F1111] hover:translate-x-1 transition-all w-full text-left font-medium"
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#FFD814]"></span>
-                            {sub.name}
-                          </button>
-                        ))
-                      ) : (
-                        <p className="text-xs text-gray-400 italic">No subcategories yet</p>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={() => onNavigate('search', undefined, category.name)}
-                      className="mt-auto w-full py-2 px-4 rounded-lg bg-gray-50 text-[#007185] text-sm font-bold hover:bg-[#FFD814] hover:text-[#0F1111] border border-gray-200 hover:border-[#FFD814] transition-all"
-                    >
-                      Browse {category.name}
-                    </button>
-                  </div>
-                </div>
+                  title={category.name}
+                  image={category.image}
+                  link={`/search?category=${category.name}`}
+                  children={category.children}
+                  onClick={() => onNavigate('search', undefined, category.name)}
+                  onSubCategoryClick={(sub) => onNavigate('search', undefined, sub.name)}
+                />
               ))}
             </div>
           </section>
