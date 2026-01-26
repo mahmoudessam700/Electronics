@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse, Headphones, Keyboard, Cable, Grid3x3, HardDrive } from 'lucide-react';
+import { Search, ShoppingCart, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse, Headphones, Keyboard, Cable, Grid3x3, HardDrive, LogIn, UserPlus, User, Package, List, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -22,8 +22,16 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   const navigate = useNavigate();
   const [isHoverCardOpen, setIsHoverCardOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
 
   const handleSignInClick = () => {
+    setAuthView('signin');
+    setIsHoverCardOpen(false);
+    setIsAuthModalOpen(true);
+  };
+
+  const handleSignUpClick = () => {
+    setAuthView('signup');
     setIsHoverCardOpen(false);
     setIsAuthModalOpen(true);
   };
@@ -209,74 +217,97 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                     </button>
                   )}
                 </HoverCardTrigger>
-                <HoverCardContent className="w-80">
-                  <div className="flex flex-col gap-4">
-                    {user ? (
-                      <>
-                        <div className="p-2 bg-gray-50 rounded">
-                          <p className="font-bold">{user.name}</p>
-                          <p className="text-xs text-gray-500">{user.email}</p>
+                <HoverCardContent className="w-80 p-0 border-0 shadow-2xl rounded-xl overflow-hidden">
+                  <div className="flex flex-col bg-white">
+                    {/* Header/Greeting */}
+                    <div className="p-4 bg-gray-50 border-b">
+                      {user ? (
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-[#FFD814] flex items-center justify-center font-bold text-[#0F1111]">
+                            {user.name?.[0].toUpperCase() || user.email[0].toUpperCase()}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-[#0F1111]">{user.name}</span>
+                            <span className="text-xs text-gray-500 truncate max-w-[180px]">{user.email}</span>
+                          </div>
                         </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <Button
+                            className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] w-full h-10 shadow-sm font-bold flex items-center justify-center gap-2"
+                            onClick={handleSignInClick}
+                          >
+                            <LogIn className="h-4 w-4" />
+                            Sign in
+                          </Button>
+                          <div className="text-center">
+                            <p className="text-xs text-gray-500 mb-2">New customer?</p>
+                            <Button
+                              variant="outline"
+                              className="w-full h-10 border-gray-300 hover:bg-gray-50 text-[#0F1111] font-bold flex items-center justify-center gap-2 transition-all"
+                              onClick={handleSignUpClick}
+                            >
+                              <UserPlus className="h-4 w-4" />
+                              Create new account
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Navigation Links */}
+                    <div className="p-2 space-y-1">
+                      {user?.role === 'ADMIN' && (
                         <button
-                          className="text-sm font-bold hover:text-red-600 text-left px-2 py-1"
+                          className="flex items-center gap-3 w-full px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          onClick={() => {
+                            navigate('/admin');
+                            setIsHoverCardOpen(false);
+                          }}
+                        >
+                          <Settings className="h-4 w-4" />
+                          Admin Dashboard
+                        </button>
+                      )}
+
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 py-2">
+                        Your Account
+                      </div>
+
+                      {[
+                        { label: 'Your Account', icon: User, path: '/account' },
+                        { label: 'Your Orders', icon: Package, path: '/orders' },
+                        { label: 'Your Lists', icon: List, path: '/lists' }
+                      ].map((item) => (
+                        <button
+                          key={item.label}
+                          className="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors group"
+                          onClick={() => {
+                            navigate(item.path);
+                            setIsHoverCardOpen(false);
+                          }}
+                        >
+                          <item.icon className="h-4 w-4 text-gray-400 group-hover:text-[#0F1111]" />
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Footer */}
+                    {user && (
+                      <div className="p-2 border-t mt-1">
+                        <button
+                          className="flex items-center gap-3 w-full px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           onClick={() => {
                             logout();
                             setIsHoverCardOpen(false);
                           }}
                         >
+                          <LogIn className="h-4 w-4 rotate-180" />
                           Sign Out
                         </button>
-                      </>
-                    ) : (
-                      <Button
-                        className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] w-full"
-                        onClick={handleSignInClick}
-                      >
-                        Sign in
-                      </Button>
+                      </div>
                     )}
-
-                    {user?.role === 'ADMIN' && (
-                      <button
-                        className="text-sm font-bold text-blue-600 hover:underline text-left px-2 py-1"
-                        onClick={() => {
-                          navigate('/admin');
-                          setIsHoverCardOpen(false);
-                        }}
-                      >
-                        Admin Dashboard
-                      </button>
-                    )}
-
-                    <div className="border-t pt-2">
-                      <button
-                        className="text-sm font-bold hover:outline hover:outline-1 hover:outline-white px-2 py-1 w-full text-left"
-                        onClick={() => {
-                          navigate('/account');
-                          setIsHoverCardOpen(false);
-                        }}
-                      >
-                        Your Account
-                      </button>
-                      <button
-                        className="text-sm font-bold hover:outline hover:outline-1 hover:outline-white px-2 py-1 w-full text-left"
-                        onClick={() => {
-                          navigate('/orders');
-                          setIsHoverCardOpen(false);
-                        }}
-                      >
-                        Your Orders
-                      </button>
-                      <button
-                        className="text-sm font-bold hover:outline hover:outline-1 hover:outline-white px-2 py-1 w-full text-left"
-                        onClick={() => {
-                          navigate('/lists');
-                          setIsHoverCardOpen(false);
-                        }}
-                      >
-                        Your Lists
-                      </button>
-                    </div>
                   </div>
                 </HoverCardContent>
               </HoverCard>
@@ -285,7 +316,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
               <AuthModal
                 isOpen={isAuthModalOpen}
                 onOpenChange={setIsAuthModalOpen}
-                defaultView="signin"
+                defaultView={authView}
               />
 
               <button className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1" onClick={() => navigate('/orders')}>
