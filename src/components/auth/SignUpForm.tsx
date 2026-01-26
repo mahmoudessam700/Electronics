@@ -3,7 +3,6 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { AlertCircle, Loader2, Mail, MapPin } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface SignUpFormProps {
     onSuccess?: () => void;
@@ -137,35 +136,33 @@ export function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
                     )}
 
                     <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="name" className="text-sm font-medium text-[#0F1111]">
-                                    Full Name <span className="text-red-500">*</span>
-                                </Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    required
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="mt-1 h-10"
-                                    placeholder="John Doe"
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor="phone" className="text-sm font-medium text-[#0F1111]">
-                                    Phone <span className="text-red-500">*</span>
-                                </Label>
-                                <Input
-                                    id="phone"
-                                    type="tel"
-                                    required
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    className="mt-1 h-10"
-                                    placeholder="+20 123 456 7890"
-                                />
-                            </div>
+                        <div>
+                            <Label htmlFor="name" className="text-sm font-medium text-[#0F1111]">
+                                Full Name <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="name"
+                                type="text"
+                                required
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="mt-1 h-10"
+                                placeholder="John Doe"
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="phone" className="text-sm font-medium text-[#0F1111]">
+                                Phone <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="phone"
+                                type="tel"
+                                required
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                className="mt-1 h-10"
+                                placeholder="+20 123 456 7890"
+                            />
                         </div>
 
                         <div>
