@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle, Loader2, ArrowRight, Clock, Calendar, CreditCard, MapPin, RotateCcw } from 'lucide-react';
-import { Button } from './ui/button';
+import { Package, Truck, CheckCircle, Clock, Loader2, ArrowRight, Calendar, MapPin, RotateCcw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+
+type OrderTab = 'all' | 'in-progress' | 'delivered';
 
 interface OrderItem {
   id: string;
@@ -33,7 +34,7 @@ export function OrdersPage({ onNavigate }: OrdersPageProps) {
   const { token } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'processing' | 'delivered'>('all');
+  const [activeTab, setActiveTab] = useState<OrderTab>('all');
 
   useEffect(() => {
     if (token) {
@@ -62,178 +63,378 @@ export function OrdersPage({ onNavigate }: OrdersPageProps) {
   const getStatusConfig = (status: Order['status']) => {
     switch (status) {
       case 'DELIVERED':
-        return { icon: CheckCircle, color: 'text-emerald-500', bg: 'bg-emerald-50', border: 'border-emerald-100', label: 'Delivered' };
+        return { icon: CheckCircle, color: '#16a34a', bg: '#dcfce7', label: 'Delivered' };
       case 'SHIPPED':
-        return { icon: Truck, color: 'text-blue-500', bg: 'bg-blue-50', border: 'border-blue-100', label: 'Shipped' };
+        return { icon: Truck, color: '#2563eb', bg: '#dbeafe', label: 'Shipped' };
       case 'PROCESSING':
-        return { icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50', border: 'border-amber-100', label: 'Processing' };
+        return { icon: Clock, color: '#d97706', bg: '#fef3c7', label: 'Processing' };
       case 'CANCELLED':
-        return { icon: RotateCcw, color: 'text-red-500', bg: 'bg-red-50', border: 'border-red-100', label: 'Cancelled' };
+        return { icon: RotateCcw, color: '#dc2626', bg: '#fee2e2', label: 'Cancelled' };
       default:
-        return { icon: Package, color: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-100', label: 'Pending' };
+        return { icon: Package, color: '#6b7280', bg: '#f3f4f6', label: 'Pending' };
     }
   };
 
   const filteredOrders = orders.filter(order => {
     if (activeTab === 'all') return true;
-    if (activeTab === 'processing') return ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(order.status);
+    if (activeTab === 'in-progress') return ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(order.status);
     if (activeTab === 'delivered') return order.status === 'DELIVERED';
     return true;
   });
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full border-4 border-gray-100"></div>
-            <Loader2 className="h-16 w-16 animate-spin text-[#FFD814] absolute inset-0" />
-          </div>
-          <p className="text-gray-400 font-medium">Loading your orders...</p>
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <Loader2 style={{ width: 48, height: 48, color: '#ffffff', animation: 'spin 1s linear infinite' }} />
+          <p style={{ color: 'rgba(255,255,255,0.8)', marginTop: 16, fontWeight: 500 }}>Loading your orders...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-12">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-black text-[#0F1111] tracking-tight">Your Orders</h1>
-            <p className="text-gray-500 text-lg font-medium">Track, manage, and reorder with ease</p>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)', fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+      {/* Hero Section */}
+      <div style={{ position: 'relative', height: 256, overflow: 'hidden' }}>
+        {/* Gradient Overlay */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)',
+          zIndex: 10
+        }} />
+
+        {/* Background Image */}
+        <img
+          src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80"
+          alt="Shopping"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+
+        {/* Hero Content */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 20,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div style={{ textAlign: 'center', color: '#ffffff', padding: '0 16px' }}>
+            <h1 style={{ fontSize: 42, fontWeight: 700, margin: '0 0 12px', letterSpacing: '-0.02em' }}>
+              Your Orders
+            </h1>
+            <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.9)', margin: 0, fontWeight: 400 }}>
+              Track, manage, and reorder with ease
+            </p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100">
-              <Package className="h-5 w-5 text-[#FFD814]" />
-              <span className="font-black text-[#0F1111]">{orders.length}</span>
-              <span className="text-gray-400 font-medium">Total Orders</span>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ maxWidth: 1152, margin: '0 auto', padding: '0 24px 64px', marginTop: -32, position: 'relative', zIndex: 30 }}>
+        {/* Stats Card */}
+        <div style={{
+          backgroundColor: '#ffffff',
+          borderRadius: 16,
+          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)',
+          border: '1px solid #f3f4f6',
+          padding: 24,
+          marginBottom: 32,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+            <span style={{
+              fontSize: 40,
+              fontWeight: 700,
+              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              {orders.length}
+            </span>
+            <span style={{ fontSize: 18, color: '#6b7280' }}>Total Orders</span>
+          </div>
+          <div style={{
+            width: 56,
+            height: 56,
+            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+            borderRadius: 14,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Package style={{ width: 28, height: 28, color: '#ffffff' }} />
+          </div>
+        </div>
+
+        {/* Orders Card with Tabs */}
+        <div style={{
+          backgroundColor: '#ffffff',
+          borderRadius: 16,
+          boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)',
+          border: '1px solid #f3f4f6',
+          overflow: 'hidden'
+        }}>
+          {/* Tabs */}
+          <div style={{ borderBottom: '1px solid #e5e7eb' }}>
+            <div style={{ display: 'flex' }}>
+              {[
+                { key: 'all', label: 'All Orders' },
+                { key: 'in-progress', label: 'In Progress' },
+                { key: 'delivered', label: 'Delivered' }
+              ].map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key as OrderTab)}
+                  style={{
+                    flex: 1,
+                    padding: '16px 24px',
+                    border: 'none',
+                    background: activeTab === tab.key ? 'rgba(59, 130, 246, 0.05)' : 'transparent',
+                    color: activeTab === tab.key ? '#3b82f6' : '#6b7280',
+                    fontSize: 14,
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    position: 'relative',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {tab.label}
+                  {activeTab === tab.key && (
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: 2,
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'
+                    }} />
+                  )}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* Filter Tabs */}
-        <div className="flex gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-gray-100 w-fit">
-          {[
-            { key: 'all', label: 'All Orders' },
-            { key: 'processing', label: 'In Progress' },
-            { key: 'delivered', label: 'Delivered' }
-          ].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
-              className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === tab.key
-                  ? 'bg-[#0F1111] text-white shadow-lg'
-                  : 'text-gray-400 hover:text-[#0F1111] hover:bg-gray-50'
-                }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+          {/* Orders List or Empty State */}
+          {filteredOrders.length > 0 ? (
+            <div style={{ padding: 24 }}>
+              {filteredOrders.map((order, index) => {
+                const statusConfig = getStatusConfig(order.status);
+                const StatusIcon = statusConfig.icon;
 
-        {filteredOrders.length > 0 ? (
-          <div className="space-y-6">
-            {filteredOrders.map((order) => {
-              const statusConfig = getStatusConfig(order.status);
-              const StatusIcon = statusConfig.icon;
-
-              return (
-                <div
-                  key={order.id}
-                  className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden hover:shadow-[0_20px_50px_rgb(0,0,0,0.08)] transition-all duration-300 group"
-                >
-                  {/* Order Header */}
-                  <div className="bg-gradient-to-r from-gray-50 to-white px-8 py-6 border-b border-gray-100">
-                    <div className="flex flex-wrap items-center justify-between gap-4">
-                      <div className="flex items-center gap-6">
-                        <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${statusConfig.bg} ${statusConfig.border} border`}>
-                          <StatusIcon className={`h-4 w-4 ${statusConfig.color}`} />
-                          <span className={`font-black text-sm ${statusConfig.color}`}>{statusConfig.label}</span>
+                return (
+                  <div
+                    key={order.id}
+                    style={{
+                      backgroundColor: '#fafafa',
+                      border: '1px solid #f3f4f6',
+                      borderRadius: 16,
+                      padding: 24,
+                      marginBottom: index < filteredOrders.length - 1 ? 16 : 0,
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {/* Order Header */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        {/* Status Badge */}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          padding: '6px 14px',
+                          backgroundColor: statusConfig.bg,
+                          borderRadius: 999,
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: statusConfig.color
+                        }}>
+                          <StatusIcon style={{ width: 14, height: 14 }} />
+                          {statusConfig.label}
                         </div>
-                        <div className="hidden md:flex items-center gap-2 text-gray-400">
-                          <Calendar className="h-4 w-4" />
-                          <span className="font-medium text-sm">{new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+
+                        {/* Order Date */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#9ca3af', fontSize: 13 }}>
+                          <Calendar style={{ width: 14, height: 14 }} />
+                          {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </div>
                       </div>
-                      <div className="flex items-center gap-6">
-                        <div className="text-right">
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Order</p>
-                          <p className="font-mono font-bold text-[#0F1111]">#{order.orderNumber}</p>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Order</div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: '#18181b', fontFamily: 'monospace' }}>#{order.orderNumber}</div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</p>
-                          <p className="font-black text-xl text-[#0F1111]">E£{order.totalAmount.toLocaleString()}</p>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total</div>
+                          <div style={{ fontSize: 18, fontWeight: 700, color: '#18181b' }}>E£{order.totalAmount.toLocaleString()}</div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Order Items */}
-                  <div className="p-8">
-                    <div className="space-y-6">
-                      {order.items?.map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-6 group/item">
-                          <div className="w-24 h-24 bg-gray-50 rounded-2xl p-3 flex-shrink-0 border border-gray-100 group-hover/item:scale-105 transition-transform">
+                    {/* Order Items */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      {order.items?.slice(0, 3).map((item, idx) => (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                          {/* Product Image */}
+                          <div style={{
+                            width: 72,
+                            height: 72,
+                            backgroundColor: '#ffffff',
+                            borderRadius: 12,
+                            padding: 8,
+                            border: '1px solid #f3f4f6',
+                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
                             {item.product && (
                               <img
                                 src={item.product.image}
                                 alt={item.product.name}
-                                className="w-full h-full object-contain"
+                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                               />
                             )}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-[#0F1111] line-clamp-1 text-lg group-hover/item:text-[#007185] transition-colors cursor-pointer">
-                              {item.product?.name || 'Product Details'}
-                            </h3>
-                            <div className="flex items-center gap-4 mt-2">
-                              <span className="text-sm text-gray-400 font-medium">Qty: {item.quantity}</span>
-                              <span className="text-sm font-black text-[#0F1111]">E£{item.price.toLocaleString()}</span>
+
+                          {/* Product Info */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <h4 style={{
+                              fontSize: 14,
+                              fontWeight: 500,
+                              color: '#18181b',
+                              margin: '0 0 4px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {item.product?.name || 'Product'}
+                            </h4>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                              <span style={{ fontSize: 13, color: '#9ca3af' }}>Qty: {item.quantity}</span>
+                              <span style={{ fontSize: 14, fontWeight: 600, color: '#18181b' }}>E£{item.price.toLocaleString()}</span>
                             </div>
                           </div>
-                          <Button
-                            className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-bold h-12 px-6 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+
+                          {/* Buy Again Button */}
+                          <button
                             onClick={() => onNavigate('search')}
+                            style={{
+                              padding: '8px 18px',
+                              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: 10,
+                              fontSize: 13,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              flexShrink: 0
+                            }}
                           >
                             Buy Again
-                          </Button>
+                          </button>
                         </div>
                       ))}
+
+                      {order.items?.length > 3 && (
+                        <p style={{ fontSize: 13, color: '#9ca3af', margin: 0 }}>
+                          +{order.items.length - 3} more items
+                        </p>
+                      )}
                     </div>
 
-                    {/* Order Footer */}
+                    {/* Shipping Address */}
                     {order.shippingAddress && (
-                      <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-3 text-gray-400">
-                        <MapPin className="h-4 w-4" />
-                        <span className="text-sm font-medium line-clamp-1">{order.shippingAddress}</span>
+                      <div style={{
+                        marginTop: 20,
+                        paddingTop: 16,
+                        borderTop: '1px solid #e5e7eb',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        color: '#9ca3af',
+                        fontSize: 13
+                      }}>
+                        <MapPin style={{ width: 14, height: 14, flexShrink: 0 }} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {order.shippingAddress}
+                        </span>
                       </div>
                     )}
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="bg-white rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-16 md:p-24 text-center">
-            <div className="w-28 h-28 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-              <Package className="h-12 w-12 text-gray-300" />
+                );
+              })}
             </div>
-            <h2 className="text-3xl font-black text-[#0F1111] mb-4">No orders yet</h2>
-            <p className="text-gray-400 max-w-sm mx-auto font-medium mb-10">
-              When you place your first order, it will appear here for easy tracking and reordering.
-            </p>
-            <Button
-              className="bg-[#0F1111] hover:bg-[#2D3748] text-white h-14 px-12 rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-3 mx-auto"
-              onClick={() => onNavigate('home')}
-            >
-              Start Shopping
-              <ArrowRight className="h-5 w-5" />
-            </Button>
-          </div>
-        )}
+          ) : (
+            /* Empty State */
+            <div style={{ padding: '64px 24px', textAlign: 'center' }}>
+              <div style={{
+                width: 80,
+                height: 80,
+                background: 'linear-gradient(135deg, #dbeafe 0%, #e9d5ff 100%)',
+                borderRadius: 16,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px'
+              }}>
+                <Package style={{ width: 40, height: 40, color: '#3b82f6' }} />
+              </div>
+
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: '#18181b', margin: '0 0 12px' }}>
+                No orders yet
+              </h2>
+              <p style={{ fontSize: 16, color: '#6b7280', margin: '0 0 32px', maxWidth: 400, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+                When you place your first order, it will appear here for easy tracking and reordering.
+              </p>
+
+              <button
+                onClick={() => onNavigate('home')}
+                style={{
+                  padding: '14px 32px',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: 14,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.4)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  transition: 'all 0.2s'
+                }}
+              >
+                Start Shopping
+                <ArrowRight style={{ width: 18, height: 18 }} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* CSS for animations */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
