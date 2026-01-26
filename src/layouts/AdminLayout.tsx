@@ -1,6 +1,6 @@
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate, Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
 export function AdminLayout() {
@@ -19,6 +19,7 @@ export function AdminLayout() {
         { name: 'Overview', path: '/admin', icon: LayoutDashboard },
         { name: 'Categories', path: '/admin/categories', icon: Folder },
         { name: 'Products', path: '/admin/products', icon: Package },
+        { name: 'Suppliers', path: '/admin/suppliers', icon: Building2 },
         { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
         { name: 'Files', path: '/admin/files', icon: FolderOpen },
     ];

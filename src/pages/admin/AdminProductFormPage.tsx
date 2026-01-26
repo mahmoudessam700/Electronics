@@ -13,6 +13,11 @@ interface Category {
     children?: Category[];
 }
 
+interface Supplier {
+    id: string;
+    name: string;
+}
+
 export function AdminProductFormPage() {
     const { id } = useParams();
     const isEditing = !!id;
@@ -21,6 +26,7 @@ export function AdminProductFormPage() {
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 
     // Form fields
     const [name, setName] = useState('');
@@ -29,11 +35,13 @@ export function AdminProductFormPage() {
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
     const [categoryId, setCategoryId] = useState('');
+    const [supplierId, setSupplierId] = useState('');
     const [image, setImage] = useState('');
     const [inStock, setInStock] = useState(true);
 
     useEffect(() => {
         fetchCategories();
+        fetchSuppliers();
         if (isEditing) {
             fetchProduct(id);
         }
@@ -49,6 +57,18 @@ export function AdminProductFormPage() {
         }
     };
 
+    const fetchSuppliers = async () => {
+        try {
+            const res = await fetch('/api/suppliers');
+            const data = await res.json();
+            if (res.ok) {
+                setSuppliers(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch suppliers', error);
+        }
+    };
+
     const fetchProduct = async (productId: string) => {
         try {
             const res = await fetch(`/api/products?id=${productId}`);
@@ -60,6 +80,7 @@ export function AdminProductFormPage() {
                 setDescription(data.description || '');
                 setCategory(data.category || '');
                 setCategoryId(data.categoryId || '');
+                setSupplierId(data.supplierId || '');
                 setImage(data.image);
                 setInStock(data.inStock);
             }
@@ -121,6 +142,7 @@ export function AdminProductFormPage() {
             description,
             category,
             categoryId: categoryId || null,
+            supplierId: supplierId || null,
             image,
             inStock,
         };
@@ -215,26 +237,45 @@ export function AdminProductFormPage() {
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="categoryId">Category</Label>
-                    <select
-                        id="categoryId"
-                        value={categoryId}
-                        onChange={(e) => {
-                            setCategoryId(e.target.value);
-                            // Also set the category name for backwards compatibility
-                            const selected = flatCategories.find(c => c.id === e.target.value);
-                            setCategory(selected?.name.trim() || '');
-                        }}
-                        className="w-full h-10 px-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="">Select a category</option>
-                        {flatCategories.map((cat) => (
-                            <option key={cat.id} value={cat.id}>
-                                {cat.name}
-                            </option>
-                        ))}
-                    </select>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="categoryId">Category</Label>
+                        <select
+                            id="categoryId"
+                            value={categoryId}
+                            onChange={(e) => {
+                                setCategoryId(e.target.value);
+                                // Also set the category name for backwards compatibility
+                                const selected = flatCategories.find(c => c.id === e.target.value);
+                                setCategory(selected?.name.trim() || '');
+                            }}
+                            className="w-full h-10 px-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">Select a category</option>
+                            {flatCategories.map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="supplierId">Supplier</Label>
+                        <select
+                            id="supplierId"
+                            value={supplierId}
+                            onChange={(e) => setSupplierId(e.target.value)}
+                            className="w-full h-10 px-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        >
+                            <option value="">Select a supplier</option>
+                            {suppliers.map((sup) => (
+                                <option key={sup.id} value={sup.id}>
+                                    {sup.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 <div className="space-y-2">

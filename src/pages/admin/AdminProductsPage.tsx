@@ -12,6 +12,8 @@ interface Product {
     parentCategoryName?: string;
     image: string;
     inStock: boolean;
+    supplierName?: string;
+    supplierId?: string;
 }
 
 export function AdminProductsPage() {
@@ -71,6 +73,7 @@ export function AdminProductsPage() {
                             <th className="p-4 font-medium text-gray-500">Image</th>
                             <th className="p-4 font-medium text-gray-500">Name</th>
                             <th className="p-4 font-medium text-gray-500">Category</th>
+                            <th className="p-4 font-medium text-gray-500">Supplier</th>
                             <th className="p-4 font-medium text-gray-500">Price</th>
                             <th className="p-4 font-medium text-gray-500">Status</th>
                             <th className="p-4 font-medium text-right text-gray-500">Actions</th>
@@ -93,6 +96,11 @@ export function AdminProductsPage() {
                                     ) : (
                                         product.subcategoryName || product.category || '-'
                                     )}
+                                </td>
+                                <td className="p-4">
+                                    <span className="text-gray-600">
+                                        {product.supplierName || '-'}
+                                    </span>
                                 </td>
                                 <td className="p-4">E£{product.price.toFixed(2)}</td>
                                 <td className="p-4">

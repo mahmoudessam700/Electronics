@@ -22,10 +22,12 @@ module.exports = async (req, res) => {
                 const { rows } = await pool.query(`
                     SELECT p.*, 
                            c.name as "subcategoryName",
-                           cp.name as "parentCategoryName"
+                           cp.name as "parentCategoryName",
+                           s.name as "supplierName"
                     FROM "Product" p 
                     LEFT JOIN "Category" c ON p."categoryId" = c.id 
                     LEFT JOIN "Category" cp ON c."parentId" = cp.id
+                    LEFT JOIN "Supplier" s ON p."supplierId" = s.id
                     WHERE p.id = $1
                 `, [id]);
 
@@ -37,10 +39,12 @@ module.exports = async (req, res) => {
             let query = `
                 SELECT p.*, 
                        c.name as "subcategoryName",
-                       cp.name as "parentCategoryName"
+                       cp.name as "parentCategoryName",
+                       s.name as "supplierName"
                 FROM "Product" p 
                 LEFT JOIN "Category" c ON p."categoryId" = c.id 
                 LEFT JOIN "Category" cp ON c."parentId" = cp.id
+                LEFT JOIN "Supplier" s ON p."supplierId" = s.id
             `;
             const params = [];
             const conditions = [];
@@ -64,15 +68,15 @@ module.exports = async (req, res) => {
         }
 
         if (req.method === 'POST') {
-            const { name, price, originalPrice, description, category, categoryId, image, inStock } = req.body;
+            const { name, price, originalPrice, description, category, categoryId, supplierId, image, inStock } = req.body;
 
             if (!name || price === undefined || !image) {
                 return res.status(400).json({ error: 'Name, price, and image are required' });
             }
 
             const { rows } = await pool.query(`
-                INSERT INTO "Product" (id, name, price, "originalPrice", description, category, "categoryId", image, "inStock", "updatedAt")
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+                INSERT INTO "Product" (id, name, price, "originalPrice", description, category, "categoryId", "supplierId", image, "inStock", "updatedAt")
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
                 RETURNING *
             `, [
                 `prod_${Date.now()}`,
@@ -82,6 +86,7 @@ module.exports = async (req, res) => {
                 description || null,
                 category || null,
                 categoryId || null,
+                supplierId || null,
                 image,
                 inStock ?? true
             ]);
@@ -91,7 +96,7 @@ module.exports = async (req, res) => {
 
         if (req.method === 'PUT') {
             const { id } = req.query;
-            const { name, price, originalPrice, description, category, categoryId, image, inStock } = req.body;
+            const { name, price, originalPrice, description, category, categoryId, supplierId, image, inStock } = req.body;
 
             if (!id) return res.status(400).json({ error: 'Product ID is required' });
 
@@ -103,12 +108,13 @@ module.exports = async (req, res) => {
                     description = COALESCE($5, description),
                     category = COALESCE($6, category),
                     "categoryId" = COALESCE($7, "categoryId"),
-                    image = COALESCE($8, image),
-                    "inStock" = COALESCE($9, "inStock"),
+                    "supplierId" = COALESCE($8, "supplierId"),
+                    image = COALESCE($9, image),
+                    "inStock" = COALESCE($10, "inStock"),
                     "updatedAt" = NOW()
                 WHERE id = $1
                 RETURNING *
-            `, [id, name, price, originalPrice, description, category, categoryId, image, inStock]);
+            `, [id, name, price, originalPrice, description, category, categoryId, supplierId, image, inStock]);
 
             if (rows.length === 0) return res.status(404).json({ error: 'Product not found' });
             return res.json(rows[0]);

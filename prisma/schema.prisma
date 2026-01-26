@@ -38,6 +38,8 @@ model Product {
   category      String?     // Keep for backwards compatibility
   categoryId    String?
   categoryRef   Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  supplierId    String?
+  supplier      Supplier?    @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   description   String?
   inStock       Boolean     @default(true)
   createdAt     DateTime    @default(now())
@@ -46,6 +48,7 @@ model Product {
 
   @@index([category])
   @@index([categoryId])
+  @@index([supplierId])
 }
 
 model Order {
@@ -100,6 +103,18 @@ model User {
   
   resetPasswordToken   String? @unique
   resetPasswordExpires DateTime?
+}
+
+model Supplier {
+  id        String    @id @default(cuid())
+  name      String
+  contact   String?
+  email     String?
+  phone     String?
+  address   String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 enum Role {

@@ -22,11 +22,11 @@ import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
 import { AdminProductFormPage } from './pages/admin/AdminProductFormPage';
 import { AdminFilesPage } from './pages/admin/AdminFilesPage';
 import { AdminCategoriesPage } from './pages/admin/AdminCategoriesPage';
+import { AdminSuppliersPage } from './pages/admin/AdminSuppliersPage';
 import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
-import { allProducts as products } from './data/products';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -167,14 +167,14 @@ function AppContent() {
             cartItems={cartItems}
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}
-            onNavigate={handleNavigate}
+            onContinueShopping={() => handleNavigate('home')}
+            onProceedToCheckout={() => handleNavigate('checkout')}
           />
         } />
         <Route path="/checkout" element={
           <CheckoutPage
             cartItems={cartItems}
             onPlaceOrder={handlePlaceOrder}
-            onNavigate={handleNavigate}
           />
         } />
 
@@ -185,6 +185,7 @@ function AppContent() {
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="products/new" element={<AdminProductFormPage />} />
           <Route path="products/:id" element={<AdminProductFormPage />} />
+          <Route path="suppliers" element={<AdminSuppliersPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="files" element={<AdminFilesPage />} />
         </Route>
