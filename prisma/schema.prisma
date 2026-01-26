@@ -97,6 +97,7 @@ model User {
   name      String?
   phone     String?
   address   String?
+  image     String?
   latitude  Float?
   longitude Float?
   role      Role     @default(CUSTOMER)

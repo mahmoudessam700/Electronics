@@ -319,10 +319,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                 defaultView={authView}
               />
 
-              <button className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1" onClick={() => navigate('/orders')}>
-                <span className="text-xs">Returns</span>
-                <span className="text-sm font-bold">& Orders</span>
-              </button>
+              />
 
               <button
                 onClick={() => navigate('/cart')}
