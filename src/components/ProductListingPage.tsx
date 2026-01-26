@@ -40,8 +40,13 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
           category: selectedCategory || undefined,
         });
         setProducts(data as Product[]);
-      } catch (err) {
-        setError('Failed to load products. Please try again.');
+      } catch (err: unknown) {
+        // Check if it's a network error or server error
+        if (err instanceof Error && err.message.includes('fetch')) {
+          setError('Unable to connect to the server. Please check your connection.');
+        } else {
+          setError('Failed to load products. Please try again.');
+        }
         console.error('Error fetching products:', err);
       } finally {
         setLoading(false);
@@ -267,7 +272,13 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
               </div>
             ) : filteredByCategory.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-[#565959]">No products found.</p>
+                <div className="text-6xl mb-4">📦</div>
+                <h3 className="text-xl font-medium text-[#0F1111] mb-2">No products available</h3>
+                <p className="text-[#565959]">
+                  {products.length === 0
+                    ? "There are no products in this category yet. Check back later!"
+                    : "No products match your current filters. Try adjusting your filters."}
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
