@@ -48,7 +48,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         return res.status(405).json({ error: 'Method not allowed' });
     } catch (error) {
-        console.error(error);
+        console.error('API Error:', error);
+        // For GET requests, return empty array instead of error (graceful degradation)
+        if (req.method === 'GET' && !req.query.id) {
+            return res.json([]);
+        }
         res.status(500).json({ error: 'Internal server error' });
     }
 }
+

@@ -41,13 +41,9 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
         });
         setProducts(data as Product[]);
       } catch (err: unknown) {
-        // Check if it's a network error or server error
-        if (err instanceof Error && err.message.includes('fetch')) {
-          setError('Unable to connect to the server. Please check your connection.');
-        } else {
-          setError('Failed to load products. Please try again.');
-        }
         console.error('Error fetching products:', err);
+        // Show a generic error message for any failure
+        setError('Unable to load products right now. Please try again later.');
       } finally {
         setLoading(false);
       }
