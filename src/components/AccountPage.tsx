@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, MapPin, Mail, Phone, Shield, Package, List, ChevronRight, Camera, Loader2, Save } from 'lucide-react';
+import { User, MapPin, Mail, Phone, Shield, Package, List, ChevronRight, Camera, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AccountPageProps {
@@ -12,7 +12,6 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
-    const [locationDetected, setLocationDetected] = useState(false);
     const [detecting, setDetecting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,9 +38,6 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                 latitude: (user as any).latitude || null,
                 longitude: (user as any).longitude || null,
             });
-            if ((user as any).latitude && (user as any).longitude) {
-                setLocationDetected(true);
-            }
             setLoading(false);
         }
     }, [user]);
@@ -65,7 +61,6 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                 const data = await res.json();
                 if (data.display_name) {
                     setFormData(prev => ({ ...prev, address: data.display_name }));
-                    setLocationDetected(true);
                 }
             } catch (err) {
                 console.error('Reverse geocoding failed', err);
@@ -145,151 +140,146 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <h1 className="text-3xl font-semibold text-gray-900">Your Account</h1>
-                    <p className="text-gray-600 mt-1">Control your profile, security, and preferences</p>
+            <div className="bg-white border-b border-gray-100">
+                <div className="max-w-6xl mx-auto px-6 py-6">
+                    <h1 className="text-2xl font-bold text-gray-900">Your Account</h1>
+                    <p className="text-gray-500 text-sm mt-1">Control your profile, security, and preferences</p>
 
                     {/* Navigation Tabs */}
-                    <div className="flex gap-6 mt-6 border-b border-gray-200">
+                    <div className="flex gap-8 mt-6">
                         <button
                             onClick={() => onNavigate('orders')}
-                            className="pb-3 px-1 border-b-2 border-transparent text-gray-600 hover:text-gray-900 flex items-center"
+                            className="pb-3 text-gray-500 hover:text-gray-900 flex items-center gap-2 text-sm font-medium"
                         >
-                            <Package className="inline-block w-5 h-5 mr-2" />
+                            <Package className="w-4 h-4" />
                             Orders
                         </button>
                         <button
                             onClick={() => onNavigate('lists')}
-                            className="pb-3 px-1 border-b-2 border-transparent text-gray-600 hover:text-gray-900 flex items-center"
+                            className="pb-3 text-gray-500 hover:text-gray-900 flex items-center gap-2 text-sm font-medium"
                         >
-                            <List className="inline-block w-5 h-5 mr-2" />
+                            <List className="w-4 h-4" />
                             Lists
                         </button>
-                        <button className="pb-3 px-1 border-b-2 border-gray-700 text-gray-700 font-medium flex items-center">
-                            <User className="inline-block w-5 h-5 mr-2" />
-                            Account
+                        <button className="pb-3 text-gray-900 font-medium text-sm">
+                            A
                         </button>
                     </div>
                 </div>
             </div>
 
             {/* User Info Bar */}
-            <div className="bg-gray-700 text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="bg-[#3D4F5F] text-white">
+                <div className="max-w-6xl mx-auto px-6 py-4">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
                             {formData.image ? (
                                 <img src={formData.image} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
-                                <User className="w-6 h-6" />
+                                <User className="w-5 h-5" />
                             )}
                         </div>
                         <div>
-                            <div className="font-semibold">{formData.name || 'User'}</div>
-                            <div className="text-sm text-gray-300">{formData.email}</div>
+                            <div className="font-medium text-sm">{formData.name || 'User'}</div>
+                            <div className="text-xs text-gray-300">{formData.email}</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="max-w-6xl mx-auto px-6 py-8">
+                <div className="flex gap-8">
                     {/* Sidebar */}
-                    <div className="lg:col-span-1">
-                        <nav className="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div className="w-64 flex-shrink-0">
+                        <nav className="bg-white rounded-lg overflow-hidden border border-gray-100">
                             <button
                                 onClick={() => setActiveTab('personal')}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors ${activeTab === 'personal' ? 'bg-gray-100 text-gray-800 border-l-4 border-gray-700' : 'text-gray-700'
+                                className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors ${activeTab === 'personal' ? 'bg-gray-50 border-l-2 border-[#3D4F5F]' : 'hover:bg-gray-50'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <User className="w-5 h-5" />
-                                    <span className="font-medium">Personal Data</span>
+                                    <User className="w-4 h-4 text-gray-500" />
+                                    <span className="text-sm text-gray-700">Personal Data</span>
                                 </div>
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-4 h-4 text-gray-400" />
                             </button>
 
                             <button
                                 onClick={() => setActiveTab('security')}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors border-t border-gray-100 ${activeTab === 'security' ? 'bg-gray-100 text-gray-800 border-l-4 border-gray-700' : 'text-gray-700'
+                                className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors border-t border-gray-100 ${activeTab === 'security' ? 'bg-gray-50 border-l-2 border-[#3D4F5F]' : 'hover:bg-gray-50'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <Shield className="w-5 h-5" />
-                                    <span className="font-medium">Security</span>
+                                    <Shield className="w-4 h-4 text-gray-500" />
+                                    <span className="text-sm text-gray-700">Security</span>
                                 </div>
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-4 h-4 text-gray-400" />
                             </button>
 
                             <button
                                 onClick={() => setActiveTab('addresses')}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors border-t border-gray-100 ${activeTab === 'addresses' ? 'bg-gray-100 text-gray-800 border-l-4 border-gray-700' : 'text-gray-700'
+                                className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors border-t border-gray-100 ${activeTab === 'addresses' ? 'bg-gray-50 border-l-2 border-[#3D4F5F]' : 'hover:bg-gray-50'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <MapPin className="w-5 h-5" />
-                                    <span className="font-medium">My Addresses</span>
+                                    <MapPin className="w-4 h-4 text-gray-500" />
+                                    <span className="text-sm text-gray-700">My Addresses</span>
                                 </div>
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-4 h-4 text-gray-400" />
                             </button>
 
                             <button
                                 onClick={() => setActiveTab('professional')}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors border-t border-gray-100 ${activeTab === 'professional' ? 'bg-gray-100 text-gray-800 border-l-4 border-gray-700' : 'text-gray-700'
+                                className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors border-t border-gray-100 ${activeTab === 'professional' ? 'bg-gray-50 border-l-2 border-[#3D4F5F]' : 'hover:bg-gray-50'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <User className="w-5 h-5" />
-                                    <span className="font-medium">Professional Profile</span>
+                                    <User className="w-4 h-4 text-gray-500" />
+                                    <span className="text-sm text-gray-700">Professional Profile</span>
                                 </div>
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-4 h-4 text-gray-400" />
                             </button>
                         </nav>
                     </div>
 
                     {/* Main Content Area */}
-                    <div className="lg:col-span-3 space-y-6">
+                    <div className="flex-1 space-y-6">
                         {/* Profile Completion */}
-                        <div className="bg-gradient-to-r from-gray-600 to-gray-700 rounded-lg shadow-sm p-6 text-white">
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                    <h3 className="font-semibold text-lg mb-2">Complete Your Profile</h3>
-                                    <p className="text-gray-200 text-sm mb-4">
-                                        Completing your profile items unlocks premium discounts and faster checkout experiences.
-                                    </p>
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-1 bg-white/20 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-white h-full rounded-full" style={{ width: '65%' }}></div>
-                                        </div>
-                                        <span className="font-semibold text-lg">65%</span>
-                                    </div>
-                                    <p className="text-sm text-gray-200 mt-2">Completed</p>
+                        <div className="bg-[#3D4F5F] rounded-lg p-6 text-white">
+                            <h3 className="font-semibold mb-2">Complete Your Profile</h3>
+                            <p className="text-gray-300 text-sm mb-4">
+                                Completing your profile items unlocks premium discounts and faster checkout experiences.
+                            </p>
+                            <div className="flex items-center gap-4">
+                                <div className="flex-1 bg-white/20 rounded-full h-1.5 overflow-hidden">
+                                    <div className="bg-white h-full rounded-full" style={{ width: '65%' }}></div>
                                 </div>
+                                <span className="text-sm font-medium">65%</span>
                             </div>
+                            <p className="text-xs text-gray-300 mt-2">Completed</p>
                         </div>
 
                         {/* Message Alert */}
                         {message && (
-                            <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'
+                            <div className={`p-4 rounded-lg text-sm ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'
                                 }`}>
                                 {message.text}
                             </div>
                         )}
 
                         {/* Profile Details */}
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            <div className="border-b border-gray-200 pb-4 mb-6">
-                                <h2 className="text-xl font-semibold text-gray-900">Profile Details</h2>
-                                <p className="text-gray-600 text-sm mt-1">Update your public information and avatar</p>
+                        <div className="bg-white rounded-lg border border-gray-100 p-6">
+                            <div className="border-b border-gray-100 pb-4 mb-6">
+                                <h2 className="text-lg font-semibold text-gray-900">Profile Details</h2>
+                                <p className="text-gray-500 text-sm mt-1">Update your public information and avatar</p>
                             </div>
 
                             <div className="space-y-6">
                                 {/* Avatar Upload */}
                                 <div className="flex flex-col items-center mb-8">
                                     <div className="relative">
-                                        <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
+                                        <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
                                             {formData.image ? (
                                                 <img
                                                     src={formData.image}
@@ -297,21 +287,19 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-gray-300">
-                                                    <User className="w-16 h-16 text-gray-500" />
-                                                </div>
+                                                <User className="w-12 h-12 text-gray-400" />
                                             )}
                                             {uploading && (
-                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                                    <Loader2 className="h-8 w-8 animate-spin text-white" />
+                                                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                                                    <Loader2 className="h-6 w-6 animate-spin text-white" />
                                                 </div>
                                             )}
                                         </div>
                                         <label
                                             htmlFor="avatar-upload"
-                                            className="absolute bottom-0 right-0 w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors shadow-lg border-2 border-white"
+                                            className="absolute bottom-0 right-0 w-8 h-8 bg-[#3D4F5F] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#2D3F4F] transition-colors border-2 border-white"
                                         >
-                                            <Camera className="w-5 h-5 text-white" />
+                                            <Camera className="w-4 h-4 text-white" />
                                             <input
                                                 id="avatar-upload"
                                                 type="file"
@@ -322,7 +310,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                             />
                                         </label>
                                     </div>
-                                    <p className="text-sm text-gray-500 mt-3">Click the camera icon to upload your avatar</p>
+                                    <p className="text-xs text-gray-400 mt-3">Click the camera icon to upload your avatar</p>
                                 </div>
 
                                 {/* Full Name */}
@@ -334,7 +322,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 outline-none"
+                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3D4F5F] focus:border-[#3D4F5F] outline-none text-sm"
                                         placeholder="Enter your full name"
                                     />
                                 </div>
@@ -344,13 +332,13 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Account Email
                                     </label>
-                                    <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
-                                        <Mail className="w-5 h-5 text-gray-400" />
+                                    <div className="flex items-center gap-3 px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50">
+                                        <Mail className="w-4 h-4 text-gray-400" />
                                         <input
                                             type="email"
                                             value={formData.email}
                                             disabled
-                                            className="flex-1 bg-transparent outline-none text-gray-600"
+                                            className="flex-1 bg-transparent outline-none text-gray-500 text-sm"
                                         />
                                     </div>
                                 </div>
@@ -360,13 +348,13 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Phone Connectivity
                                     </label>
-                                    <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-gray-500">
-                                        <Phone className="w-5 h-5 text-gray-400" />
+                                    <div className="flex items-center gap-3 px-4 py-2.5 border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-[#3D4F5F] focus-within:border-[#3D4F5F]">
+                                        <Phone className="w-4 h-4 text-gray-400" />
                                         <input
                                             type="tel"
                                             value={formData.phone}
                                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            className="flex-1 outline-none"
+                                            className="flex-1 outline-none text-sm"
                                             placeholder="+20 123 456 7890"
                                         />
                                     </div>
@@ -378,31 +366,29 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                         Delivery Location
                                     </label>
                                     <div className="space-y-3">
-                                        <div className="flex gap-3">
-                                            <button
-                                                onClick={handleDetectLocation}
-                                                disabled={detecting}
-                                                className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2 font-medium disabled:opacity-50"
-                                            >
-                                                {detecting ? (
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                ) : (
-                                                    <MapPin className="w-4 h-4" />
-                                                )}
-                                                Auto-Detect Address
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={handleDetectLocation}
+                                            disabled={detecting}
+                                            className="px-4 py-2.5 bg-[#3D4F5F] text-white rounded-lg hover:bg-[#2D3F4F] transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
+                                        >
+                                            {detecting ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <MapPin className="w-4 h-4" />
+                                            )}
+                                            Auto-Detect Address
+                                        </button>
 
                                         <textarea
                                             value={formData.address}
                                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 outline-none resize-none"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3D4F5F] focus:border-[#3D4F5F] outline-none resize-none text-sm"
                                             rows={3}
                                             placeholder="Detect your address using the button..."
                                         />
 
                                         {/* Map */}
-                                        <div className="bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 h-64 flex flex-col items-center justify-center overflow-hidden">
+                                        <div className="rounded-lg border-2 border-dashed border-gray-200 h-48 flex flex-col items-center justify-center overflow-hidden bg-gray-50">
                                             {formData.latitude && formData.longitude ? (
                                                 <iframe
                                                     width="100%"
@@ -414,29 +400,25 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                                 />
                                             ) : (
                                                 <div className="text-center">
-                                                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
-                                                        <MapPin className="w-8 h-8 text-gray-400" />
+                                                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                                        <MapPin className="w-5 h-5 text-gray-400" />
                                                     </div>
-                                                    <p className="text-gray-500 font-medium">Map Unavailable</p>
-                                                    <p className="text-sm text-gray-400 mt-1">Click detect location to see your address on the map</p>
+                                                    <p className="text-gray-500 text-sm font-medium">Map Unavailable</p>
+                                                    <p className="text-xs text-gray-400 mt-1">Click detect location to see your address on the map</p>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Action Buttons */}
-                                <div className="flex gap-3 pt-4">
+                                {/* Save Button */}
+                                <div className="pt-2">
                                     <button
                                         onClick={handleSave}
                                         disabled={saving}
-                                        className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium flex items-center gap-2 disabled:opacity-50"
+                                        className="px-6 py-2.5 bg-[#3D4F5F] text-white rounded-lg hover:bg-[#2D3F4F] transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50"
                                     >
-                                        {saving ? (
-                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                        ) : (
-                                            <Save className="w-4 h-4" />
-                                        )}
+                                        {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                                         Save Account Details
                                     </button>
                                 </div>
