@@ -20,9 +20,12 @@ module.exports = async (req, res) => {
             // Detail view
             if (id) {
                 const { rows } = await pool.query(`
-                    SELECT p.*, c.name as "categoryName" 
+                    SELECT p.*, 
+                           c.name as "subcategoryName",
+                           cp.name as "parentCategoryName"
                     FROM "Product" p 
                     LEFT JOIN "Category" c ON p."categoryId" = c.id 
+                    LEFT JOIN "Category" cp ON c."parentId" = cp.id
                     WHERE p.id = $1
                 `, [id]);
 
@@ -31,7 +34,14 @@ module.exports = async (req, res) => {
             }
 
             // List view with filters
-            let query = 'SELECT p.*, c.name as "categoryName" FROM "Product" p LEFT JOIN "Category" c ON p."categoryId" = c.id';
+            let query = `
+                SELECT p.*, 
+                       c.name as "subcategoryName",
+                       cp.name as "parentCategoryName"
+                FROM "Product" p 
+                LEFT JOIN "Category" c ON p."categoryId" = c.id 
+                LEFT JOIN "Category" cp ON c."parentId" = cp.id
+            `;
             const params = [];
             const conditions = [];
 

@@ -8,6 +8,8 @@ interface Product {
     name: string;
     price: number;
     category?: string;
+    subcategoryName?: string;
+    parentCategoryName?: string;
     image: string;
     inStock: boolean;
 }
@@ -81,7 +83,17 @@ export function AdminProductsPage() {
                                     <img src={product.image} alt={product.name} className="h-10 w-10 object-cover rounded" />
                                 </td>
                                 <td className="p-4 font-medium">{product.name}</td>
-                                <td className="p-4 text-gray-500">{product.category || '-'}</td>
+                                <td className="p-4 text-gray-500">
+                                    {product.parentCategoryName ? (
+                                        <span>
+                                            {product.parentCategoryName}{' '}
+                                            <span className="text-gray-300 mx-1">/</span>{' '}
+                                            <span className="text-gray-600 font-medium">{product.subcategoryName}</span>
+                                        </span>
+                                    ) : (
+                                        product.subcategoryName || product.category || '-'
+                                    )}
+                                </td>
                                 <td className="p-4">${product.price.toFixed(2)}</td>
                                 <td className="p-4">
                                     {product.inStock ? (

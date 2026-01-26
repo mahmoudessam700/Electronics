@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
 
     try {
         if (req.method === 'GET') {
-            const { id, parentId, includeProducts } = req.query;
+            const { id, parentId } = req.query;
 
             // Single category detail
             if (id) {
@@ -30,32 +30,35 @@ module.exports = async (req, res) => {
                 return res.json(rows[0]);
             }
 
-            // List categories
-            let query = `
+            // List categories with tree support
+            const { rows } = await pool.query(`
                 SELECT c.*, 
                        (SELECT count(*) FROM "Product" p WHERE p."categoryId" = c.id)::int as product_count
                 FROM "Category" c
-            `;
-            const params = [];
+                ORDER BY c."sortOrder" ASC
+            `);
 
+            const buildTree = (items, pId = null) => {
+                return items
+                    .filter(item => item.parentId === pId)
+                    .map(item => ({
+                        ...item,
+                        children: buildTree(items, item.id),
+                        _count: { products: item.product_count }
+                    }));
+            };
+
+            // If parentId=null is passed, return the tree
             if (parentId === 'null') {
-                query += ' WHERE c."parentId" IS NULL';
-            } else if (parentId) {
-                params.push(parentId);
-                query += ' WHERE c."parentId" = $1';
+                return res.json(buildTree(rows, null));
             }
 
-            query += ' ORDER BY c."sortOrder" ASC';
+            // Otherwise return flat list or filtered by parentId
+            if (parentId) {
+                return res.json(rows.filter(c => c.parentId === parentId));
+            }
 
-            const { rows } = await pool.query(query, params);
-
-            // Map keys to match Prisma naming if needed by frontend (product_count vs _count.products)
-            const result = rows.map(cat => ({
-                ...cat,
-                _count: { products: cat.product_count }
-            }));
-
-            return res.json(result);
+            return res.json(rows);
         }
 
         if (req.method === 'POST') {
@@ -76,7 +79,29 @@ module.exports = async (req, res) => {
 
         if (req.method === 'PUT') {
             const { id } = req.query;
-            const { name, description, image, parentId, sortOrder } = req.body;
+            const { name, description, image, parentId, sortOrder, categories: batchUpdates } = req.body;
+
+            // Batch update for reordering
+            if (batchUpdates && Array.isArray(batchUpdates)) {
+                await pool.query('BEGIN');
+                try {
+                    for (const update of batchUpdates) {
+                        await pool.query(`
+                            UPDATE "Category"
+                            SET "sortOrder" = $2,
+                                "parentId" = $3,
+                                "updatedAt" = NOW()
+                            WHERE id = $1
+                        `, [update.id, update.sortOrder, update.parentId || null]);
+                    }
+                    await pool.query('COMMIT');
+                    return res.json({ success: true });
+                } catch (e) {
+                    await pool.query('ROLLBACK');
+                    throw e;
+                }
+            }
+
             if (!id) return res.status(400).json({ error: 'ID is required' });
 
             const { rows } = await pool.query(`

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, GripVertical, ChevronRight, ChevronDown, Folder, FolderOpen, Loader2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, GripVertical, ChevronRight, ChevronDown, Folder, FolderOpen, Loader2 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -128,7 +128,7 @@ export function AdminCategoriesPage() {
         setSaving(true);
         try {
             const url = editingCategory
-                ? `/api/categories/${editingCategory.id}`
+                ? `/api/categories?id=${editingCategory.id}`
                 : '/api/categories';
 
             const res = await fetch(url, {
@@ -156,7 +156,7 @@ export function AdminCategoriesPage() {
         if (!deletingCategory) return;
 
         try {
-            const res = await fetch(`/api/categories/${deletingCategory.id}`, {
+            const res = await fetch(`/api/categories?id=${deletingCategory.id}`, {
                 method: 'DELETE'
             });
 
