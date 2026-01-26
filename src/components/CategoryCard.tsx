@@ -1,6 +1,3 @@
-import { Card, CardContent } from './ui/card';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-
 interface CategoryCardProps {
   title: string;
   image?: string;
@@ -9,27 +6,59 @@ interface CategoryCardProps {
 
 export function CategoryCard({ title, image, onClick }: CategoryCardProps) {
   return (
-    <Card
-      className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-[#D5D9D9] bg-white h-full flex flex-col overflow-hidden"
+    <div
       onClick={onClick}
+      style={{
+        backgroundColor: '#ffffff',
+        borderRadius: 8,
+        padding: 20,
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        transition: 'box-shadow 0.2s'
+      }}
     >
-      <CardContent className="p-4 flex-1 flex flex-col items-center">
-        <h3 className="text-base font-bold mb-4 text-[#0F1111] line-clamp-2 text-center h-12 flex items-center justify-center">
-          {title}
-        </h3>
+      {/* Title at top left */}
+      <h3 style={{
+        fontSize: 18,
+        fontWeight: 700,
+        color: '#0F1111',
+        margin: '0 0 16px 0',
+        lineHeight: 1.3
+      }}>
+        {title}
+      </h3>
 
-        <div className="aspect-square w-full overflow-hidden rounded-lg bg-[#F7F8FA] flex items-center justify-center border border-gray-50 group-hover:border-[#FFD814] transition-all">
-          <ImageWithFallback
-            src={image || 'https://via.placeholder.com/400?text=Category'}
-            alt={title}
-            className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500"
-          />
-        </div>
+      {/* Square image */}
+      <div style={{
+        aspectRatio: '1',
+        width: '100%',
+        overflow: 'hidden',
+        borderRadius: 4,
+        marginBottom: 16,
+        backgroundColor: '#f7f7f7'
+      }}>
+        <img
+          src={image || 'https://via.placeholder.com/300?text=Category'}
+          alt={title}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover'
+          }}
+        />
+      </div>
 
-        <p className="text-xs font-bold text-[#007185] group-hover:text-[#C7511F] mt-4 group-hover:underline transition-all">
-          Shop now
-        </p>
-      </CardContent>
-    </Card>
+      {/* Shop now link at bottom left */}
+      <span style={{
+        fontSize: 13,
+        fontWeight: 400,
+        color: '#007185',
+        marginTop: 'auto'
+      }}>
+        Shop now
+      </span>
+    </div>
   );
 }
