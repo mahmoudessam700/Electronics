@@ -1,5 +1,4 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from './ui/button';
 import { ProductCard, Product } from './ProductCard';
 import { useRef } from 'react';
 
@@ -15,7 +14,7 @@ export function ProductCarousel({ title, products, onProductClick }: ProductCaro
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 300;
-      const newScrollLeft = scrollContainerRef.current.scrollLeft + 
+      const newScrollLeft = scrollContainerRef.current.scrollLeft +
         (direction === 'right' ? scrollAmount : -scrollAmount);
       scrollContainerRef.current.scrollTo({
         left: newScrollLeft,
@@ -24,41 +23,90 @@ export function ProductCarousel({ title, products, onProductClick }: ProductCaro
     }
   };
 
+  if (!products || products.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-[#D5D9D9]">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl">{title}</h2>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-full"
+    <div style={{
+      backgroundColor: '#ffffff',
+      padding: 24,
+      borderRadius: 12,
+      boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+      border: '1px solid #D5D9D9',
+      marginBottom: 32
+    }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20
+      }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0F1111', margin: 0 }}>{title}</h2>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
             onClick={() => scroll('left')}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              border: '1px solid #D5D9D9',
+              backgroundColor: '#ffffff',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s'
+            }}
           >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-full"
+            <ChevronLeft style={{ width: 18, height: 18, color: '#0F1111' }} />
+          </button>
+          <button
             onClick={() => scroll('right')}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              border: '1px solid #D5D9D9',
+              backgroundColor: '#ffffff',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s'
+            }}
           >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+            <ChevronRight style={{ width: 18, height: 18, color: '#0F1111' }} />
+          </button>
         </div>
       </div>
 
-      <div 
+      {/* Products Scroll Container */}
+      <div
         ref={scrollContainerRef}
-        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        style={{
+          display: 'flex',
+          gap: 16,
+          overflowX: 'auto',
+          scrollBehavior: 'smooth',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
       >
         {products.map((product) => (
-          <div key={product.id} className="flex-none w-[200px] sm:w-[240px]">
+          <div key={product.id} style={{ flexShrink: 0, width: 200 }}>
             <ProductCard product={product} onClick={() => onProductClick(product)} />
           </div>
         ))}
       </div>
+
+      {/* Hide scrollbar CSS */}
+      <style>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }

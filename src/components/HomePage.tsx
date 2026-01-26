@@ -57,38 +57,33 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#EAEDED] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 animate-spin text-[#718096]" />
-          <p className="text-gray-500 font-medium">Loading your premium electronics...</p>
+      <div style={{ minHeight: '100vh', backgroundColor: '#EAEDED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, system-ui, sans-serif' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <Loader2 style={{ width: 40, height: 40, animation: 'spin 1s linear infinite', color: '#718096' }} />
+          <p style={{ color: '#718096', fontWeight: 500 }}>Loading your premium electronics...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#EAEDED]">
+    <div style={{ minHeight: '100vh', backgroundColor: '#EAEDED', fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Hero Slider */}
       <HeroSlider onNavigate={onNavigate} />
 
       {/* Main Content */}
-      <div className="max-w-[1500px] mx-auto px-4 py-8 space-y-8">
+      <div style={{ maxWidth: 1500, margin: '0 auto', padding: '32px 16px' }}>
 
-        {/* Premium Department Grid (Individual Flat Cards) */}
+        {/* Categories Grid - 4 columns */}
         {categories.length > 0 && (
-          <section className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-2 border-b border-gray-200 pb-4">
-              <h2 className="text-3xl font-extrabold tracking-tight text-[#0F1111]">Explore Departments</h2>
-              <button
-                onClick={() => onNavigate('search')}
-                className="text-sm font-semibold text-[#007185] hover:text-[#C7511F] hover:underline transition-all"
-              >
-                View all &rarr;
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {categories.map((category) => (
+          <section style={{ marginBottom: 32 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0F1111', marginBottom: 16 }}>Shop by Category</h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: 24
+            }}>
+              {categories.slice(0, 8).map((category) => (
                 <CategoryCard
                   key={category.id}
                   title={category.name}
@@ -100,53 +95,108 @@ export function HomePage({ onNavigate }: HomePageProps) {
           </section>
         )}
 
-        {/* Deals of the Day - Premium Layout */}
+        {/* Deals of the Day */}
         {dealsOfTheDay.length > 0 && (
-          <section>
-            <div className="bg-[#FFFFFF] p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 relative overflow-hidden">
-              {/* Background Accent */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#FFD814]/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 relative z-10">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-red-50 rounded-xl">
-                    <Clock className="h-6 w-6 text-red-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-[#0F1111]">Daily Lightning Deals</h2>
-                    <p className="text-sm text-gray-500 font-medium">Limited quantities. Refreshed every 24 hours.</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 bg-[#FEF1EE] text-[#C7511F] px-4 py-2 rounded-full text-sm font-bold animate-pulse">
-                  <span>Ends in 08:42:15</span>
+          <section style={{ marginBottom: 32 }}>
+            <div style={{
+              backgroundColor: '#ffffff',
+              padding: 24,
+              borderRadius: 12,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              border: '1px solid #D5D9D9'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0F1111', margin: 0 }}>Deals of the Day</h2>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  color: '#C7511F',
+                  backgroundColor: '#FEF1EE',
+                  padding: '6px 14px',
+                  borderRadius: 999,
+                  fontSize: 13,
+                  fontWeight: 600
+                }}>
+                  <Clock style={{ width: 16, height: 16 }} />
+                  <span>Ends in 12:34:56</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                gap: 16
+              }}>
                 {dealsOfTheDay.map((product) => (
-                  <div key={product.id} className="group cursor-pointer flex flex-col" onClick={() => onNavigate('product', product)}>
-                    <div className="aspect-square mb-5 overflow-hidden rounded-2xl bg-[#F7F8FA] flex items-center justify-center border border-gray-100 group-hover:border-[#FFD814] transition-all relative">
+                  <div
+                    key={product.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => onNavigate('product', product)}
+                  >
+                    <div style={{
+                      aspectRatio: '1',
+                      marginBottom: 12,
+                      overflow: 'hidden',
+                      borderRadius: 8,
+                      backgroundColor: '#ffffff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '1px solid #D5D9D9',
+                      position: 'relative'
+                    }}>
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain',
+                          padding: 16,
+                          transition: 'transform 0.2s'
+                        }}
                       />
-                      <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-lg">
+                      {/* Discount Badge */}
+                      <div style={{
+                        position: 'absolute',
+                        top: 8,
+                        left: 8,
+                        backgroundColor: '#CC0C39',
+                        color: '#ffffff',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        padding: '4px 10px',
+                        borderRadius: 4
+                      }}>
                         -{Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)}%
                       </div>
                     </div>
-                    <div className="space-y-2 text-center md:text-left">
-                      <div className="flex items-baseline justify-center md:justify-start gap-2">
-                        <span className="text-2xl font-black text-[#0F1111]">E£{product.price.toLocaleString()}</span>
-                        <span className="text-sm text-gray-400 line-through">E£{product.originalPrice?.toLocaleString()}</span>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                        <span style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: '#CC0C39'
+                        }}>
+                          -{Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)}%
+                        </span>
+                        <span style={{ fontSize: 18, fontWeight: 700, color: '#0F1111' }}>
+                          E£{product.price.toLocaleString()}
+                        </span>
                       </div>
-                      <p className="text-sm font-semibold text-[#0F1111] line-clamp-2 group-hover:text-[#007185] transition-colors h-10 overflow-hidden">
+                      <p style={{
+                        fontSize: 13,
+                        color: '#565959',
+                        margin: '4px 0 0',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: 1.4
+                      }}>
                         {product.name}
                       </p>
-                      <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden mt-3">
-                        <div className="bg-red-500 h-full w-[65%] rounded-full"></div>
-                      </div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">65% Claimed</p>
                     </div>
                   </div>
                 ))}
@@ -158,7 +208,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
         {/* Product Carousels */}
         {recommendedProducts.length > 0 && (
           <ProductCarousel
-            title="Recommended for you"
+            title="Inspired by your browsing history"
             products={recommendedProducts}
             onProductClick={(product) => onNavigate('product', product)}
           />
@@ -166,64 +216,43 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
         {trendingProducts.length > 0 && (
           <ProductCarousel
-            title="Premium Selection"
+            title="Trending in Electronics"
             products={trendingProducts}
             onProductClick={(product) => onNavigate('product', product)}
           />
         )}
 
-        {/* Sign In Banner - Super Premium Design */}
-        {!localStorage.getItem('auth_token') && (
-          <section className="relative rounded-[2rem] overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#2D3748] to-[#4A5568]"></div>
-            <div className="absolute top-0 left-0 w-full h-full opacity-10">
-              <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-              <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#FFD814] rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
-            </div>
-
-            <div className="relative z-10 p-10 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-10">
-              <div className="text-center lg:text-left max-w-2xl">
-                <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-[#FFD814] text-sm font-bold mb-6 backdrop-blur-md">
-                  Join 10k+ Tech Enthusiasts
-                </span>
-                <h2 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight leading-tight">
-                  Unlock the full power of <span className="text-[#FFD814]">Adsolutions</span>
-                </h2>
-                <p className="text-gray-300 text-lg md:text-xl font-medium mb-10 leading-relaxed">
-                  Track orders in real-time, get personalized tech recommendations, and access VIP-only checkout experiences.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                  <button
-                    className="w-full sm:w-auto bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] px-10 py-4 rounded-xl font-black shadow-[0_10px_40px_-10px_rgba(255,216,20,0.5)] hover:-translate-y-1 transition-all text-lg"
-                    onClick={() => {
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                      // Assuming account link click triggers the modal or we use an event
-                    }}
-                  >
-                    Get Started Free
-                  </button>
-                  <button
-                    className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-10 py-4 rounded-xl font-black backdrop-blur-md transition-all text-lg"
-                    onClick={() => onNavigate('search')}
-                  >
-                    Learn More
-                  </button>
-                </div>
-              </div>
-
-              <div className="hidden lg:block relative">
-                <div className="w-80 h-80 rounded-full border-2 border-white/10 flex items-center justify-center relative">
-                  <div className="w-64 h-64 rounded-full border border-white/20 animate-pulse"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-48 h-48 bg-[#FFD814] rounded-3xl rotate-12 flex items-center justify-center shadow-2xl">
-                      <span className="text-5xl font-black text-[#0F1111] -rotate-12 whitespace-nowrap">SIGN UP</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        {/* Sign Up Banner */}
+        <section style={{
+          background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+          borderRadius: 16,
+          padding: '48px 32px',
+          marginBottom: 32,
+          color: '#ffffff',
+          textAlign: 'center'
+        }}>
+          <h2 style={{ fontSize: 32, fontWeight: 700, margin: '0 0 16px' }}>Sign up and save</h2>
+          <p style={{ fontSize: 18, margin: '0 0 24px', maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', opacity: 0.9 }}>
+            Get exclusive deals, personalized recommendations, and early access to sales
+          </p>
+          <button
+            onClick={() => onNavigate('account')}
+            style={{
+              backgroundColor: '#ffffff',
+              color: '#0F1111',
+              padding: '14px 32px',
+              borderRadius: 8,
+              border: 'none',
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            }}
+          >
+            Create your account
+          </button>
+        </section>
 
         {peripherals.length > 0 && (
           <ProductCarousel
@@ -233,6 +262,14 @@ export function HomePage({ onNavigate }: HomePageProps) {
           />
         )}
       </div>
+
+      {/* CSS for animations */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
