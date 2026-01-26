@@ -35,7 +35,7 @@ export function AuthModal({ children, defaultView = 'signin', isOpen, onOpenChan
         }}>
             {children && <DialogTrigger asChild>{children}</DialogTrigger>}
             <DialogContent
-                className={`${view === 'signup' ? 'sm:max-w-[900px]' : 'sm:max-w-[450px]'} w-[95vw] bg-white text-[#0F1111] p-0 overflow-hidden rounded-xl shadow-2xl border-0 transition-all duration-300`}
+                className={`${view === 'signup' ? 'sm:max-w-[900px]' : 'sm:max-w-[550px]'} w-[95vw] bg-white text-[#0F1111] p-0 overflow-hidden rounded-xl shadow-2xl border-0 transition-all duration-300`}
                 style={{
                     background: 'linear-gradient(180deg, #f7f8fa 0%, #ffffff 100%)',
                 }}
