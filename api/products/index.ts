@@ -1,7 +1,20 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+// Lazy initialization of Prisma to prevent function invocation failures
+let prisma: PrismaClient | null = null;
+
+function getPrisma(): PrismaClient | null {
+    if (!prisma) {
+        try {
+            prisma = new PrismaClient();
+        } catch (e) {
+            console.error('Failed to initialize Prisma:', e);
+            return null;
+        }
+    }
+    return prisma;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Set CORS
@@ -11,20 +24,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === 'OPTIONS') return res.status(200).end();
 
+    const db = getPrisma();
+
+    // If Prisma failed to initialize, return empty array for GET, error for others
+    if (!db) {
+        console.error('Prisma client not available');
+        if (req.method === 'GET' && !req.query.id) {
+            return res.json([]);
+        }
+        return res.status(500).json({ error: 'Database unavailable' });
+    }
+
     try {
         if (req.method === 'GET') {
             const { id } = req.query;
             if (id) {
-                const product = await prisma.product.findUnique({ where: { id: String(id) } });
+                const product = await db.product.findUnique({ where: { id: String(id) } });
                 return res.json(product);
             }
-            const products = await prisma.product.findMany({ orderBy: { createdAt: 'desc' } });
+            const products = await db.product.findMany({ orderBy: { createdAt: 'desc' } });
             return res.json(products);
         }
 
         if (req.method === 'POST') {
             const { name, price, description, category, image, inStock } = req.body;
-            const product = await prisma.product.create({
+            const product = await db.product.create({
                 data: { name, price, description, category, image, inStock },
             });
             return res.status(201).json(product);
@@ -33,7 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (req.method === 'PUT') {
             const { id } = req.query;
             const { name, price, description, category, image, inStock } = req.body;
-            const product = await prisma.product.update({
+            const product = await db.product.update({
                 where: { id: String(id) },
                 data: { name, price, description, category, image, inStock },
             });
@@ -42,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (req.method === 'DELETE') {
             const { id } = req.query;
-            await prisma.product.delete({ where: { id: String(id) } });
+            await db.product.delete({ where: { id: String(id) } });
             return res.status(204).end();
         }
 
@@ -56,4 +80,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(500).json({ error: 'Internal server error' });
     }
 }
-
