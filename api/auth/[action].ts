@@ -12,20 +12,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // action is a string or string[]
     const actionName = Array.isArray(action) ? action[0] : action;
 
-    switch (actionName) {
-        case 'login':
-            return login(req, res);
-        case 'signup':
-            return signup(req, res);
-        case 'me':
-            return me(req, res);
-        case 'forgot-password':
-            return forgotPassword(req, res);
-        case 'reset-password':
-            return resetPassword(req, res);
-        case 'verify-email':
-            return verifyEmail(req, res);
-        default:
-            return res.status(404).json({ error: 'Endpoint not found' });
+    try {
+        switch (actionName) {
+            case 'login':
+                return await login(req, res);
+            case 'signup':
+                return await signup(req, res);
+            case 'me':
+                return await me(req, res);
+            case 'forgot-password':
+                return await forgotPassword(req, res);
+            case 'reset-password':
+                return await resetPassword(req, res);
+            case 'verify-email':
+                return await verifyEmail(req, res);
+            default:
+                return res.status(404).json({ error: 'Endpoint not found' });
+        }
+    } catch (error: any) {
+        console.error(`Error in auth handler [${actionName}]:`, error);
+        // Even if the sub-handler crashed, try to return a JSON response
+        if (!res.headersSent) {
+            return res.status(500).json({
+                error: 'Internal server error',
+                details: error.message
+            });
+        }
     }
 }
