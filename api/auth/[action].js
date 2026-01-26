@@ -30,7 +30,13 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ error: 'Email and password are required' });
             }
 
-            const prisma = new PrismaClient();
+            const prisma = new PrismaClient({
+                datasources: {
+                    db: {
+                        url: process.env.DATABASE_URL
+                    }
+                }
+            });
 
             try {
                 const user = await prisma.user.findUnique({
