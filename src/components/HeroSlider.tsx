@@ -16,7 +16,7 @@ const slides: Slide[] = [
   {
     id: '1',
     title: 'New Year Sale',
-    subtitle: 'Up to 50% off on electronics',
+    subtitle: 'Up to 50% off on premium tech',
     ctaText: 'Shop Now',
     image: 'https://images.unsplash.com/photo-1515940175183-6798529cb860?w=1200',
     gradient: 'from-blue-600/20 to-purple-600/20',

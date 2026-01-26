@@ -49,7 +49,7 @@ export function AdminProductFormPage() {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch('/api/categories?parentId=null');
+            const res = await fetch('/api/categories');
             const data = await res.json();
             setCategories(data);
         } catch (error) {

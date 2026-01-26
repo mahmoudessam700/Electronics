@@ -83,14 +83,17 @@ export function HomePage({ onNavigate }: HomePageProps) {
               gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
               gap: 24
             }}>
-              {categories.slice(0, 8).map((category) => (
-                <CategoryCard
-                  key={category.id}
-                  title={category.name}
-                  image={category.image}
-                  onClick={() => onNavigate('search', undefined, category.name)}
-                />
-              ))}
+              {categories
+                .filter(cat => cat.name.toLowerCase() !== 'electronics')
+                .slice(0, 8)
+                .map((category) => (
+                  <CategoryCard
+                    key={category.id}
+                    title={category.name}
+                    image={category.image}
+                    onClick={() => onNavigate('search', undefined, category.name)}
+                  />
+                ))}
             </div>
           </section>
         )}

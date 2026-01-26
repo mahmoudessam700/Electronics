@@ -41,21 +41,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-        // GET - List all categories
+        // GET - List all categories (flat, no hierarchy)
         if (req.method === 'GET') {
-            const { parentId, includeProducts } = req.query;
-
             const categories = await db.category.findMany({
-                where: parentId === 'null' ? { parentId: null } : parentId ? { parentId: String(parentId) } : {},
-                include: {
-                    children: {
-                        orderBy: { sortOrder: 'asc' },
-                        include: {
-                            _count: { select: { products: true } }
+                where: {
+                    // Exclude "Electronics" category
+                    NOT: {
+                        name: {
+                            equals: 'Electronics',
+                            mode: 'insensitive'
                         }
-                    },
-                    _count: { select: { products: true } },
-                    ...(includeProducts === 'true' ? { products: true } : {})
+                    }
+                },
+                include: {
+                    _count: { select: { products: true } }
                 },
                 orderBy: { sortOrder: 'asc' }
             });
@@ -65,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // POST - Create new category
         if (req.method === 'POST') {
-            const { name, description, image, parentId, sortOrder } = req.body;
+            const { name, description, image, sortOrder } = req.body;
 
             if (!name) {
                 return res.status(400).json({ error: 'Category name is required' });
@@ -78,9 +77,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 slug = `${slug}-${Date.now()}`;
             }
 
-            // Get max sortOrder for the parent
+            // Get max sortOrder
             const maxSort = await db.category.findFirst({
-                where: { parentId: parentId || null },
                 orderBy: { sortOrder: 'desc' },
                 select: { sortOrder: true }
             });
@@ -91,12 +89,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     slug,
                     description,
                     image,
-                    parentId: parentId || null,
+                    parentId: null, // No parent - flat structure
                     sortOrder: sortOrder ?? ((maxSort?.sortOrder ?? 0) + 1)
                 },
                 include: {
-                    parent: true,
-                    children: true,
                     _count: { select: { products: true } }
                 }
             });
@@ -104,7 +100,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(201).json(category);
         }
 
-        // PUT - Bulk update (for reordering)
+        // PUT - Update category or bulk update (for reordering)
         if (req.method === 'PUT') {
             const { categories } = req.body;
 
@@ -114,15 +110,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     await db.category.update({
                         where: { id: cat.id },
                         data: {
-                            sortOrder: cat.sortOrder,
-                            parentId: cat.parentId ?? undefined
+                            sortOrder: cat.sortOrder
                         }
                     });
                 }
                 return res.json({ success: true, updated: categories.length });
             }
 
-            return res.status(400).json({ error: 'Invalid request' });
+            // Single category update
+            const { id } = req.query;
+            const { name, description, image } = req.body;
+
+            if (!id) {
+                return res.status(400).json({ error: 'Category ID required' });
+            }
+
+            const updated = await db.category.update({
+                where: { id: String(id) },
+                data: {
+                    name,
+                    description,
+                    image,
+                    slug: generateSlug(name)
+                },
+                include: {
+                    _count: { select: { products: true } }
+                }
+            });
+
+            return res.json(updated);
         }
 
         return res.status(405).json({ error: 'Method not allowed' });

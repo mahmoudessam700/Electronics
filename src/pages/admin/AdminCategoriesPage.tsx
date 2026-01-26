@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, GripVertical, ChevronRight, ChevronDown, Folder, FolderOpen, Loader2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, GripVertical, Folder, Loader2 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -29,15 +29,24 @@ interface Category {
     description?: string;
     image?: string;
     sortOrder: number;
-    parentId?: string | null;
-    children?: Category[];
     _count?: { products: number };
 }
+
+// Allowed categories - only these can be created
+const ALLOWED_CATEGORIES = [
+    'PCs',
+    'Laptops',
+    'Mice',
+    'Keyboards',
+    'Headphones',
+    'Cables',
+    'Mouse Pads',
+    'Hard Drives'
+];
 
 export function AdminCategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
     // Modal states
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -49,8 +58,7 @@ export function AdminCategoriesPage() {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        image: '',
-        parentId: '' as string | null
+        image: ''
     });
     const [saving, setSaving] = useState(false);
 
@@ -65,13 +73,13 @@ export function AdminCategoriesPage() {
     async function fetchCategories() {
         try {
             setLoading(true);
-            const res = await fetch('/api/categories?parentId=null');
+            const res = await fetch('/api/categories');
             const data = await res.json();
-            setCategories(data);
-            // Expand all by default
-            const ids = new Set<string>();
-            data.forEach((cat: Category) => ids.add(cat.id));
-            setExpandedIds(ids);
+            // Filter out "Electronics" and any subcategories
+            const filtered = data.filter((cat: Category) =>
+                cat.name.toLowerCase() !== 'electronics'
+            );
+            setCategories(filtered);
         } catch (error) {
             console.error('Failed to fetch categories:', error);
             toast.error('Failed to load categories');
@@ -80,25 +88,12 @@ export function AdminCategoriesPage() {
         }
     }
 
-    function toggleExpand(id: string) {
-        setExpandedIds(prev => {
-            const next = new Set(prev);
-            if (next.has(id)) {
-                next.delete(id);
-            } else {
-                next.add(id);
-            }
-            return next;
-        });
-    }
-
-    function openAddForm(parentId?: string) {
+    function openAddForm() {
         setEditingCategory(null);
         setFormData({
             name: '',
             description: '',
-            image: '',
-            parentId: parentId || null
+            image: ''
         });
         setIsFormOpen(true);
     }
@@ -108,8 +103,7 @@ export function AdminCategoriesPage() {
         setFormData({
             name: category.name,
             description: category.description || '',
-            image: category.image || '',
-            parentId: category.parentId || null
+            image: category.image || ''
         });
         setIsFormOpen(true);
     }
@@ -124,13 +118,13 @@ export function AdminCategoriesPage() {
         if (!file) return;
 
         setSaving(true);
-        const formData = new FormData();
-        formData.append('file', file);
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', file);
 
         try {
             const res = await fetch('/api/upload', {
                 method: 'POST',
-                body: formData,
+                body: formDataUpload,
             });
             const data = await res.json();
             if (res.ok && data.files?.[0]?.url) {
@@ -150,6 +144,12 @@ export function AdminCategoriesPage() {
     async function handleSave() {
         if (!formData.name.trim()) {
             toast.error('Category name is required');
+            return;
+        }
+
+        // Check if the category name is allowed
+        if (!editingCategory && !ALLOWED_CATEGORIES.some(c => c.toLowerCase() === formData.name.trim().toLowerCase())) {
+            toast.error(`Only these categories are allowed: ${ALLOWED_CATEGORIES.join(', ')}`);
             return;
         }
 
@@ -227,22 +227,15 @@ export function AdminCategoriesPage() {
             return;
         }
 
-        // Find all siblings and reorder
-        const siblings = categories.flatMap(cat =>
-            cat.id === draggedItem.parentId || (!draggedItem.parentId && !cat.parentId)
-                ? [cat, ...(cat.children || [])]
-                : cat.children || []
-        ).filter(c => c.parentId === targetCategory.parentId);
-
-        const newOrder = siblings.filter(s => s.id !== draggedItem.id);
-        const targetIndex = newOrder.findIndex(s => s.id === targetCategory.id);
-        newOrder.splice(targetIndex, 0, { ...draggedItem, parentId: targetCategory.parentId });
+        // Find all categories and reorder
+        const newOrder = categories.filter(c => c.id !== draggedItem.id);
+        const targetIndex = newOrder.findIndex(c => c.id === targetCategory.id);
+        newOrder.splice(targetIndex, 0, draggedItem);
 
         // Update sort orders
         const updates = newOrder.map((cat, idx) => ({
             id: cat.id,
-            sortOrder: idx,
-            parentId: cat.parentId
+            sortOrder: idx
         }));
 
         try {
@@ -259,91 +252,6 @@ export function AdminCategoriesPage() {
         setDraggedItem(null);
     }
 
-    function renderCategory(category: Category, level: number = 0) {
-        const isExpanded = expandedIds.has(category.id);
-        const hasChildren = category.children && category.children.length > 0;
-        const isDragOver = dragOverId === category.id;
-
-        return (
-            <div key={category.id}>
-                <div
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, category)}
-                    onDragOver={(e) => handleDragOver(e, category)}
-                    onDragLeave={handleDragLeave}
-                    onDrop={(e) => handleDrop(e, category)}
-                    className={`
-                        flex items-center gap-2 p-3 bg-white border rounded-lg mb-2
-                        hover:shadow-sm transition-all cursor-move
-                        ${isDragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}
-                    `}
-                    style={{ marginLeft: level * 24 }}
-                >
-                    <GripVertical className="h-4 w-4 text-gray-400 flex-shrink-0" />
-
-                    {hasChildren ? (
-                        <button onClick={() => toggleExpand(category.id)} className="p-1">
-                            {isExpanded ? (
-                                <ChevronDown className="h-4 w-4" />
-                            ) : (
-                                <ChevronRight className="h-4 w-4" />
-                            )}
-                        </button>
-                    ) : (
-                        <div className="w-6" />
-                    )}
-
-                    {isExpanded ? (
-                        <FolderOpen className="h-5 w-5 text-yellow-500" />
-                    ) : (
-                        <Folder className="h-5 w-5 text-yellow-500" />
-                    )}
-
-                    <div className="flex-1">
-                        <span className="font-medium">{category.name}</span>
-                        {category._count && (
-                            <span className="ml-2 text-sm text-gray-500">
-                                ({category._count.products} products)
-                            </span>
-                        )}
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openAddForm(category.id)}
-                            title="Add subcategory"
-                        >
-                            <Plus className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openEditForm(category)}
-                        >
-                            <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openDeleteConfirm(category)}
-                            className="text-red-600 hover:text-red-700"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </div>
-
-                {isExpanded && hasChildren && (
-                    <div>
-                        {category.children!.map(child => renderCategory(child, level + 1))}
-                    </div>
-                )}
-            </div>
-        );
-    }
-
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -357,12 +265,19 @@ export function AdminCategoriesPage() {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-2xl font-bold">Categories</h1>
-                    <p className="text-gray-500">Manage product categories and subcategories</p>
+                    <p className="text-gray-500">Manage product categories</p>
                 </div>
                 <Button onClick={() => openAddForm()}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Category
                 </Button>
+            </div>
+
+            {/* Allowed Categories Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-800">
+                    <strong>Allowed categories:</strong> {ALLOWED_CATEGORIES.join(', ')}
+                </p>
             </div>
 
             {categories.length === 0 ? (
@@ -376,7 +291,65 @@ export function AdminCategoriesPage() {
                 </div>
             ) : (
                 <div className="space-y-2">
-                    {categories.map(cat => renderCategory(cat))}
+                    {categories.map(category => {
+                        const isDragOver = dragOverId === category.id;
+
+                        return (
+                            <div
+                                key={category.id}
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, category)}
+                                onDragOver={(e) => handleDragOver(e, category)}
+                                onDragLeave={handleDragLeave}
+                                onDrop={(e) => handleDrop(e, category)}
+                                className={`
+                                    flex items-center gap-3 p-4 bg-white border rounded-lg
+                                    hover:shadow-sm transition-all cursor-move
+                                    ${isDragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}
+                                `}
+                            >
+                                <GripVertical className="h-5 w-5 text-gray-400 flex-shrink-0" />
+
+                                {/* Category Image */}
+                                {category.image && (
+                                    <img
+                                        src={category.image}
+                                        alt={category.name}
+                                        className="h-12 w-12 object-cover rounded"
+                                    />
+                                )}
+
+                                <Folder className="h-5 w-5 text-yellow-500 flex-shrink-0" />
+
+                                <div className="flex-1">
+                                    <span className="font-medium text-lg">{category.name}</span>
+                                    {category._count && (
+                                        <span className="ml-2 text-sm text-gray-500">
+                                            ({category._count.products} products)
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => openEditForm(category)}
+                                    >
+                                        <Edit2 className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => openDeleteConfirm(category)}
+                                        className="text-red-600 hover:text-red-700"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
 
@@ -392,12 +365,26 @@ export function AdminCategoriesPage() {
                     <div className="space-y-4 py-4">
                         <div>
                             <Label htmlFor="name">Name *</Label>
-                            <Input
-                                id="name"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                placeholder="e.g., Gaming Laptops"
-                            />
+                            {editingCategory ? (
+                                <Input
+                                    id="name"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="Category name"
+                                />
+                            ) : (
+                                <select
+                                    id="name"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="">Select a category...</option>
+                                    {ALLOWED_CATEGORIES.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            )}
                         </div>
 
                         <div>
@@ -433,12 +420,6 @@ export function AdminCategoriesPage() {
                                 </div>
                             </div>
                         </div>
-
-                        {formData.parentId && (
-                            <div className="p-2 bg-gray-100 rounded text-sm">
-                                This will be a subcategory
-                            </div>
-                        )}
                     </div>
 
                     <DialogFooter>
@@ -463,7 +444,6 @@ export function AdminCategoriesPage() {
                         <AlertDialogDescription>
                             Are you sure you want to delete "{deletingCategory?.name}"?
                             Products in this category will become uncategorized.
-                            Subcategories will be moved to the parent level.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

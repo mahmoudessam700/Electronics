@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ProductCard, Product } from './ProductCard';
-import { ChevronDown, SlidersHorizontal, Star, ChevronRight, Loader2 } from 'lucide-react';
+import { SlidersHorizontal, Star, ChevronRight, Loader2 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { Slider } from './ui/slider';
@@ -185,9 +185,9 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
           <ChevronRight className="h-4 w-4 mx-1" />
           <span
             className="hover:text-[#C7511F] cursor-pointer"
-            onClick={() => onNavigate('search', undefined, null)}
+            onClick={() => onNavigate('search', undefined, undefined)}
           >
-            Electronics
+            Shop
           </span>
           {selectedCategory && (
             <>

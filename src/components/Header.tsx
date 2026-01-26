@@ -170,7 +170,6 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
               <div className="flex items-center">
                 <select className="hidden sm:block h-10 px-2 bg-[#F3F3F3] border-none rounded-l-md text-[#0F1111] text-sm focus:outline-none focus:ring-2 focus:ring-[#718096]">
                   <option>All</option>
-                  <option>Electronics</option>
                   <option>Books</option>
                   <option>Fashion</option>
                   <option>Home & Kitchen</option>
@@ -350,12 +349,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                 <SheetTitle className="sr-only">Department Menu</SheetTitle>
                 <SheetDescription className="sr-only">Browse all departments and categories</SheetDescription>
                 <div className="flex flex-col gap-2 mt-8">
-                  <h3 className="font-bold mb-2">Shop by Department</h3>
-
-                  {/* Electronics Label */}
-                  <div className="text-[#0F1111] font-bold text-sm px-2 py-1 mt-2">
-                    Electronics
-                  </div>
+                  <h3 className="font-bold mb-2">Departments</h3>
 
                   {/* Electronics Subcategories */}
                   {[
