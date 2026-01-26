@@ -3,61 +3,71 @@ import fs from 'fs';
 import path from 'path';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+    // Dynamic debugging to prevent startup crash
+    const debugInfo: any = {
+        status: 'running',
+        step: 'init'
+    };
+
     try {
-        const envSanitized = Object.keys(process.env).reduce((acc, key) => {
-            if (key.includes('SECRET') || key.includes('PASSWORD') || key.includes('KEY')) {
-                acc[key] = '***';
-            } else {
-                acc[key] = process.env[key];
-            }
-            return acc;
-        }, {} as Record<string, any>);
+        debugInfo.env = {
+            NODE_ENV: process.env.NODE_ENV,
+            HAS_DB_URL: !!process.env.DATABASE_URL
+        };
 
-        // Check if DB URL exists (don't show it)
-        const hasDbUrl = !!process.env.DATABASE_URL;
-
-        // List directory structure to debug bundling
+        // 1. Check Root Dir
         const rootDir = process.cwd();
-        const files = fs.readdirSync(rootDir);
+        debugInfo.rootDir = rootDir;
 
-        let nodeModules = 'not found';
         try {
-            nodeModules = fs.readdirSync(path.join(rootDir, 'node_modules')).slice(0, 20).join(', ');
-        } catch (e) { }
+            debugInfo.rootFiles = fs.readdirSync(rootDir);
+        } catch (e: any) { debugInfo.rootFilesError = e.message; }
 
-        let prismaClient = 'not found';
+        // 2. Check node_modules
         try {
-            prismaClient = fs.readdirSync(path.join(rootDir, 'node_modules', '.prisma', 'client')).join(', ');
-        } catch (e) {
-            prismaClient = e instanceof Error ? e.message : String(e);
+            const modulesPath = path.join(rootDir, 'node_modules');
+            debugInfo.nodeModules = fs.existsSync(modulesPath) ? 'exists' : 'missing';
+            if (fs.existsSync(modulesPath)) {
+                debugInfo.modulesList = fs.readdirSync(modulesPath).filter(f => f.startsWith('@') || f === 'prisma' || f === '.prisma');
+            }
+        } catch (e: any) { debugInfo.nodeModulesError = e.message; }
+
+        // 3. Check Prisma Generation
+        try {
+            const prismaPath = path.join(rootDir, 'node_modules', '.prisma', 'client');
+            debugInfo.prismaGenerated = fs.existsSync(prismaPath) ? 'exists' : 'missing';
+            if (fs.existsSync(prismaPath)) {
+                debugInfo.prismaFiles = fs.readdirSync(prismaPath);
+            }
+        } catch (e: any) { debugInfo.prismaCheckError = e.message; }
+
+        // 4. Try Safe Load
+        debugInfo.step = 'loading_prisma';
+        let PrismaClient;
+        try {
+            // Use dynamic require so we catch the error instead of crashing
+            const prismaPkg = require('@prisma/client');
+            PrismaClient = prismaPkg.PrismaClient;
+            debugInfo.prismaLoaded = 'success';
+        } catch (e: any) {
+            debugInfo.prismaLoadError = e.message;
+            debugInfo.prismaLoadStack = e.stack;
+            throw new Error('Prisma Client load failed');
         }
 
-        // Try to load Prisma
-        let prismaLoad = 'success';
-        try {
-            const { PrismaClient } = require('@prisma/client');
+        // 5. Try Connection
+        if (PrismaClient) {
+            debugInfo.step = 'connecting_db';
             const prisma = new PrismaClient();
             await prisma.$connect();
+            debugInfo.dbConnection = 'success';
             await prisma.$disconnect();
-        } catch (e: any) {
-            prismaLoad = e.message;
         }
 
-        res.status(200).json({
-            status: 'ok',
-            hasDbUrl,
-            prismaLoad,
-            prismaClientFiles: prismaClient,
-            rootDir,
-            files,
-            nodeModulesShort: nodeModules,
-            env: envSanitized
-        });
     } catch (error: any) {
-        res.status(200).json({
-            status: 'error',
-            message: error.message,
-            stack: error.stack
-        });
+        debugInfo.globalError = error.message;
+        debugInfo.globalStack = error.stack;
     }
+
+    res.status(200).json(debugInfo);
 }
