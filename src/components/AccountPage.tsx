@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, MapPin, Mail, Phone, Shield, Package, List, ChevronRight, Camera, Loader2, Save } from 'lucide-react';
+import { User, MapPin, Mail, Phone, Shield, Package, List, ChevronRight, Camera, Loader2, Save, Upload } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AccountPageProps {
@@ -168,20 +168,20 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                 </div>
             </div>
 
-            {/* User Info Bar */}
-            <div className="bg-[#333333] text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            {/* User Info Bar - Greyish Background */}
+            <div className="bg-[#F5F5F5] border-b border-[#E0E0E0]">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
+                        <div className="w-14 h-14 bg-[#E0E0E0] rounded-full flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
                             {formData.image ? (
                                 <img src={formData.image} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
-                                <User className="w-6 h-6" />
+                                <User className="w-7 h-7 text-[#666666]" />
                             )}
                         </div>
                         <div>
-                            <div className="font-semibold text-lg">{formData.name || 'User'}</div>
-                            <div className="text-sm text-white/70">{formData.email}</div>
+                            <div className="font-semibold text-lg text-[#000000]">{formData.name || 'User'}</div>
+                            <div className="text-sm text-[#666666]">{formData.email}</div>
                         </div>
                     </div>
                 </div>
@@ -248,19 +248,19 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
 
                     {/* Main Content Area */}
                     <div className="lg:col-span-3 space-y-8">
-                        {/* Profile Completion */}
-                        <div className="bg-[#333333] rounded-xl p-8 text-white">
-                            <h3 className="font-semibold text-xl mb-3">Complete Your Profile</h3>
-                            <p className="text-white/70 text-sm mb-6">
+                        {/* Profile Completion - Greyish Background */}
+                        <div className="bg-[#F5F5F5] rounded-xl p-8 border border-[#E0E0E0]">
+                            <h3 className="font-semibold text-xl text-[#000000] mb-3">Complete Your Profile</h3>
+                            <p className="text-[#666666] text-sm mb-6">
                                 Completing your profile items unlocks premium discounts and faster checkout experiences.
                             </p>
                             <div className="flex items-center gap-6">
-                                <div className="flex-1 bg-white/20 rounded-full h-3 overflow-hidden">
-                                    <div className="bg-white h-full rounded-full transition-all" style={{ width: '65%' }}></div>
+                                <div className="flex-1 bg-[#E0E0E0] rounded-full h-3 overflow-hidden">
+                                    <div className="bg-[#333333] h-full rounded-full transition-all" style={{ width: '65%' }}></div>
                                 </div>
-                                <span className="font-bold text-2xl">65%</span>
+                                <span className="font-bold text-2xl text-[#000000]">65%</span>
                             </div>
-                            <p className="text-sm text-white/60 mt-3">Completed</p>
+                            <p className="text-sm text-[#666666] mt-3">Completed</p>
                         </div>
 
                         {/* Message Alert */}
@@ -281,43 +281,63 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                             </div>
 
                             <div className="space-y-8">
-                                {/* Avatar Upload */}
-                                <div className="flex flex-col items-center mb-10">
-                                    <div className="relative">
-                                        <div className="w-36 h-36 rounded-full overflow-hidden bg-[#F9F9F9] border-4 border-white shadow-xl">
-                                            {formData.image ? (
-                                                <img
-                                                    src={formData.image}
-                                                    alt="Avatar"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-[#E0E0E0]">
-                                                    <User className="w-16 h-16 text-[#666666]" />
+                                {/* Avatar Upload - Facebook Style with Greyish Background */}
+                                <div className="bg-[#F5F5F5] rounded-xl p-8 border border-[#E0E0E0]">
+                                    <div className="flex flex-col items-center">
+                                        <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                                            {/* Avatar Container */}
+                                            <div className="w-40 h-40 rounded-full overflow-hidden bg-[#E0E0E0] border-4 border-white shadow-xl relative">
+                                                {formData.image ? (
+                                                    <img
+                                                        src={formData.image}
+                                                        alt="Avatar"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-[#D0D0D0]">
+                                                        <User className="w-20 h-20 text-[#888888]" />
+                                                    </div>
+                                                )}
+
+                                                {/* Hover Overlay - Facebook Style */}
+                                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
+                                                    <Camera className="w-8 h-8 text-white mb-2" />
+                                                    <span className="text-white text-sm font-medium">Update Photo</span>
                                                 </div>
-                                            )}
-                                            {uploading && (
-                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
-                                                    <Loader2 className="w-8 h-8 text-white animate-spin" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <label
-                                            htmlFor="avatar-upload"
-                                            className="absolute bottom-1 right-1 w-11 h-11 bg-[#333333] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#000000] transition-colors shadow-lg border-3 border-white"
-                                        >
-                                            <Camera className="w-5 h-5 text-white" />
+
+                                                {/* Loading State */}
+                                                {uploading && (
+                                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                                        <Loader2 className="w-10 h-10 text-white animate-spin" />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Camera Badge */}
+                                            <div className="absolute bottom-2 right-2 w-12 h-12 bg-[#333333] rounded-full flex items-center justify-center shadow-lg border-3 border-white group-hover:bg-[#000000] transition-colors">
+                                                <Camera className="w-6 h-6 text-white" />
+                                            </div>
+
                                             <input
-                                                id="avatar-upload"
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={handleAvatarUpload}
                                                 className="hidden"
                                                 ref={fileInputRef}
                                             />
-                                        </label>
+                                        </div>
+
+                                        {/* Upload Instructions with Icon */}
+                                        <div className="mt-6 flex items-center gap-3 text-[#666666]">
+                                            <div className="w-10 h-10 bg-[#E0E0E0] rounded-full flex items-center justify-center">
+                                                <Upload className="w-5 h-5 text-[#666666]" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-[#000000]">Click to upload your avatar</p>
+                                                <p className="text-sm text-[#888888]">JPG, PNG or GIF. Max size 5MB</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p className="text-sm text-[#666666] mt-4">Click the camera icon to upload your avatar</p>
                                 </div>
 
                                 {/* Full Name */}
@@ -395,7 +415,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                         />
 
                                         {/* Map */}
-                                        <div className="bg-[#F9F9F9] rounded-xl border-2 border-dashed border-[#E0E0E0] h-72 flex flex-col items-center justify-center overflow-hidden">
+                                        <div className="bg-[#F5F5F5] rounded-xl border-2 border-dashed border-[#E0E0E0] h-72 flex flex-col items-center justify-center overflow-hidden">
                                             {formData.latitude && formData.longitude ? (
                                                 <iframe
                                                     width="100%"
@@ -418,23 +438,27 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Action Buttons */}
-                                <div className="pt-6">
-                                    <button
-                                        onClick={handleSave}
-                                        disabled={saving}
-                                        className="px-8 py-4 bg-[#333333] text-white rounded-xl hover:bg-[#000000] transition-colors font-semibold flex items-center gap-3 disabled:opacity-50 text-lg"
-                                    >
-                                        {saving ? (
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                        ) : (
-                                            <Save className="w-5 h-5" />
-                                        )}
-                                        Save Account Details
-                                    </button>
-                                </div>
                             </div>
+                        </div>
+
+                        {/* Save Changes Button - At the End */}
+                        <div className="bg-[#F5F5F5] rounded-xl p-6 border border-[#E0E0E0] flex items-center justify-between">
+                            <div>
+                                <p className="font-semibold text-[#000000]">Ready to save your changes?</p>
+                                <p className="text-sm text-[#666666]">Make sure all information is correct before saving.</p>
+                            </div>
+                            <button
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="px-10 py-4 bg-[#333333] text-white rounded-xl hover:bg-[#000000] transition-colors font-semibold flex items-center gap-3 disabled:opacity-50 text-lg shadow-lg hover:shadow-xl"
+                            >
+                                {saving ? (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : (
+                                    <Save className="w-5 h-5" />
+                                )}
+                                Save Changes
+                            </button>
                         </div>
                     </div>
                 </div>
