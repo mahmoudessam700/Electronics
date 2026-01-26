@@ -6,6 +6,24 @@ datasource db {
   provider = "postgresql"
 }
 
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  image       String?
+  sortOrder   Int        @default(0)
+  parentId    String?
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryToCategory")
+  products    Product[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([parentId])
+  @@index([sortOrder])
+}
+
 model Product {
   id            String      @id @default(cuid())
   name          String
@@ -16,7 +34,9 @@ model Product {
   image         String
   isPrime       Boolean     @default(true)
   deliveryDate  String      @default("Tomorrow")
-  category      String?
+  category      String?     // Keep for backwards compatibility
+  categoryId    String?
+  categoryRef   Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   description   String?
   inStock       Boolean     @default(true)
   createdAt     DateTime    @default(now())
@@ -24,6 +44,7 @@ model Product {
   orderItems    OrderItem[]
 
   @@index([category])
+  @@index([categoryId])
 }
 
 model Order {

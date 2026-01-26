@@ -21,6 +21,7 @@ import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
 import { AdminProductFormPage } from './pages/admin/AdminProductFormPage';
 import { AdminFilesPage } from './pages/admin/AdminFilesPage';
+import { AdminCategoriesPage } from './pages/admin/AdminCategoriesPage';
 import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
@@ -180,8 +181,12 @@ function AppContent() {
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="products" element={<AdminProductsPage />} />
+          <Route path="products/new" element={<AdminProductFormPage />} />
+          <Route path="products/:id" element={<AdminProductFormPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="files" element={<AdminFilesPage />} />
         </Route>
 
         <Route path="/customer-service" element={<CustomerServicePage onNavigate={handleNavigate} />} />
