@@ -1,11 +1,34 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { serialize } from 'cookie';
 
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
+
+// Lazy initialization of Prisma
+let prisma: PrismaClient | null = null;
+
+function getPrisma(): PrismaClient | null {
+    if (!prisma) {
+        try {
+            const connectionString = process.env.DATABASE_URL;
+            if (!connectionString) {
+                console.error('DATABASE_URL not set');
+                return null;
+            }
+            const pool = new Pool({ connectionString });
+            const adapter = new PrismaPg(pool);
+            prisma = new PrismaClient({ adapter });
+        } catch (e) {
+            console.error('Failed to initialize Prisma:', e);
+            return null;
+        }
+    }
+    return prisma;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,6 +43,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    const db = getPrisma();
+    if (!db) {
+        return res.status(500).json({ error: 'Database unavailable' });
+    }
+
     try {
         const { email, password } = req.body;
 
@@ -27,7 +55,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(400).json({ error: 'Email and password are required' });
         }
 
-        const user = await prisma.user.findUnique({
+        const user = await db.user.findUnique({
             where: { email },
         });
 

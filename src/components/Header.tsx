@@ -1,4 +1,5 @@
 import { Search, ShoppingCart, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse, Headphones, Keyboard, Cable, Grid3x3, HardDrive } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription, SheetClose } from './ui/sheet';
@@ -19,6 +20,13 @@ interface HeaderProps {
 export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isHoverCardOpen, setIsHoverCardOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const handleSignInClick = () => {
+    setIsHoverCardOpen(false);
+    setIsAuthModalOpen(true);
+  };
 
   return (
     <header className="sticky top-0 z-50">
@@ -178,7 +186,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
 
             {/* Account & Orders (Desktop) */}
             <div className="hidden lg:flex items-center gap-4">
-              <HoverCard openDelay={200} closeDelay={150}>
+              <HoverCard open={isHoverCardOpen} onOpenChange={setIsHoverCardOpen} openDelay={200} closeDelay={150}>
                 <HoverCardTrigger asChild>
                   {user ? (
                     <button
@@ -192,17 +200,13 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                       </div>
                     </button>
                   ) : (
-                    <div className="cursor-pointer">
-                      <AuthModal defaultView="signin">
-                        <button className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1 text-left">
-                          <span className="text-xs">Hello, sign in</span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-sm font-bold">Account & Lists</span>
-                            <ChevronDown className="h-3 w-3" />
-                          </div>
-                        </button>
-                      </AuthModal>
-                    </div>
+                    <button className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1 text-left">
+                      <span className="text-xs">Hello, sign in</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-bold">Account & Lists</span>
+                        <ChevronDown className="h-3 w-3" />
+                      </div>
+                    </button>
                   )}
                 </HoverCardTrigger>
                 <HoverCardContent className="w-80">
@@ -217,25 +221,28 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           className="text-sm font-bold hover:text-red-600 text-left px-2 py-1"
                           onClick={() => {
                             logout();
+                            setIsHoverCardOpen(false);
                           }}
                         >
                           Sign Out
                         </button>
                       </>
                     ) : (
-                      <AuthModal defaultView="signin">
-                        <Button
-                          className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] w-full"
-                        >
-                          Sign in
-                        </Button>
-                      </AuthModal>
+                      <Button
+                        className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] w-full"
+                        onClick={handleSignInClick}
+                      >
+                        Sign in
+                      </Button>
                     )}
 
                     {user?.role === 'ADMIN' && (
                       <button
                         className="text-sm font-bold text-blue-600 hover:underline text-left px-2 py-1"
-                        onClick={() => navigate('/admin')}
+                        onClick={() => {
+                          navigate('/admin');
+                          setIsHoverCardOpen(false);
+                        }}
                       >
                         Admin Dashboard
                       </button>
@@ -244,19 +251,28 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                     <div className="border-t pt-2">
                       <button
                         className="text-sm font-bold hover:outline hover:outline-1 hover:outline-white px-2 py-1 w-full text-left"
-                        onClick={() => navigate('/account')}
+                        onClick={() => {
+                          navigate('/account');
+                          setIsHoverCardOpen(false);
+                        }}
                       >
                         Your Account
                       </button>
                       <button
                         className="text-sm font-bold hover:outline hover:outline-1 hover:outline-white px-2 py-1 w-full text-left"
-                        onClick={() => navigate('/orders')}
+                        onClick={() => {
+                          navigate('/orders');
+                          setIsHoverCardOpen(false);
+                        }}
                       >
                         Your Orders
                       </button>
                       <button
                         className="text-sm font-bold hover:outline hover:outline-1 hover:outline-white px-2 py-1 w-full text-left"
-                        onClick={() => navigate('/lists')}
+                        onClick={() => {
+                          navigate('/lists');
+                          setIsHoverCardOpen(false);
+                        }}
                       >
                         Your Lists
                       </button>
@@ -264,6 +280,13 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                   </div>
                 </HoverCardContent>
               </HoverCard>
+
+              {/* Auth Modal - controlled separately */}
+              <AuthModal
+                isOpen={isAuthModalOpen}
+                onOpenChange={setIsAuthModalOpen}
+                defaultView="signin"
+              />
 
               <button className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1" onClick={() => navigate('/orders')}>
                 <span className="text-xs">Returns</span>
