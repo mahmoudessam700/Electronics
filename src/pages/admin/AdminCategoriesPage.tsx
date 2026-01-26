@@ -119,6 +119,34 @@ export function AdminCategoriesPage() {
         setIsDeleteOpen(true);
     }
 
+    async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setSaving(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await res.json();
+            if (res.ok && data.files?.[0]?.url) {
+                setFormData(prev => ({ ...prev, image: data.files[0].url }));
+                toast.success('Image uploaded!');
+            } else {
+                toast.error(data.error || 'Upload failed');
+            }
+        } catch (error) {
+            console.error('Upload error', error);
+            toast.error('Upload failed');
+        } finally {
+            setSaving(false);
+        }
+    }
+
     async function handleSave() {
         if (!formData.name.trim()) {
             toast.error('Category name is required');
@@ -383,13 +411,27 @@ export function AdminCategoriesPage() {
                         </div>
 
                         <div>
-                            <Label htmlFor="image">Image URL</Label>
-                            <Input
-                                id="image"
-                                value={formData.image}
-                                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                placeholder="https://..."
-                            />
+                            <Label>Image</Label>
+                            <div className="flex items-start gap-4 mt-1">
+                                {formData.image && (
+                                    <img src={formData.image} alt="Preview" className="h-20 w-20 object-cover rounded border" />
+                                )}
+                                <div className="flex-1 space-y-2">
+                                    <Input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        disabled={saving}
+                                    />
+                                    <p className="text-xs text-gray-500">Or paste an image URL:</p>
+                                    <Input
+                                        id="image"
+                                        value={formData.image}
+                                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                        placeholder="https://..."
+                                    />
+                                </div>
+                            </div>
                         </div>
 
                         {formData.parentId && (
