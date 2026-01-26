@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, MapPin, Mail, Phone, Shield, Package, List, ChevronRight, Camera, Loader2, Save } from 'lucide-react';
+import { User, MapPin, Mail, Phone, Package, List, Camera, Loader2, Save } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AccountPageProps {
@@ -8,7 +8,6 @@ interface AccountPageProps {
 
 export function AccountPage({ onNavigate }: AccountPageProps) {
     const { user, token } = useAuth();
-    const [activeTab, setActiveTab] = useState('personal');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -236,103 +235,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
 
             {/* Main Content */}
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: 24 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 24 }}>
-                    {/* Sidebar */}
-                    <div>
-                        <nav style={{ backgroundColor: '#ffffff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                            <button
-                                onClick={() => setActiveTab('personal')}
-                                style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: '14px 16px',
-                                    border: 'none',
-                                    borderLeft: activeTab === 'personal' ? '4px solid #374151' : '4px solid transparent',
-                                    background: activeTab === 'personal' ? '#f9fafb' : '#ffffff',
-                                    cursor: 'pointer',
-                                    textAlign: 'left'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <User style={{ width: 20, height: 20, color: '#374151' }} />
-                                    <span style={{ fontWeight: 500, fontSize: 14, color: '#000000' }}>Personal Data</span>
-                                </div>
-                                <ChevronRight style={{ width: 16, height: 16, color: '#9ca3af' }} />
-                            </button>
-
-                            <button
-                                onClick={() => setActiveTab('security')}
-                                style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: '14px 16px',
-                                    border: 'none',
-                                    borderTop: '1px solid #f3f4f6',
-                                    borderLeft: activeTab === 'security' ? '4px solid #374151' : '4px solid transparent',
-                                    background: activeTab === 'security' ? '#f9fafb' : '#ffffff',
-                                    cursor: 'pointer',
-                                    textAlign: 'left'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <Shield style={{ width: 20, height: 20, color: '#374151' }} />
-                                    <span style={{ fontWeight: 500, fontSize: 14, color: '#6b7280' }}>Security</span>
-                                </div>
-                                <ChevronRight style={{ width: 16, height: 16, color: '#9ca3af' }} />
-                            </button>
-
-                            <button
-                                onClick={() => setActiveTab('addresses')}
-                                style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: '14px 16px',
-                                    border: 'none',
-                                    borderTop: '1px solid #f3f4f6',
-                                    borderLeft: activeTab === 'addresses' ? '4px solid #374151' : '4px solid transparent',
-                                    background: activeTab === 'addresses' ? '#f9fafb' : '#ffffff',
-                                    cursor: 'pointer',
-                                    textAlign: 'left'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <MapPin style={{ width: 20, height: 20, color: '#374151' }} />
-                                    <span style={{ fontWeight: 500, fontSize: 14, color: '#6b7280' }}>My Addresses</span>
-                                </div>
-                                <ChevronRight style={{ width: 16, height: 16, color: '#9ca3af' }} />
-                            </button>
-
-                            <button
-                                onClick={() => setActiveTab('professional')}
-                                style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: '14px 16px',
-                                    border: 'none',
-                                    borderTop: '1px solid #f3f4f6',
-                                    borderLeft: activeTab === 'professional' ? '4px solid #374151' : '4px solid transparent',
-                                    background: activeTab === 'professional' ? '#f9fafb' : '#ffffff',
-                                    cursor: 'pointer',
-                                    textAlign: 'left'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <User style={{ width: 20, height: 20, color: '#374151' }} />
-                                    <span style={{ fontWeight: 500, fontSize: 14, color: '#6b7280' }}>Professional Profile</span>
-                                </div>
-                                <ChevronRight style={{ width: 16, height: 16, color: '#9ca3af' }} />
-                            </button>
-                        </nav>
-                    </div>
-
+                <div style={{ maxWidth: 800, margin: '0 auto' }}>
                     {/* Main Content Area */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                         {/* Complete Your Profile - Dark Card */}
