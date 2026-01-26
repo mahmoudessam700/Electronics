@@ -26,7 +26,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
     const fetchData = async () => {
       try {
         const [catsRes, prodsRes] = await Promise.all([
-          fetch('/api/categories?parentId=null'),
+          fetch('/api/categories'),
           fetch('/api/products')
         ]);
 
@@ -74,7 +74,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
       {/* Main Content */}
       <div className="max-w-[1500px] mx-auto px-4 py-8 space-y-8">
 
-        {/* Premium Department Grid (Multi-Item Cards) */}
+        {/* Premium Department Grid (Individual Flat Cards) */}
         {categories.length > 0 && (
           <section className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-2 border-b border-gray-200 pb-4">
@@ -83,20 +83,17 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 onClick={() => onNavigate('search')}
                 className="text-sm font-semibold text-[#007185] hover:text-[#C7511F] hover:underline transition-all"
               >
-                View all categories &rarr;
+                View all &rarr;
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {categories.slice(0, 8).map((category) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {categories.map((category) => (
                 <CategoryCard
                   key={category.id}
                   title={category.name}
                   image={category.image}
-                  link={`/search?category=${category.name}`}
-                  children={category.children}
                   onClick={() => onNavigate('search', undefined, category.name)}
-                  onSubCategoryClick={(sub) => onNavigate('search', undefined, sub.name)}
                 />
               ))}
             </div>
