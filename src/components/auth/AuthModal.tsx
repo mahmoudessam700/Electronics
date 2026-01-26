@@ -27,7 +27,7 @@ export function AuthModal({ children, defaultView = 'signin', isOpen, onOpenChan
     };
 
     return (
-        <Dialog open={open} onOpenChange={(val) => {
+        <Dialog open={open} onOpenChange={(val: boolean) => {
             setOpen(val);
             if (!val) {
                 setTimeout(() => setView(defaultView), 200);
@@ -35,7 +35,7 @@ export function AuthModal({ children, defaultView = 'signin', isOpen, onOpenChan
         }}>
             {children && <DialogTrigger asChild>{children}</DialogTrigger>}
             <DialogContent
-                className="sm:max-w-[360px] bg-white text-[#0F1111] p-0 overflow-hidden rounded-xl shadow-2xl border-0"
+                className={`${view === 'signup' ? 'sm:max-w-[900px]' : 'sm:max-w-[450px]'} bg-white text-[#0F1111] p-0 overflow-hidden rounded-xl shadow-2xl border-0 transition-all duration-300`}
                 style={{
                     background: 'linear-gradient(180deg, #f7f8fa 0%, #ffffff 100%)',
                 }}
