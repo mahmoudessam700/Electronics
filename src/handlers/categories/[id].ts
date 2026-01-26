@@ -1,6 +1,4 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { Pool } from 'pg';
-import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
 // Lazy initialization of Prisma
@@ -9,14 +7,7 @@ let prisma: PrismaClient | null = null;
 function getPrisma(): PrismaClient | null {
     if (!prisma) {
         try {
-            const connectionString = process.env.DATABASE_URL;
-            if (!connectionString) {
-                console.error('DATABASE_URL not set');
-                return null;
-            }
-            const pool = new Pool({ connectionString });
-            const adapter = new PrismaPg(pool);
-            prisma = new PrismaClient({ adapter });
+            prisma = new PrismaClient();
         } catch (e) {
             console.error('Failed to initialize Prisma:', e);
             return null;
