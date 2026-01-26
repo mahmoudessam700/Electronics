@@ -4,7 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { sendEmailVerificationEmail } from '../lib/mail';
+import { sendEmailVerificationEmail } from '../../lib/mail';
 
 // Lazy initialization of Prisma
 let prisma: PrismaClient | null = null;

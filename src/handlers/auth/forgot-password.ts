@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
-import { sendPasswordResetEmail } from '../lib/mail';
+import { sendPasswordResetEmail } from '../../lib/mail';
 
 const prisma = new PrismaClient();
 
