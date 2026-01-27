@@ -55,6 +55,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
     return section ? section.isEnabled : true;
   };
 
+  const getSectionName = (id: string, defaultName: string) => {
+    if (!settings || !settings.sections) return defaultName;
+    const section = settings.sections.find((s: any) => s.id === id);
+    return section && section.name ? section.name : defaultName;
+  };
+
   // Filter products for different sections
   const dealsOfTheDay = products.filter(p => p.originalPrice && p.originalPrice > p.price).slice(0, 5);
   const recommendedProducts = products.slice(0, 10);
@@ -119,7 +125,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
               border: '1px solid #D5D9D9'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-                <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0F1111', margin: 0 }}>Deals of the Day</h2>
+                <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0F1111', margin: 0 }}>
+                  {getSectionName('deals-of-the-day', 'Deals of the Day')}
+                </h2>
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -221,7 +229,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
         {/* Product Carousels */}
         {recommendedProducts.length > 0 && isVisible('inspired-browsing') && (
           <ProductCarousel
-            title="Inspired by your browsing history"
+            title={getSectionName('inspired-browsing', 'Inspired by your browsing history')}
             products={recommendedProducts}
             onProductClick={(product) => onNavigate('product', product)}
           />
@@ -229,7 +237,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
         {trendingProducts.length > 0 && isVisible('trending') && (
           <ProductCarousel
-            title="Trending in Electronics"
+            title={getSectionName('trending', 'Trending in Electronics')}
             products={trendingProducts}
             onProductClick={(product) => onNavigate('product', product)}
           />
@@ -245,7 +253,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
             color: '#ffffff',
             textAlign: 'center'
           }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, margin: '0 0 16px' }}>Sign up and save</h2>
+            <h2 style={{ fontSize: 32, fontWeight: 700, margin: '0 0 16px' }}>
+              {getSectionName('signup-banner', 'Sign up and save')}
+            </h2>
             <p style={{ fontSize: 18, margin: '0 0 24px', maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', opacity: 0.9 }}>
               Get exclusive deals, personalized recommendations, and early access to sales
             </p>
@@ -271,7 +281,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
         {peripherals.length > 0 && isVisible('pc-peripherals') && (
           <ProductCarousel
-            title="PC Accessories & Peripherals"
+            title={getSectionName('pc-peripherals', 'PC Accessories & Peripherals')}
             products={peripherals}
             onProductClick={(product) => onNavigate('product', product)}
           />

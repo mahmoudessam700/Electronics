@@ -87,6 +87,12 @@ export function AdminHomePageSettings() {
         ));
     };
 
+    const updateSection = (id: string, field: 'name' | 'description', value: string) => {
+        setSections(prev => prev.map(section => 
+            section.id === id ? { ...section, [field]: value } : section
+        ));
+    };
+
     const handleSave = async () => {
         setSaving(true);
         try {
@@ -172,15 +178,28 @@ export function AdminHomePageSettings() {
                                 }`}>
                                     <LayoutDashboard className="h-5 w-5" />
                                 </div>
-                                <div>
-                                    <h3 className={`font-bold transition-colors ${
-                                        section.isEnabled ? 'text-slate-900' : 'text-slate-400'
-                                    }`}>
-                                        {section.name}
-                                    </h3>
-                                    <p className="text-xs text-slate-500 mt-1 max-w-md">
-                                        {section.description}
-                                    </p>
+                                <div className="flex-1 space-y-2">
+                                    <input 
+                                        type="text"
+                                        value={section.name}
+                                        onChange={(e) => updateSection(section.id, 'name', e.target.value)}
+                                        className={`block w-full font-bold bg-transparent border-none p-0 focus:ring-0 transition-colors ${
+                                            section.isEnabled ? 'text-slate-900' : 'text-slate-400'
+                                        }`}
+                                        placeholder="Section Name"
+                                    />
+                                    <textarea 
+                                        value={section.description}
+                                        onChange={(e) => updateSection(section.id, 'description', e.target.value)}
+                                        rows={1}
+                                        className="block w-full text-xs text-slate-500 bg-transparent border-none p-0 focus:ring-0 resize-none overflow-hidden"
+                                        placeholder="Section Description"
+                                        onInput={(e) => {
+                                            const target = e.target as HTMLTextAreaElement;
+                                            target.style.height = 'auto';
+                                            target.style.height = target.scrollHeight + 'px';
+                                        }}
+                                    />
                                 </div>
                             </div>
 
