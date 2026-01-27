@@ -128,18 +128,18 @@ export function AdminLayout() {
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
+        <div className="min-h-screen bg-gray-100">
             {/* Mobile Header - fixed at top with gradient */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 z-[9999] bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 h-16 flex items-center justify-between px-4 shadow-xl backdrop-blur-xl border-b border-white/10">
+            <header className="lg:hidden fixed top-0 left-0 right-0 z-[9999] h-16 flex items-center justify-between px-4 shadow-xl border-b border-white/10" style={{ background: 'linear-gradient(to right, #0f172a, #581c87, #0f172a)' }}>
                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #a855f7, #3b82f6)' }}>
                         <Zap className="h-5 w-5 text-white" />
                     </div>
                     <span className="font-bold text-white text-base">Admin Panel</span>
                 </div>
                 <button
                     onClick={() => setIsSidebarOpen(true)}
-                    className="p-2.5 text-white hover:bg-white/10 rounded-xl transition-all duration-200 hover:scale-105"
+                    className="p-2.5 text-white hover:bg-white/10 rounded-xl transition-all duration-200"
                 >
                     <Menu className="h-5 w-5" />
                 </button>
@@ -150,23 +150,23 @@ export function AdminLayout() {
                 <>
                     {/* Overlay with blur effect */}
                     <div 
-                        className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
+                        className="lg:hidden fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm"
                         onClick={() => setIsSidebarOpen(false)}
                     />
                     {/* Sidebar with slide-in animation */}
-                    <aside className="lg:hidden fixed top-0 left-0 bottom-0 w-72 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col z-50 shadow-2xl animate-slide-in">
+                    <aside className="lg:hidden fixed top-0 left-0 bottom-0 w-72 flex flex-col z-[9999] shadow-2xl" style={{ background: 'linear-gradient(to bottom right, #0f172a, #581c87, #0f172a)' }}>
                         <SidebarContent />
                     </aside>
                 </>
             )}
 
-            {/* Desktop Sidebar - hidden on mobile */}
-            <aside className="hidden lg:flex w-72 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex-col flex-shrink-0 fixed top-0 left-0 h-screen shadow-2xl z-30">
+            {/* Desktop Sidebar - static positioning in flex container */}
+            <aside className="hidden lg:flex w-72 flex-col flex-shrink-0 fixed top-0 left-0 h-screen shadow-2xl z-[100]" style={{ background: 'linear-gradient(to bottom right, #0f172a, #581c87, #0f172a)' }}>
                 <SidebarContent />
             </aside>
 
-            {/* Main Content Area with improved spacing */}
-            <main className="flex-1 min-h-screen pt-16 lg:pt-0 lg:pl-72 bg-gradient-to-br from-gray-50 to-gray-100">
+            {/* Main Content Area */}
+            <main className="min-h-screen pt-16 lg:pt-0 lg:ml-72 bg-gray-100">
                 <div className="p-4 lg:p-8">
                     <Outlet />
                 </div>
