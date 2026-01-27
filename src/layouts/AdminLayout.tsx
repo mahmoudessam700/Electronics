@@ -34,21 +34,30 @@ export function AdminLayout() {
         { name: 'Files', path: '/admin/files', icon: FolderOpen },
     ];
 
-    const renderSidebarContent = () => (
+    const renderSidebarContent = (isMobile = false) => (
         <div className="flex flex-col h-full w-full bg-white border-r border-slate-200">
-            {/* Logo Section */}
-            <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-100 flex-shrink-0">
-                <div 
-                    className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-                    style={{ backgroundColor: '#0F172A' }}
-                >
-                    <Zap className="h-6 w-6 text-white" />
+            {/* Logo Section - Hidden on Mobile Drawer to avoid duplication */}
+            {!isMobile && (
+                <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-100 flex-shrink-0">
+                    <div 
+                        className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
+                        style={{ backgroundColor: '#0F172A' }}
+                    >
+                        <Zap className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <h1 className="font-bold text-slate-900 text-base leading-tight">Adsolutions</h1>
+                        <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase">Admin Area</p>
+                    </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                    <h1 className="font-bold text-slate-900 text-base leading-tight">Adsolutions</h1>
-                    <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase">Admin Area</p>
+            )}
+
+            {/* Mobile Header indicator */}
+            {isMobile && (
+                <div className="h-16 flex items-center px-6 border-b border-slate-100 bg-slate-50/50">
+                    <span className="text-sm font-bold text-slate-900 uppercase tracking-widest">Navigation Menu</span>
                 </div>
-            </div>
+            )}
 
             {/* Navigation */}
             <div className="flex-1 py-6 px-4 overflow-y-auto">
@@ -145,34 +154,37 @@ export function AdminLayout() {
 
             {/* Mobile Sidebar Modal */}
             {isSidebarOpen && (
-                <div className="lg:hidden fixed inset-0 z-[100]">
+                <div className="lg:hidden fixed inset-0 z-[10000]">
                     {/* Backdrop */}
                     <div 
                         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
                         onClick={() => setIsSidebarOpen(false)}
                     />
                     {/* Drawer */}
-                    <aside className="absolute inset-y-0 left-0 w-80 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
+                    <aside className="absolute inset-y-0 left-0 w-80 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-300 z-[10001]">
                         <button
                             onClick={() => setIsSidebarOpen(false)}
-                            className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all z-50"
+                            className="absolute top-4 right-4 p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all z-[10002]"
                         >
                             <X className="h-6 w-6" />
                         </button>
-                        {renderSidebarContent()}
+                        {renderSidebarContent(true)}
                     </aside>
                 </div>
             )}
 
             {/* Main Page Layout */}
             <div className="admin-main-content flex-1 flex flex-col min-w-0 transition-all duration-300">
-                {/* Top Mobile Nav Bar */}
-                <header className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-[30]">
+                {/* Top Mobile Nav Bar - Always at the top */}
+                <header className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-[9999]">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center shadow-lg">
+                        <div 
+                            className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg"
+                            style={{ backgroundColor: '#0F172A' }}
+                        >
                             <Zap className="h-5 w-5 text-white" />
                         </div>
-                        <span className="font-bold text-slate-800 tracking-tight">Admin Dashboard</span>
+                        <span className="font-bold text-slate-900 tracking-tight">Admin Area</span>
                     </div>
                     <button
                         onClick={() => setIsSidebarOpen(true)}
@@ -183,7 +195,7 @@ export function AdminLayout() {
                 </header>
 
                 {/* Content Outlet */}
-                <main className="flex-1 p-6 md:p-8 lg:p-10">
+                <main className="flex-1 p-4 md:p-8 lg:p-10 relative">
                     <div className="max-w-7xl mx-auto">
                         <Outlet />
                     </div>
