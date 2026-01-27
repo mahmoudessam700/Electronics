@@ -35,10 +35,10 @@ export function AdminLayout() {
     return (
         <div className="min-h-screen flex bg-slate-50">
             {/* Modern Glass Sidebar */}
-            <aside className="w-72 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 flex flex-col min-h-screen relative overflow-hidden">
+            <aside className="w-72 bg-slate-900 flex flex-col min-h-screen relative overflow-hidden shadow-2xl">
                 {/* Background decoration */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
                 
                 {/* Logo */}
                 <div className="relative h-20 flex items-center gap-3 px-6 border-b border-white/5">
@@ -54,9 +54,9 @@ export function AdminLayout() {
                 {/* Navigation */}
                 <div className="relative flex-1 py-6 px-4 overflow-y-auto">
                     <div className="mb-4">
-                        <span className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Navigation</span>
+                        <span className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menu</span>
                     </div>
-                    <nav className="space-y-1">
+                    <nav className="space-y-1.5">
                         {navItems.map((item) => {
                             const isActive = location.pathname === item.path;
                             const Icon = item.icon;
@@ -67,22 +67,22 @@ export function AdminLayout() {
                                     tabIndex={0}
                                     onClick={() => navigate(item.path)}
                                     onKeyDown={(e) => e.key === 'Enter' && navigate(item.path)}
-                                    className={`w-full group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer select-none ${
+                                    className={`w-full group flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer select-none ${
                                         isActive
-                                            ? 'bg-gradient-to-r from-violet-500/20 to-purple-500/10 text-white border border-violet-500/20 shadow-lg shadow-violet-500/5'
-                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                            ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-xl shadow-violet-500/30'
+                                            : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                                     }`}
                                 >
                                     <div className={`flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 ${
                                         isActive 
-                                            ? 'bg-violet-500/20 text-violet-400' 
-                                            : 'bg-slate-800/50 text-slate-500 group-hover:bg-slate-700/50 group-hover:text-slate-300'
+                                            ? 'bg-white/20 text-white' 
+                                            : 'bg-slate-800 text-slate-400 group-hover:bg-slate-700 group-hover:text-slate-200'
                                     }`}>
                                         <Icon className="h-[18px] w-[18px]" />
                                     </div>
                                     <span className="flex-1 text-left">{item.name}</span>
                                     {isActive && (
-                                        <ChevronRight className="h-4 w-4 text-violet-400" />
+                                        <ChevronRight className="h-4 w-4 text-white" />
                                     )}
                                 </div>
                             );

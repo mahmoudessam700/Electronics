@@ -72,16 +72,16 @@ export function AdminDashboard() {
     return (
         <div className="space-y-8">
             {/* Modern Header with gradient */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-600 p-8 text-white">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-                <div className="relative">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-600 p-8 text-white shadow-2xl">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="h-5 w-5" />
-                        <span className="text-sm font-medium text-white/90">Dashboard</span>
+                        <Sparkles className="h-5 w-5 text-white" />
+                        <span className="text-sm font-semibold text-white">Dashboard</span>
                     </div>
-                    <h1 className="text-3xl font-bold mb-2">Welcome back, Admin!</h1>
-                    <p className="text-white/80">Here's what's happening with your store today.</p>
+                    <h1 className="text-3xl font-bold mb-2 text-white">Welcome back, Admin!</h1>
+                    <p className="text-white/90">Here's what's happening with your store today.</p>
                 </div>
             </div>
 
