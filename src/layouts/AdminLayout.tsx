@@ -128,7 +128,7 @@ export function AdminLayout() {
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
             {/* Mobile Header - fixed at top with gradient */}
             <header className="lg:hidden fixed top-0 left-0 right-0 z-[9999] bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 h-16 flex items-center justify-between px-4 shadow-xl backdrop-blur-xl border-b border-white/10">
                 <div className="flex items-center gap-3">
@@ -166,7 +166,7 @@ export function AdminLayout() {
             </aside>
 
             {/* Main Content Area with improved spacing */}
-            <main className="min-h-screen pt-16 lg:pt-0 lg:ml-72 bg-gradient-to-br from-gray-50 to-gray-100 w-full">
+            <main className="flex-1 min-h-screen pt-16 lg:pt-0 lg:pl-72 bg-gradient-to-br from-gray-50 to-gray-100">
                 <div className="p-4 lg:p-8">
                     <Outlet />
                 </div>
