@@ -26,14 +26,16 @@ export function AdminLayout() {
 
     const navItems = [
         { name: 'Overview', path: '/admin', icon: LayoutDashboard },
+        { name: 'Management Financial', path: '/admin/financial', icon: DollarSign },
         { name: 'Categories', path: '/admin/categories', icon: Folder },
         { name: 'Products', path: '/admin/products', icon: Package },
         { name: 'Suppliers', path: '/admin/suppliers', icon: Building2 },
         { name: 'Customers', path: '/admin/users', icon: Users },
         { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
-        { name: 'Financial', path: '/admin/financial', icon: DollarSign },
         { name: 'Files', path: '/admin/files', icon: FolderOpen },
     ];
+
+    console.log('Admin Nav Items:', navItems);
 
     const renderSidebarContent = (isMobile = false) => (
         <div className="flex flex-col h-full w-full bg-white border-r border-slate-200">
