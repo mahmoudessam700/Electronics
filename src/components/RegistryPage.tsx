@@ -147,9 +147,9 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
             <CardContent className="p-8">
               <h2 className="text-2xl mb-6">Find a Registry</h2>
               <div className="grid md:grid-cols-3 gap-4">
-                <Input placeholder="First Name" />
-                <Input placeholder="Last Name" />
-                <Input placeholder="Event Date (Optional)" type="date" />
+                <Input id="registry-first-name" name="firstName" placeholder="First Name" autoComplete="off" />
+                <Input id="registry-last-name" name="lastName" placeholder="Last Name" autoComplete="off" />
+                <Input id="registry-event-date" name="eventDate" placeholder="Event Date (Optional)" type="date" autoComplete="off" />
               </div>
               <Button className="mt-4 bg-[#718096] hover:bg-[#4A5568] text-white">
                 <Search className="h-4 w-4 mr-2" />
