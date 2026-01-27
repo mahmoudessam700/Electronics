@@ -132,7 +132,7 @@ export function AdminLayout() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100 pt-14 lg:pt-0">
             {/* Mobile Header - fixed at top */}
             <header className="lg:hidden fixed top-0 left-0 right-0 z-[100] bg-[#4A5568] h-14 flex items-center justify-between px-4 shadow-md">
                 <div className="flex items-center gap-3">
@@ -247,15 +247,12 @@ export function AdminLayout() {
                 </main>
             </div>
 
-            {/* Mobile Main Content - spacer div pushes content below fixed header */}
-            <div className="lg:hidden">
-                <div className="h-14" aria-hidden="true" /> {/* Spacer for fixed header */}
-                <main className="min-h-screen bg-gray-100">
-                    <div className="p-4">
-                        <Outlet />
-                    </div>
-                </main>
-            </div>
+            {/* Mobile Main Content */}
+            <main className="lg:hidden min-h-screen bg-gray-100">
+                <div className="p-4">
+                    <Outlet />
+                </div>
+            </main>
         </div>
     );
 }
