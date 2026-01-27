@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Input } from '../../components/ui/input';
+import { Plus, Pencil, Trash2, Loader2, Package, Search, Filter, MoreVertical, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Product {
@@ -19,6 +20,7 @@ interface Product {
 export function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchProducts();
@@ -53,86 +55,194 @@ export function AdminProductsPage() {
         }
     };
 
-    if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>;
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (product.subcategoryName?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+    );
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                <span className="mt-4 text-slate-500">Loading products...</span>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-bold tracking-tight">Products</h2>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                        Products
+                    </h1>
+                    <p className="text-slate-500 mt-1">Manage your product inventory</p>
+                </div>
                 <Link to="/admin/products/new">
-                    <Button>
+                    <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all">
                         <Plus className="mr-2 h-4 w-4" /> Add Product
                     </Button>
                 </Link>
             </div>
 
-            <div className="border rounded-md">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-50 border-b">
-                        <tr className="text-left">
-                            <th className="p-4 font-medium text-gray-500">Image</th>
-                            <th className="p-4 font-medium text-gray-500">Name</th>
-                            <th className="p-4 font-medium text-gray-500">Category</th>
-                            <th className="p-4 font-medium text-gray-500">Supplier</th>
-                            <th className="p-4 font-medium text-gray-500">Price</th>
-                            <th className="p-4 font-medium text-gray-500">Status</th>
-                            <th className="p-4 font-medium text-right text-gray-500">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                        {products.map((product) => (
-                            <tr key={product.id}>
-                                <td className="p-4">
-                                    <img src={product.image} alt={product.name} className="h-10 w-10 object-cover rounded" />
-                                </td>
-                                <td className="p-4 font-medium">{product.name}</td>
-                                <td className="p-4 text-gray-500">
-                                    {product.parentCategoryName ? (
-                                        <span>
-                                            {product.parentCategoryName}{' '}
-                                            <span className="text-gray-300 mx-1">/</span>{' '}
-                                            <span className="text-gray-600 font-medium">{product.subcategoryName}</span>
-                                        </span>
-                                    ) : (
-                                        product.subcategoryName || product.category || '-'
-                                    )}
-                                </td>
-                                <td className="p-4">
-                                    <span className="text-gray-600">
-                                        {product.supplierName || '-'}
-                                    </span>
-                                </td>
-                                <td className="p-4">E£{product.price.toFixed(2)}</td>
-                                <td className="p-4">
-                                    {product.inStock ? (
-                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                            In Stock
-                                        </span>
-                                    ) : (
-                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                                            Out of Stock
-                                        </span>
-                                    )}
-                                </td>
-                                <td className="p-4 text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <Link to={`/admin/products/${product.id}`}>
-                                            <Button variant="ghost" size="icon">
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                        </Link>
-                                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(product.id)}>
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </td>
+            {/* Filters Bar */}
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                        placeholder="Search products..."
+                        className="pl-10 bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <Button variant="outline" className="border-slate-200 hover:bg-slate-50 rounded-xl">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filters
+                </Button>
+            </div>
+
+            {/* Products Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                    <p className="text-sm text-slate-500">Total Products</p>
+                    <p className="text-2xl font-bold text-slate-900">{products.length}</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                    <p className="text-sm text-slate-500">In Stock</p>
+                    <p className="text-2xl font-bold text-emerald-600">{products.filter(p => p.inStock).length}</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                    <p className="text-sm text-slate-500">Out of Stock</p>
+                    <p className="text-2xl font-bold text-red-500">{products.filter(p => !p.inStock).length}</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                    <p className="text-sm text-slate-500">Categories</p>
+                    <p className="text-2xl font-bold text-indigo-600">
+                        {new Set(products.map(p => p.subcategoryName)).size}
+                    </p>
+                </div>
+            </div>
+
+            {/* Products Table */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="bg-slate-50/80 border-b border-slate-100">
+                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Product</th>
+                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</th>
+                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Supplier</th>
+                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Price</th>
+                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                                <th className="text-right py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {products.length === 0 && (
-                    <div className="p-8 text-center text-gray-500">
-                        No products found. Add one to get started.
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {filteredProducts.map((product) => (
+                                <tr key={product.id} className="hover:bg-slate-50/50 transition-colors group">
+                                    <td className="py-4 px-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="relative">
+                                                <img 
+                                                    src={product.image} 
+                                                    alt={product.name} 
+                                                    className="h-14 w-14 object-cover rounded-xl border border-slate-100 shadow-sm group-hover:shadow-md transition-shadow" 
+                                                />
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-xl transition-colors flex items-center justify-center">
+                                                    <Eye className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold text-slate-900">{product.name}</p>
+                                                <p className="text-xs text-slate-400 font-mono">ID: {product.id.slice(0, 8)}...</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        {product.parentCategoryName ? (
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="px-2 py-1 bg-slate-100 rounded-md text-xs text-slate-600">
+                                                    {product.parentCategoryName}
+                                                </span>
+                                                <span className="text-slate-300">/</span>
+                                                <span className="px-2 py-1 bg-indigo-50 rounded-md text-xs font-medium text-indigo-600">
+                                                    {product.subcategoryName}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="px-2 py-1 bg-slate-100 rounded-md text-xs text-slate-600">
+                                                {product.subcategoryName || product.category || 'Uncategorized'}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <span className="text-sm text-slate-600">
+                                            {product.supplierName || <span className="text-slate-400">—</span>}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <span className="text-base font-bold text-slate-900">
+                                            E£{product.price.toFixed(2)}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        {product.inStock ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                In Stock
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                                Out of Stock
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div className="flex justify-end gap-1">
+                                            <Link to={`/admin/products/${product.id}`}>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="h-9 w-9 rounded-lg hover:bg-indigo-50 hover:text-indigo-600"
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                            </Link>
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="h-9 w-9 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600" 
+                                                onClick={() => handleDelete(product.id)}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {filteredProducts.length === 0 && (
+                    <div className="py-16 text-center">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
+                            <Package className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-slate-900 mb-1">No products found</h3>
+                        <p className="text-slate-500 mb-6">
+                            {searchQuery ? 'Try adjusting your search terms' : 'Get started by adding your first product'}
+                        </p>
+                        {!searchQuery && (
+                            <Link to="/admin/products/new">
+                                <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg">
+                                    <Plus className="mr-2 h-4 w-4" /> Add First Product
+                                </Button>
+                            </Link>
+                        )}
                     </div>
                 )}
             </div>

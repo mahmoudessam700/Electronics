@@ -1,6 +1,6 @@
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate, Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, User } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, User, Zap, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
 export function AdminLayout() {
@@ -8,7 +8,14 @@ export function AdminLayout() {
     const location = useLocation();
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                    <span className="text-slate-400 text-sm">Loading admin panel...</span>
+                </div>
+            </div>
+        );
     }
 
     if (!user || user.role !== 'ADMIN') {
@@ -26,44 +33,68 @@ export function AdminLayout() {
     ];
 
     return (
-        <div className="min-h-screen flex bg-gray-100">
-            {/* Sidebar */}
-            <aside className="w-64 bg-white shadow-md flex flex-col">
-                <div className="p-4 border-b">
-                    <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                        <span className="text-[#0F1111]">Admin</span> Panel
-                    </h1>
+        <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50">
+            {/* Modern Sidebar */}
+            <aside className="w-72 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col shadow-2xl">
+                {/* Logo Area */}
+                <div className="p-6 border-b border-slate-700/50">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                            <Zap className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-lg font-bold text-white tracking-tight">Admin Panel</h1>
+                            <p className="text-xs text-slate-400">Electronics Store</p>
+                        </div>
+                    </div>
                 </div>
 
-                <nav className="flex-1 p-4 space-y-1">
+                {/* Navigation */}
+                <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
+                    <div className="px-3 py-2">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Main Menu</span>
+                    </div>
                     {navItems.map((item) => {
                         const isActive = location.pathname === item.path;
                         return (
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
-                                    ? 'bg-blue-50 text-blue-700'
-                                    : 'text-gray-700 hover:bg-gray-100'
+                                className={`group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
+                                    ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-white shadow-lg shadow-indigo-500/10 border border-indigo-500/20'
+                                    : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                                     }`}
                             >
-                                <item.icon className="h-5 w-5" />
-                                {item.name}
+                                <div className={`p-2 rounded-lg transition-colors ${isActive ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-700/50 group-hover:bg-slate-600/50'}`}>
+                                    <item.icon className="h-4 w-4" />
+                                </div>
+                                <span className="flex-1">{item.name}</span>
+                                {isActive && <ChevronRight className="h-4 w-4 text-indigo-400" />}
                             </Link>
                         );
                     })}
                 </nav>
 
-                <div className="p-4 border-t space-y-2">
-                    <Link to="/">
-                        <Button variant="ghost" className="w-full justify-start gap-2">
+                {/* User Profile & Actions */}
+                <div className="p-4 border-t border-slate-700/50 space-y-3">
+                    <div className="flex items-center gap-3 px-3 py-2">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+                            {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white truncate">{user.name || 'Admin'}</p>
+                            <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                        </div>
+                    </div>
+                    <Link to="/" className="block">
+                        <Button variant="ghost" className="w-full justify-start gap-3 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-xl h-11">
                             <Home className="h-4 w-4" />
-                            Storefront
+                            Go to Storefront
                         </Button>
                     </Link>
                     <Button
                         variant="ghost"
-                        className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="w-full justify-start gap-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl h-11"
                         onClick={logout}
                     >
                         <LogOut className="h-4 w-4" />
@@ -74,7 +105,7 @@ export function AdminLayout() {
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
-                <div className="p-8">
+                <div className="p-8 max-w-7xl mx-auto">
                     <Outlet />
                 </div>
             </main>

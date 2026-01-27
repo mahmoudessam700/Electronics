@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Package, DollarSign, Tag, Building2, ImageIcon, CheckSquare, FileText, Upload } from 'lucide-react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -187,159 +187,281 @@ export function AdminProductFormPage() {
     const flatCategories = flattenCategories(categories);
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-3xl mx-auto space-y-6">
+            {/* Header */}
             <div className="flex items-center gap-4">
                 <Link to="/admin/products">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="h-4 w-4" />
+                    <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-10 w-10 rounded-xl hover:bg-slate-100"
+                    >
+                        <ArrowLeft className="h-5 w-5" />
                     </Button>
                 </Link>
-                <h2 className="text-2xl font-bold tracking-tight">
-                    {isEditing ? 'Edit Product' : 'New Product'}
-                </h2>
+                <div>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                        {isEditing ? 'Edit Product' : 'New Product'}
+                    </h1>
+                    <p className="text-sm text-slate-500">
+                        {isEditing ? 'Update product details' : 'Add a new product to your store'}
+                    </p>
+                </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6 border p-6 rounded-lg bg-white">
-                <div className="space-y-2">
-                    <Label htmlFor="name">Product Name *</Label>
-                    <Input
-                        id="name"
-                        required
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g., Gaming Laptop Pro"
-                    />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="price">Price *</Label>
-                        <Input
-                            id="price"
-                            type="number"
-                            step="0.01"
-                            required
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            placeholder="99.99"
-                        />
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Basic Info Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                        <div className="flex items-center gap-2">
+                            <Package className="h-5 w-5 text-indigo-600" />
+                            <h2 className="font-semibold text-slate-900">Basic Information</h2>
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="originalPrice">Original Price (optional)</Label>
-                        <Input
-                            id="originalPrice"
-                            type="number"
-                            step="0.01"
-                            value={originalPrice}
-                            onChange={(e) => setOriginalPrice(e.target.value)}
-                            placeholder="149.99"
-                        />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="categoryId">Category</Label>
-                        <select
-                            id="categoryId"
-                            value={categoryId}
-                            onChange={(e) => {
-                                setCategoryId(e.target.value);
-                                // Also set the category name for backwards compatibility
-                                const selected = flatCategories.find(c => c.id === e.target.value);
-                                setCategory(selected?.name.trim() || '');
-                            }}
-                            className="w-full h-10 px-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="">Select a category</option>
-                            {flatCategories.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="supplierId">Supplier</Label>
-                        <select
-                            id="supplierId"
-                            value={supplierId}
-                            onChange={(e) => setSupplierId(e.target.value)}
-                            className="w-full h-10 px-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                        >
-                            <option value="">Select a supplier</option>
-                            {suppliers.map((sup) => (
-                                <option key={sup.id} value={sup.id}>
-                                    {sup.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <Label>Product Image *</Label>
-                    <div className="flex items-start gap-4">
-                        {image && (
-                            <img src={image} alt="Preview" className="h-24 w-24 object-cover rounded border" />
-                        )}
-                        <div className="flex-1 space-y-2">
+                    <div className="p-6 space-y-5">
+                        <div className="space-y-2">
+                            <Label htmlFor="name" className="text-sm font-medium">Product Name *</Label>
                             <Input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                disabled={uploading}
+                                id="name"
+                                required
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="e.g., Gaming Laptop Pro"
+                                className="rounded-xl h-11"
                             />
-                            {uploading && (
-                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    Uploading...
-                                </div>
-                            )}
-                            <p className="text-xs text-gray-500">Or paste an image URL:</p>
-                            <Input
-                                type="url"
-                                value={image}
-                                onChange={(e) => setImage(e.target.value)}
-                                placeholder="https://..."
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+                            <textarea
+                                id="description"
+                                className="w-full min-h-[120px] p-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors resize-none"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Describe your product..."
                             />
                         </div>
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <textarea
-                        id="description"
-                        className="w-full min-h-[100px] p-3 border rounded-md text-sm"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Product description..."
-                    />
+                {/* Pricing Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                        <div className="flex items-center gap-2">
+                            <DollarSign className="h-5 w-5 text-emerald-600" />
+                            <h2 className="font-semibold text-slate-900">Pricing</h2>
+                        </div>
+                    </div>
+                    <div className="p-6">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="price" className="text-sm font-medium">Price (E£) *</Label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">E£</span>
+                                    <Input
+                                        id="price"
+                                        type="number"
+                                        step="0.01"
+                                        required
+                                        value={price}
+                                        onChange={(e) => setPrice(e.target.value)}
+                                        placeholder="0.00"
+                                        className="pl-10 rounded-xl h-11"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="originalPrice" className="text-sm font-medium">Original Price (Optional)</Label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">E£</span>
+                                    <Input
+                                        id="originalPrice"
+                                        type="number"
+                                        step="0.01"
+                                        value={originalPrice}
+                                        onChange={(e) => setOriginalPrice(e.target.value)}
+                                        placeholder="0.00"
+                                        className="pl-10 rounded-xl h-11"
+                                    />
+                                </div>
+                                <p className="text-xs text-slate-400">Set this to show a discount label</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        id="inStock"
-                        checked={inStock}
-                        onChange={(e) => setInStock(e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <Label htmlFor="inStock" className="mb-0">In Stock</Label>
+                {/* Organization Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                        <div className="flex items-center gap-2">
+                            <Tag className="h-5 w-5 text-violet-600" />
+                            <h2 className="font-semibold text-slate-900">Organization</h2>
+                        </div>
+                    </div>
+                    <div className="p-6">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="categoryId" className="text-sm font-medium">Category</Label>
+                                <select
+                                    id="categoryId"
+                                    value={categoryId}
+                                    onChange={(e) => {
+                                        setCategoryId(e.target.value);
+                                        const selected = flatCategories.find(c => c.id === e.target.value);
+                                        setCategory(selected?.name.trim() || '');
+                                    }}
+                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors bg-white"
+                                >
+                                    <option value="">Select a category</option>
+                                    {flatCategories.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="supplierId" className="text-sm font-medium">Supplier</Label>
+                                <select
+                                    id="supplierId"
+                                    value={supplierId}
+                                    onChange={(e) => setSupplierId(e.target.value)}
+                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors bg-white"
+                                >
+                                    <option value="">Select a supplier</option>
+                                    {suppliers.map((sup) => (
+                                        <option key={sup.id} value={sup.id}>
+                                            {sup.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="pt-4 flex gap-3">
+                {/* Image Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                        <div className="flex items-center gap-2">
+                            <ImageIcon className="h-5 w-5 text-pink-600" />
+                            <h2 className="font-semibold text-slate-900">Product Image *</h2>
+                        </div>
+                    </div>
+                    <div className="p-6">
+                        <div className="flex items-start gap-6">
+                            {/* Image Preview */}
+                            <div className="flex-shrink-0">
+                                {image ? (
+                                    <div className="relative group">
+                                        <img 
+                                            src={image} 
+                                            alt="Preview" 
+                                            className="h-32 w-32 object-cover rounded-2xl border-2 border-slate-100 shadow-sm" 
+                                        />
+                                        <div className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <span className="text-white text-xs font-medium">Change</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="h-32 w-32 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center bg-slate-50">
+                                        <ImageIcon className="h-10 w-10 text-slate-300" />
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* Upload Section */}
+                            <div className="flex-1 space-y-4">
+                                <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 hover:border-indigo-300 hover:bg-indigo-50/30 transition-colors cursor-pointer relative">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        disabled={uploading}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-indigo-100 rounded-lg">
+                                            <Upload className="h-5 w-5 text-indigo-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium text-slate-900">
+                                                {uploading ? 'Uploading...' : 'Click to upload'}
+                                            </p>
+                                            <p className="text-xs text-slate-500">PNG, JPG, GIF up to 10MB</p>
+                                        </div>
+                                        {uploading && <Loader2 className="h-5 w-5 animate-spin text-indigo-600 ml-auto" />}
+                                    </div>
+                                </div>
+                                
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t border-slate-200" />
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-white px-2 text-slate-400">Or paste URL</span>
+                                    </div>
+                                </div>
+                                
+                                <Input
+                                    type="url"
+                                    value={image}
+                                    onChange={(e) => setImage(e.target.value)}
+                                    placeholder="https://example.com/image.jpg"
+                                    className="rounded-xl h-11"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Stock Status Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                        <div className="flex items-center gap-2">
+                            <CheckSquare className="h-5 w-5 text-amber-600" />
+                            <h2 className="font-semibold text-slate-900">Availability</h2>
+                        </div>
+                    </div>
+                    <div className="p-6">
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                            <div className="relative">
+                                <input
+                                    type="checkbox"
+                                    checked={inStock}
+                                    onChange={(e) => setInStock(e.target.checked)}
+                                    className="peer sr-only"
+                                />
+                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-500/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                            </div>
+                            <div>
+                                <span className="text-sm font-medium text-slate-900">
+                                    {inStock ? 'In Stock' : 'Out of Stock'}
+                                </span>
+                                <p className="text-xs text-slate-500">
+                                    {inStock ? 'Product is available for purchase' : 'Product is not available'}
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4">
                     <Button
                         type="button"
                         variant="outline"
                         onClick={() => navigate('/admin/products')}
-                        className="flex-1"
+                        className="flex-1 h-12 rounded-xl border-slate-200 hover:bg-slate-50"
                     >
                         Cancel
                     </Button>
-                    <Button type="submit" disabled={loading || uploading} className="flex-1">
+                    <Button 
+                        type="submit" 
+                        disabled={loading || uploading} 
+                        className="flex-1 h-12 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+                    >
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {isEditing ? 'Update Product' : 'Create Product'}
                     </Button>

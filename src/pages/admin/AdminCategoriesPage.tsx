@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, GripVertical, Folder, Loader2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, GripVertical, Folder, Loader2, Layers, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -42,6 +42,17 @@ const ALLOWED_CATEGORIES = [
     'Cables',
     'Mouse Pads',
     'Hard Drives'
+];
+
+const CATEGORY_COLORS = [
+    'from-blue-500 to-indigo-600',
+    'from-purple-500 to-pink-600',
+    'from-emerald-500 to-teal-600',
+    'from-orange-500 to-amber-600',
+    'from-red-500 to-rose-600',
+    'from-cyan-500 to-blue-600',
+    'from-violet-500 to-purple-600',
+    'from-green-500 to-emerald-600',
 ];
 
 export function AdminCategoriesPage() {
@@ -254,45 +265,68 @@ export function AdminCategoriesPage() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                <span className="mt-4 text-slate-500">Loading categories...</span>
             </div>
         );
     }
 
     return (
-        <div>
-            <div className="flex items-center justify-between mb-6">
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Categories</h1>
-                    <p className="text-gray-500">Manage product categories</p>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                        Categories
+                    </h1>
+                    <p className="text-slate-500 mt-1">Organize your products into categories</p>
                 </div>
-                <Button onClick={() => openAddForm()}>
+                <Button 
+                    onClick={() => openAddForm()}
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+                >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Category
                 </Button>
             </div>
 
             {/* Allowed Categories Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p className="text-sm text-blue-800">
-                    <strong>Allowed categories:</strong> {ALLOWED_CATEGORIES.join(', ')}
-                </p>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50 rounded-2xl p-5">
+                <div className="flex items-start gap-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                        <Layers className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                        <p className="font-medium text-slate-900">Available Categories</p>
+                        <p className="text-sm text-slate-600 mt-1">
+                            {ALLOWED_CATEGORIES.join(' • ')}
+                        </p>
+                    </div>
+                </div>
             </div>
 
+            {/* Categories Grid */}
             {categories.length === 0 ? (
-                <div className="text-center py-20 bg-gray-50 rounded-lg">
-                    <Folder className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 mb-4">No categories yet</p>
-                    <Button onClick={() => openAddForm()}>
+                <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
+                        <Folder className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-1">No categories yet</h3>
+                    <p className="text-slate-500 mb-6">Create your first category to organize products</p>
+                    <Button 
+                        onClick={() => openAddForm()}
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+                    >
                         <Plus className="h-4 w-4 mr-2" />
                         Create First Category
                     </Button>
                 </div>
             ) : (
-                <div className="space-y-2">
-                    {categories.map(category => {
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {categories.map((category, index) => {
                         const isDragOver = dragOverId === category.id;
+                        const colorClass = CATEGORY_COLORS[index % CATEGORY_COLORS.length];
 
                         return (
                             <div
@@ -303,49 +337,66 @@ export function AdminCategoriesPage() {
                                 onDragLeave={handleDragLeave}
                                 onDrop={(e) => handleDrop(e, category)}
                                 className={`
-                                    flex items-center gap-3 p-4 bg-white border rounded-lg
-                                    hover:shadow-sm transition-all cursor-move
-                                    ${isDragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}
+                                    group relative bg-white rounded-2xl border overflow-hidden
+                                    hover:shadow-lg transition-all duration-300 cursor-move
+                                    ${isDragOver ? 'border-indigo-500 ring-2 ring-indigo-500/20 scale-[1.02]' : 'border-slate-100 hover:border-slate-200'}
                                 `}
                             >
-                                <GripVertical className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                                {/* Category Image or Gradient */}
+                                <div className="relative h-32 overflow-hidden">
+                                    {category.image ? (
+                                        <img
+                                            src={category.image}
+                                            alt={category.name}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    ) : (
+                                        <div className={`w-full h-full bg-gradient-to-br ${colorClass} opacity-90`} />
+                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                                    
+                                    {/* Drag Handle */}
+                                    <div className="absolute top-3 left-3 p-2 bg-white/20 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <GripVertical className="h-4 w-4 text-white" />
+                                    </div>
 
-                                {/* Category Image */}
-                                {category.image && (
-                                    <img
-                                        src={category.image}
-                                        alt={category.name}
-                                        className="h-12 w-12 object-cover rounded"
-                                    />
-                                )}
+                                    {/* Action Buttons */}
+                                    <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={() => openEditForm(category)}
+                                            className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors shadow-sm"
+                                        >
+                                            <Edit2 className="h-4 w-4 text-slate-700" />
+                                        </button>
+                                        <button
+                                            onClick={() => openDeleteConfirm(category)}
+                                            className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-red-50 transition-colors shadow-sm"
+                                        >
+                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                        </button>
+                                    </div>
 
-                                <Folder className="h-5 w-5 text-yellow-500 flex-shrink-0" />
-
-                                <div className="flex-1">
-                                    <span className="font-medium text-lg">{category.name}</span>
+                                    {/* Product Count Badge */}
                                     {category._count && (
-                                        <span className="ml-2 text-sm text-gray-500">
-                                            ({category._count.products} products)
-                                        </span>
+                                        <div className="absolute bottom-3 right-3">
+                                            <span className="px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-slate-700 shadow-sm">
+                                                {category._count.products} products
+                                            </span>
+                                        </div>
                                     )}
                                 </div>
 
-                                <div className="flex items-center gap-1">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => openEditForm(category)}
-                                    >
-                                        <Edit2 className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => openDeleteConfirm(category)}
-                                        className="text-red-600 hover:text-red-700"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                {/* Category Info */}
+                                <div className="p-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${colorClass}`}>
+                                            <Folder className="h-4 w-4 text-white" />
+                                        </div>
+                                        <h3 className="font-semibold text-slate-900">{category.name}</h3>
+                                    </div>
+                                    {category.description && (
+                                        <p className="text-sm text-slate-500 mt-2 line-clamp-2">{category.description}</p>
+                                    )}
                                 </div>
                             </div>
                         );
@@ -355,29 +406,30 @@ export function AdminCategoriesPage() {
 
             {/* Add/Edit Modal */}
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-md">
                     <DialogHeader>
-                        <DialogTitle>
+                        <DialogTitle className="text-xl">
                             {editingCategory ? 'Edit Category' : 'Add Category'}
                         </DialogTitle>
                     </DialogHeader>
 
-                    <div className="space-y-4 py-4">
-                        <div>
-                            <Label htmlFor="name">Name *</Label>
+                    <div className="space-y-5 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="name" className="text-sm font-medium">Name *</Label>
                             {editingCategory ? (
                                 <Input
                                     id="name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     placeholder="Category name"
+                                    className="rounded-xl"
                                 />
                             ) : (
                                 <select
                                     id="name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
                                 >
                                     <option value="">Select a category...</option>
                                     {ALLOWED_CATEGORIES.map(cat => (
@@ -387,49 +439,58 @@ export function AdminCategoriesPage() {
                             )}
                         </div>
 
-                        <div>
-                            <Label htmlFor="description">Description</Label>
+                        <div className="space-y-2">
+                            <Label htmlFor="description" className="text-sm font-medium">Description</Label>
                             <Input
                                 id="description"
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 placeholder="Optional description"
+                                className="rounded-xl"
                             />
                         </div>
 
-                        <div>
-                            <Label>Image</Label>
-                            <div className="flex items-start gap-4 mt-1">
-                                {formData.image && (
-                                    <img src={formData.image} alt="Preview" className="h-20 w-20 object-cover rounded border" />
+                        <div className="space-y-2">
+                            <Label className="text-sm font-medium">Image</Label>
+                            <div className="flex items-start gap-4">
+                                {formData.image ? (
+                                    <img src={formData.image} alt="Preview" className="h-20 w-20 object-cover rounded-xl border shadow-sm" />
+                                ) : (
+                                    <div className="h-20 w-20 rounded-xl border-2 border-dashed border-slate-200 flex items-center justify-center">
+                                        <ImageIcon className="h-6 w-6 text-slate-300" />
+                                    </div>
                                 )}
-                                <div className="flex-1 space-y-2">
+                                <div className="flex-1 space-y-3">
                                     <Input
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageUpload}
                                         disabled={saving}
+                                        className="rounded-xl"
                                     />
-                                    <p className="text-xs text-gray-500">Or paste an image URL:</p>
+                                    <p className="text-xs text-slate-400">Or paste an image URL:</p>
                                     <Input
                                         id="image"
                                         value={formData.image}
                                         onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                                         placeholder="https://..."
+                                        className="rounded-xl"
                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsFormOpen(false)}>
+                    <DialogFooter className="gap-2">
+                        <Button variant="outline" onClick={() => setIsFormOpen(false)} className="rounded-xl">
                             Cancel
                         </Button>
-                        <Button onClick={handleSave} disabled={saving}>
-                            {saving ? (
-                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            ) : null}
+                        <Button 
+                            onClick={handleSave} 
+                            disabled={saving}
+                            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl"
+                        >
+                            {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                             {editingCategory ? 'Update' : 'Create'}
                         </Button>
                     </DialogFooter>
@@ -438,7 +499,7 @@ export function AdminCategoriesPage() {
 
             {/* Delete Confirmation */}
             <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-                <AlertDialogContent>
+                <AlertDialogContent className="rounded-2xl">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Category</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -446,9 +507,12 @@ export function AdminCategoriesPage() {
                             Products in this category will become uncategorized.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+                    <AlertDialogFooter className="gap-2">
+                        <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                            onClick={handleDelete} 
+                            className="bg-red-600 hover:bg-red-700 rounded-xl"
+                        >
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
