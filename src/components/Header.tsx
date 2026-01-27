@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse, Headphones, Keyboard, Cable, Grid3x3, HardDrive, LogIn, UserPlus, User, Package, List, Settings } from 'lucide-react';
+import { Search, ShoppingCart, Bell, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse, Headphones, Keyboard, Cable, Grid3x3, HardDrive, LogIn, UserPlus, User, Package, List, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -307,6 +307,20 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                   </div>
                 </HoverCardContent>
               </HoverCard>
+
+              {/* Notification Bell */}
+              <button
+                className="flex flex-col items-center hover:outline hover:outline-1 hover:outline-white px-2 py-1 relative"
+                onClick={() => navigate('/notifications')}
+              >
+                <div className="relative">
+                  <Bell className="h-6 w-6" />
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                    3
+                  </span>
+                </div>
+                <span className="text-xs font-bold">Alerts</span>
+              </button>
 
               {/* Auth Modal - controlled separately */}
               <AuthModal
