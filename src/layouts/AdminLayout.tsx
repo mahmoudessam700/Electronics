@@ -1,6 +1,6 @@
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, Users, Zap } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, Users, Zap, ChevronRight } from 'lucide-react';
 
 export function AdminLayout() {
     const { user, loading, logout } = useAuth();
@@ -11,7 +11,7 @@ export function AdminLayout() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
                     <span className="text-slate-400 text-sm">Loading admin panel...</span>
                 </div>
             </div>
@@ -33,23 +33,30 @@ export function AdminLayout() {
     ];
 
     return (
-        <div className="min-h-screen flex bg-slate-100">
-            {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-slate-200 flex flex-col min-h-screen">
+        <div className="min-h-screen flex bg-slate-50">
+            {/* Modern Glass Sidebar */}
+            <aside className="w-72 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 flex flex-col min-h-screen relative overflow-hidden">
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                
                 {/* Logo */}
-                <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-200">
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                <div className="relative h-20 flex items-center gap-3 px-6 border-b border-white/5">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/25">
                         <Zap className="h-5 w-5 text-white" />
                     </div>
-                    <span className="font-semibold text-slate-800">Electronics Store</span>
+                    <div>
+                        <h1 className="font-bold text-white">Electronics</h1>
+                        <p className="text-[11px] text-slate-400">Admin Dashboard</p>
+                    </div>
                 </div>
 
                 {/* Navigation */}
-                <div className="flex-1 py-4 overflow-y-auto" data-form-type="other" data-lpignore="true">
-                    <div className="px-4 mb-2">
-                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Main Menu</span>
+                <div className="relative flex-1 py-6 px-4 overflow-y-auto" data-form-type="other" data-lpignore="true">
+                    <div className="mb-4">
+                        <span className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Navigation</span>
                     </div>
-                    <ul className="space-y-1 px-3">
+                    <ul className="space-y-1">
                         {navItems.map((item) => {
                             const isActive = location.pathname === item.path;
                             const Icon = item.icon;
@@ -60,14 +67,23 @@ export function AdminLayout() {
                                         onClick={() => navigate(item.path)}
                                         data-lpignore="true"
                                         data-form-type="other"
-                                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                                        className={`w-full group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                                             isActive
-                                                ? 'bg-violet-50 text-violet-700'
-                                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                                ? 'bg-gradient-to-r from-violet-500/20 to-purple-500/10 text-white border border-violet-500/20 shadow-lg shadow-violet-500/5'
+                                                : 'text-slate-400 hover:text-white hover:bg-white/5'
                                         }`}
                                     >
-                                        <Icon className={`h-5 w-5 ${isActive ? 'text-violet-600' : 'text-slate-400'}`} />
-                                        <span>{item.name}</span>
+                                        <div className={`flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 ${
+                                            isActive 
+                                                ? 'bg-violet-500/20 text-violet-400' 
+                                                : 'bg-slate-800/50 text-slate-500 group-hover:bg-slate-700/50 group-hover:text-slate-300'
+                                        }`}>
+                                            <Icon className="h-[18px] w-[18px]" />
+                                        </div>
+                                        <span className="flex-1 text-left">{item.name}</span>
+                                        {isActive && (
+                                            <ChevronRight className="h-4 w-4 text-violet-400" />
+                                        )}
                                     </button>
                                 </li>
                             );
@@ -76,41 +92,44 @@ export function AdminLayout() {
                 </div>
 
                 {/* User Section */}
-                <div className="border-t border-slate-200 p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white text-sm font-medium">
+                <div className="relative border-t border-white/5 p-4">
+                    {/* User Card */}
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 backdrop-blur-sm mb-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white font-semibold shadow-lg">
                             {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-800 truncate">{user.name || 'Admin'}</p>
+                            <p className="text-sm font-semibold text-white truncate">{user.name || 'Admin'}</p>
                             <p className="text-xs text-slate-400 truncate">{user.email}</p>
                         </div>
                     </div>
-                    <div className="space-y-1">
+                    
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-2">
                         <button
                             type="button"
                             onClick={() => navigate('/')}
                             data-lpignore="true"
-                            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                            className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-all duration-200"
                         >
                             <Home className="h-4 w-4" />
-                            <span>Go to Storefront</span>
+                            <span>Store</span>
                         </button>
                         <button
                             type="button"
                             onClick={logout}
                             data-lpignore="true"
-                            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200"
                         >
                             <LogOut className="h-4 w-4" />
-                            <span>Sign Out</span>
+                            <span>Logout</span>
                         </button>
                     </div>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-auto">
+            <main className="flex-1 overflow-auto bg-slate-50">
                 <div className="p-8 max-w-7xl mx-auto">
                     <Outlet />
                 </div>
