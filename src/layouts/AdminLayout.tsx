@@ -132,7 +132,7 @@ export function AdminLayout() {
     );
 
     return (
-        <div className="min-h-screen flex bg-gray-100">
+        <div className="min-h-screen bg-gray-100">
             {/* Mobile Header */}
             <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#4A5568] h-14 flex items-center justify-between px-4">
                 <div className="flex items-center gap-3">
@@ -157,8 +157,8 @@ export function AdminLayout() {
                 />
             )}
 
-            {/* Sidebar - Desktop */}
-            <aside className="hidden lg:flex w-64 bg-[#4A5568] flex-col min-h-screen fixed left-0 top-0 bottom-0">
+            {/* Sidebar - Desktop (fixed) */}
+            <aside className="hidden lg:flex w-64 bg-[#4A5568] flex-col fixed inset-y-0 left-0 z-30">
                 <SidebarContent />
             </aside>
 
@@ -169,14 +169,14 @@ export function AdminLayout() {
                 <SidebarContent />
             </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 lg:ml-64 min-h-screen">
-                <div className="pt-14 lg:pt-0">
+            {/* Main Content - offset for sidebar on desktop */}
+            <div className="lg:pl-64">
+                <main className="min-h-screen pt-14 lg:pt-0">
                     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
                         <Outlet />
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 }
