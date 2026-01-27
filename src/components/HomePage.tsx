@@ -29,12 +29,14 @@ export function HomePage({ onNavigate }: HomePageProps) {
         const [catsRes, prodsRes, settingsRes] = await Promise.all([
           fetch('/api/categories'),
           fetch('/api/products'),
-          fetch('/api/settings?type=homepage')
+          fetch(`/api/settings?type=homepage&t=${Date.now()}`)
         ]);
 
         const catsData = await catsRes.json();
         const prodsData = await prodsRes.json();
         const settingsData = await settingsRes.json();
+
+        console.log('Home Settings Loaded:', settingsData);
 
         setCategories(catsData);
         setProducts(prodsData);
@@ -59,6 +61,16 @@ export function HomePage({ onNavigate }: HomePageProps) {
     if (!settings || !settings.sections) return defaultName;
     const section = settings.sections.find((s: any) => s.id === id);
     return section && section.name ? section.name : defaultName;
+  };
+
+  const getSectionBadge = (id: string) => {
+    if (!settings || !settings.sections) return { show: true, text: 'Ends in 12:34:56' };
+    const section = settings.sections.find((s: any) => s.id === id);
+    if (!section) return { show: true, text: 'Ends in 12:34:56' };
+    return {
+      show: section.showBadge !== undefined ? section.showBadge : true,
+      text: section.badgeText || 'Ends in 12:34:56'
+    };
   };
 
   // Filter products for different sections
@@ -128,20 +140,22 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0F1111', margin: 0 }}>
                   {getSectionName('deals-of-the-day', 'Deals of the Day')}
                 </h2>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  color: '#C7511F',
-                  backgroundColor: '#FEF1EE',
-                  padding: '6px 14px',
-                  borderRadius: 999,
-                  fontSize: 13,
-                  fontWeight: 600
-                }}>
-                  <Clock style={{ width: 16, height: 16 }} />
-                  <span>Ends in 12:34:56</span>
-                </div>
+                {getSectionBadge('deals-of-the-day').show && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    color: '#C7511F',
+                    backgroundColor: '#FEF1EE',
+                    padding: '6px 14px',
+                    borderRadius: 999,
+                    fontSize: 13,
+                    fontWeight: 600
+                  }}>
+                    <Clock style={{ width: 16, height: 16 }} />
+                    <span>{getSectionBadge('deals-of-the-day').text}</span>
+                  </div>
+                )}
               </div>
 
               <div style={{

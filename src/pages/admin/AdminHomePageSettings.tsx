@@ -20,6 +20,8 @@ interface Section {
     name: string;
     description: string;
     isEnabled: boolean;
+    badgeText?: string;
+    showBadge?: boolean;
 }
 
 export function AdminHomePageSettings() {
@@ -28,7 +30,9 @@ export function AdminHomePageSettings() {
             id: 'deals-of-the-day', 
             name: 'Deals of the Day', 
             description: 'Shows products that have an original price higher than their current price.', 
-            isEnabled: true 
+            isEnabled: true,
+            badgeText: 'Ends in 12:34:56',
+            showBadge: true
         },
         { 
             id: 'inspired-browsing', 
@@ -66,16 +70,19 @@ export function AdminHomePageSettings() {
     const fetchSettings = async () => {
         try {
             setLoading(true);
-            const res = await fetch('/api/settings?type=homepage');
+            const res = await fetch(`/api/settings?type=homepage&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.sections) {
-                    setSections(data.sections);
+                    // Merge saved settings with defaults to ensure new fields like badgeText exist
+                    setSections(prev => prev.map(defSection => {
+                        const saved = data.sections.find((s: any) => s.id === defSection.id);
+                        return saved ? { ...defSection, ...saved } : defSection;
+                    }));
                 }
             }
         } catch (error) {
             console.error('Failed to fetch settings:', error);
-            // We use default state if fetch fails
         } finally {
             setLoading(false);
         }
@@ -87,7 +94,7 @@ export function AdminHomePageSettings() {
         ));
     };
 
-    const updateSection = (id: string, field: 'name' | 'description', value: string) => {
+    const updateSection = (id: string, field: keyof Section, value: any) => {
         setSections(prev => prev.map(section => 
             section.id === id ? { ...section, [field]: value } : section
         ));
@@ -200,6 +207,35 @@ export function AdminHomePageSettings() {
                                             target.style.height = target.scrollHeight + 'px';
                                         }}
                                     />
+
+                                    {/* Additional Settings for Specific Sections */}
+                                    {section.id === 'deals-of-the-day' && (
+                                        <div className="flex flex-col gap-3 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="h-3.5 w-3.5 text-orange-600" />
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Countdown Badge</span>
+                                                </div>
+                                                <button
+                                                    onClick={() => updateSection(section.id, 'showBadge', !section.showBadge)}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${
+                                                        section.showBadge ? 'bg-orange-100 text-orange-700' : 'bg-slate-200 text-slate-500'
+                                                    }`}
+                                                >
+                                                    {section.showBadge ? 'ENABLED' : 'DISABLED'}
+                                                </button>
+                                            </div>
+                                            {section.showBadge && (
+                                                <input 
+                                                    type="text"
+                                                    value={section.badgeText || ''}
+                                                    onChange={(e) => updateSection(section.id, 'badgeText', e.target.value)}
+                                                    className="w-full text-xs bg-white border border-slate-200 rounded-lg py-1.5 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                                                    placeholder="Enter badge text (e.g. Ends in 12:34:56)"
+                                                />
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
