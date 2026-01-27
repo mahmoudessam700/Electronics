@@ -134,7 +134,7 @@ export function AdminLayout() {
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Mobile Header - fixed at top */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#4A5568] h-14 flex items-center justify-between px-4">
+            <header className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-[#4A5568] h-14 flex items-center justify-between px-4">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-[#718096] flex items-center justify-center">
                         <Zap className="h-4 w-4 text-white" />
@@ -142,29 +142,95 @@ export function AdminLayout() {
                     <span className="font-bold text-white text-sm">Admin Panel</span>
                 </div>
                 <button
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    onClick={() => setIsSidebarOpen(true)}
                     className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
                 >
-                    {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                    <Menu className="h-5 w-5" />
                 </button>
             </header>
 
-            {/* Mobile Sidebar Overlay */}
-            <div 
-                className={`lg:hidden fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
-                    isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                }`}
-                onClick={() => setIsSidebarOpen(false)}
-            />
-
-            {/* Mobile Sidebar */}
-            <aside 
-                className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 bg-[#4A5568] flex flex-col z-50 transition-transform duration-300 ease-in-out ${
-                    isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                }`}
-            >
-                <SidebarContent />
-            </aside>
+            {/* Mobile Sidebar - only render when open */}
+            {isSidebarOpen && (
+                <>
+                    {/* Overlay */}
+                    <div 
+                        className="lg:hidden fixed inset-0 z-40 bg-black/50"
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                    {/* Sidebar */}
+                    <aside className="lg:hidden fixed top-0 left-0 bottom-0 w-64 bg-[#4A5568] flex flex-col z-50">
+                        {/* Close button in sidebar header */}
+                        <div className="h-14 flex items-center justify-between px-4 border-b border-white/10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-[#718096] flex items-center justify-center">
+                                    <Zap className="h-4 w-4 text-white" />
+                                </div>
+                                <span className="font-bold text-white text-sm">Menu</span>
+                            </div>
+                            <button
+                                onClick={() => setIsSidebarOpen(false)}
+                                className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        {/* Navigation */}
+                        <div className="flex-1 py-4 px-3 overflow-y-auto">
+                            <nav className="space-y-1">
+                                {navItems.map((item) => {
+                                    const isActive = location.pathname === item.path;
+                                    const Icon = item.icon;
+                                    return (
+                                        <div
+                                            key={item.path}
+                                            role="link"
+                                            tabIndex={0}
+                                            onClick={() => handleNavClick(item.path)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleNavClick(item.path)}
+                                            className={`w-full group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                                                isActive
+                                                    ? 'bg-[#718096] text-white'
+                                                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                                            }`}
+                                        >
+                                            <Icon className="h-4 w-4" />
+                                            <span>{item.name}</span>
+                                        </div>
+                                    );
+                                })}
+                            </nav>
+                        </div>
+                        {/* User section */}
+                        <div className="border-t border-white/10 p-3">
+                            <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5 mb-2">
+                                <div className="w-8 h-8 rounded-full bg-[#718096] flex items-center justify-center text-white font-semibold text-sm">
+                                    {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-white truncate">{user.name || 'Admin'}</p>
+                                    <p className="text-xs text-white/50 truncate">{user.email}</p>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    onClick={() => { navigate('/'); setIsSidebarOpen(false); }}
+                                    className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg"
+                                >
+                                    <Home className="h-4 w-4" />
+                                    <span>Store</span>
+                                </button>
+                                <button
+                                    onClick={() => { logout(); setIsSidebarOpen(false); }}
+                                    className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg"
+                                >
+                                    <LogOut className="h-4 w-4" />
+                                    <span>Logout</span>
+                                </button>
+                            </div>
+                        </div>
+                    </aside>
+                </>
+            )}
 
             {/* Desktop Layout */}
             <div className="hidden lg:flex min-h-screen">
