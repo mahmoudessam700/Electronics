@@ -247,12 +247,15 @@ export function AdminLayout() {
                 </main>
             </div>
 
-            {/* Mobile Main Content */}
-            <main className="lg:hidden min-h-screen mt-14">
-                <div className="p-4 pt-6">
-                    <Outlet />
-                </div>
-            </main>
+            {/* Mobile Main Content - spacer div pushes content below fixed header */}
+            <div className="lg:hidden">
+                <div className="h-14" aria-hidden="true" /> {/* Spacer for fixed header */}
+                <main className="min-h-screen bg-gray-100">
+                    <div className="p-4">
+                        <Outlet />
+                    </div>
+                </main>
+            </div>
         </div>
     );
 }
