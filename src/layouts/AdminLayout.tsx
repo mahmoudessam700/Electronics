@@ -38,11 +38,11 @@ export function AdminLayout() {
         <div className="flex flex-col h-full w-full bg-white border-r border-slate-200">
             {/* Logo Section */}
             <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-100 flex-shrink-0">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-900 shadow-lg">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#0F172A] shadow-lg">
                     <Zap className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h1 className="font-bold text-slate-900 text-base truncate">Adsolutions</h1>
+                    <h1 className="font-bold text-slate-900 text-base leading-tight">Adsolutions</h1>
                     <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase">Admin Area</p>
                 </div>
             </div>
@@ -65,14 +65,14 @@ export function AdminLayout() {
                                 }}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
                                     isActive
-                                        ? 'bg-slate-900 text-white shadow-xl shadow-slate-200'
+                                        ? 'bg-[#0F172A] text-white shadow-xl shadow-slate-200 active-menu-item'
                                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                                 }`}
                             >
                                 <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'}`} />
-                                <span className="flex-1 text-left">{item.name}</span>
+                                <span className={`flex-1 text-left ${isActive ? 'text-white' : ''}`}>{item.name}</span>
                                 {isActive && (
-                                    <div className="w-1.5 h-1.5 rounded-full bg-white/50" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-white/40" />
                                 )}
                             </button>
                         );
@@ -84,12 +84,12 @@ export function AdminLayout() {
             <div className="p-4 border-t border-slate-100 bg-slate-50/30 space-y-3">
                 <div className="flex flex-col gap-1 p-3 rounded-2xl bg-white border border-slate-200 shadow-sm">
                     <div className="flex items-center gap-2 mb-1">
-                        <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-[10px] border border-slate-200">
+                        <div className="w-7 h-7 rounded-lg bg-[#0F172A] flex items-center justify-center text-white font-bold text-[10px]">
                             {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                         </div>
-                        <span className="text-[11px] font-bold text-slate-900 truncate">{user.name || 'Administrator'}</span>
+                        <span className="text-xs font-bold text-slate-900 truncate">{user.name || 'Admin'}</span>
                     </div>
-                    <p className="text-[10px] text-slate-500 truncate px-1" title={user.email}>{user.email}</p>
+                    <p className="text-[10px] text-slate-500 truncate px-1 opacity-80" title={user.email}>{user.email}</p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
@@ -97,14 +97,14 @@ export function AdminLayout() {
                         onClick={() => navigate('/')}
                         className="flex items-center justify-center gap-2 py-2 px-3 text-[11px] font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 transition-all shadow-sm active:scale-95"
                     >
-                        <Home className="h-3.5 w-3.5" />
+                        <Home className="h-4 w-4" />
                         <span>Store</span>
                     </button>
                     <button
                         onClick={logout}
                         className="flex items-center justify-center gap-2 py-2 px-3 text-[11px] font-bold text-red-600 hover:text-red-700 bg-white hover:bg-red-50 rounded-xl border border-red-100 transition-all shadow-sm active:scale-95"
                     >
-                        <LogOut className="h-3.5 w-3.5" />
+                        <LogOut className="h-4 w-4" />
                         <span>Exit</span>
                     </button>
                 </div>
