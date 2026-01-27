@@ -107,14 +107,19 @@ export function AdminHomePageSettings() {
 
     const autoSave = async (newSections: Section[]) => {
         try {
-            await fetch('/api/settings?type=homepage', {
+            const res = await fetch('/api/settings?type=homepage', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sections: newSections })
             });
-            console.log('Auto-saved settings');
+            if (res.ok) {
+                console.log('Auto-saved settings');
+            } else {
+                toast.error('Failed to auto-save changes');
+            }
         } catch (error) {
             console.error('Auto-save failed:', error);
+            toast.error('Network error during auto-save');
         }
     };
 
@@ -128,7 +133,7 @@ export function AdminHomePageSettings() {
             });
 
             if (res.ok) {
-                toast.success('Home page settings updated successfully!');
+                toast.success('All settings saved and applied!');
             } else {
                 toast.error('Failed to save settings');
             }

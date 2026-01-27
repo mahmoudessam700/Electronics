@@ -38,15 +38,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
         const prodsData = await prodsRes.json();
         const settingsData = await settingsRes.json();
 
-        console.log('--- Home Layout Debug ---');
-        console.log('Settings Payload:', settingsData);
-        if (settingsData && settingsData.sections) {
-          settingsData.sections.forEach((s: any) => {
-            console.log(`Section [${s.id}]: Visible = ${s.isEnabled}`);
-          });
-        }
-        console.log('-------------------------');
-
+        console.log('--- Home Layout Loaded ---');
+        console.log('Sections state:', settingsData?.sections?.map((s: any) => `${s.id}: ${s.isEnabled}`).join(', '));
+        
         setCategories(catsData);
         setProducts(prodsData);
         setSettings(settingsData);
