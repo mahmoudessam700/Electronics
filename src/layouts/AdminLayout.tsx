@@ -27,7 +27,7 @@ export function AdminLayout() {
         { name: 'Categories', path: '/admin/categories', icon: Folder },
         { name: 'Products', path: '/admin/products', icon: Package },
         { name: 'Suppliers', path: '/admin/suppliers', icon: Building2 },
-        { name: 'Users', path: '/admin/users', icon: Users },
+        { name: 'Customers', path: '/admin/users', icon: Users },
         { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
         { name: 'Files', path: '/admin/files', icon: FolderOpen },
     ];
@@ -52,7 +52,13 @@ export function AdminLayout() {
                 </div>
 
                 {/* Navigation */}
-                <div className="relative flex-1 py-6 px-4 overflow-y-auto" data-form-type="other" data-lpignore="true">
+                <form 
+                    className="relative flex-1 py-6 px-4 overflow-y-auto" 
+                    autoComplete="off"
+                    onSubmit={(e) => e.preventDefault()}
+                >
+                    <input type="text" style={{ display: 'none' }} />
+                    <input type="password" style={{ display: 'none' }} />
                     <div className="mb-4">
                         <span className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Navigation</span>
                     </div>
@@ -62,12 +68,12 @@ export function AdminLayout() {
                             const Icon = item.icon;
                             return (
                                 <li key={item.path}>
-                                    <button
-                                        type="button"
+                                    <div
+                                        role="button"
+                                        tabIndex={0}
                                         onClick={() => navigate(item.path)}
-                                        data-lpignore="true"
-                                        data-form-type="other"
-                                        className={`w-full group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                        onKeyDown={(e) => e.key === 'Enter' && navigate(item.path)}
+                                        className={`w-full group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer select-none ${
                                             isActive
                                                 ? 'bg-gradient-to-r from-violet-500/20 to-purple-500/10 text-white border border-violet-500/20 shadow-lg shadow-violet-500/5'
                                                 : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -84,12 +90,12 @@ export function AdminLayout() {
                                         {isActive && (
                                             <ChevronRight className="h-4 w-4 text-violet-400" />
                                         )}
-                                    </button>
+                                    </div>
                                 </li>
                             );
                         })}
                     </ul>
-                </div>
+                </form>
 
                 {/* User Section */}
                 <div className="relative border-t border-white/5 p-4">
@@ -106,24 +112,26 @@ export function AdminLayout() {
                     
                     {/* Action Buttons */}
                     <div className="grid grid-cols-2 gap-2">
-                        <button
-                            type="button"
+                        <div
+                            role="button"
+                            tabIndex={0}
                             onClick={() => navigate('/')}
-                            data-lpignore="true"
-                            className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-all duration-200"
+                            onKeyDown={(e) => e.key === 'Enter' && navigate('/')}
+                            className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-all duration-200 cursor-pointer select-none"
                         >
                             <Home className="h-4 w-4" />
                             <span>Store</span>
-                        </button>
-                        <button
-                            type="button"
+                        </div>
+                        <div
+                            role="button"
+                            tabIndex={0}
                             onClick={logout}
-                            data-lpignore="true"
-                            className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200"
+                            onKeyDown={(e) => e.key === 'Enter' && logout()}
+                            className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200 cursor-pointer select-none"
                         >
                             <LogOut className="h-4 w-4" />
                             <span>Logout</span>
-                        </button>
+                        </div>
                     </div>
                 </div>
             </aside>
