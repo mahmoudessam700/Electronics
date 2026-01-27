@@ -87,56 +87,56 @@ export function AdminOrdersPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                         Orders
                     </h1>
-                    <p className="text-slate-500 mt-1">Manage and track customer orders</p>
+                    <p className="text-gray-500 mt-1 text-sm">Manage and track customer orders</p>
                 </div>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-indigo-50">
-                            <ShoppingBag className="h-5 w-5 text-indigo-600" />
+                        <div className="p-2 rounded-lg bg-[#4A5568]">
+                            <ShoppingBag className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Total Orders</p>
-                            <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+                            <p className="text-sm text-gray-500">Total Orders</p>
+                            <p className="text-xl font-bold text-gray-900">{stats.total}</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-amber-50">
+                        <div className="p-2 rounded-lg bg-amber-100">
                             <Clock className="h-5 w-5 text-amber-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Pending</p>
-                            <p className="text-2xl font-bold text-amber-600">{stats.pending}</p>
+                            <p className="text-sm text-gray-500">Pending</p>
+                            <p className="text-xl font-bold text-amber-600">{stats.pending}</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-blue-50">
+                        <div className="p-2 rounded-lg bg-blue-100">
                             <Package className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Processing</p>
-                            <p className="text-2xl font-bold text-blue-600">{stats.processing}</p>
+                            <p className="text-sm text-gray-500">Processing</p>
+                            <p className="text-xl font-bold text-blue-600">{stats.processing}</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-emerald-50">
+                        <div className="p-2 rounded-lg bg-emerald-100">
                             <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Delivered</p>
-                            <p className="text-2xl font-bold text-emerald-600">{stats.delivered}</p>
+                            <p className="text-sm text-gray-500">Delivered</p>
+                            <p className="text-xl font-bold text-emerald-600">{stats.delivered}</p>
                         </div>
                     </div>
                 </div>
@@ -145,10 +145,10 @@ export function AdminOrdersPage() {
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                         placeholder="Search orders..."
-                        className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
+                        className="pl-10 bg-white border-gray-200 focus:border-[#4A5568] rounded-lg"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -158,10 +158,10 @@ export function AdminOrdersPage() {
                         <button
                             key={status}
                             onClick={() => setStatusFilter(status)}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                                 statusFilter === status
-                                    ? 'bg-[#4A5568] text-white shadow-lg shadow-[#4A5568]/25'
-                                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                                    ? 'bg-[#4A5568] text-white'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                             }`}
                         >
                             {status === 'ALL' ? 'All' : STATUS_CONFIG[status]?.label || status}
@@ -171,40 +171,40 @@ export function AdminOrdersPage() {
             </div>
 
             {/* Orders Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="bg-slate-50/80 border-b border-slate-100">
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Order</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Customer</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Date</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Total</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                            <tr className="bg-gray-50 border-b border-gray-200">
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Order</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden sm:table-cell">Customer</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Date</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Total</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-gray-100">
                             {filteredOrders.map((order) => {
                                 const config = STATUS_CONFIG[order.status] || STATUS_CONFIG.PENDING;
                                 const StatusIcon = config.icon;
                                 
                                 return (
-                                    <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="py-4 px-6">
-                                            <span className="font-mono text-sm font-bold text-indigo-600">
+                                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="py-3 px-4">
+                                            <span className="font-mono text-sm font-semibold text-[#4A5568]">
                                                 {order.orderNumber}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
+                                        <td className="py-3 px-4 hidden sm:table-cell">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-8 h-8 rounded-full bg-[#4A5568] flex items-center justify-center text-white font-semibold text-xs">
                                                     {order.customerEmail[0].toUpperCase()}
                                                 </div>
-                                                <span className="text-sm text-slate-700">{order.customerEmail}</span>
+                                                <span className="text-sm text-gray-700 truncate max-w-[150px]">{order.customerEmail}</span>
                                             </div>
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <div className="flex items-center gap-2 text-slate-500">
+                                        <td className="py-3 px-4 hidden md:table-cell">
+                                            <div className="flex items-center gap-2 text-gray-500">
                                                 <Calendar className="h-4 w-4" />
                                                 <span className="text-sm">
                                                     {new Date(order.createdAt).toLocaleDateString('en-US', {
@@ -215,17 +215,17 @@ export function AdminOrdersPage() {
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <span className="text-base font-bold text-slate-900">
+                                        <td className="py-3 px-4">
+                                            <span className="text-sm font-bold text-gray-900">
                                                 E£{order.totalAmount.toFixed(2)}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-6">
+                                        <td className="py-3 px-4">
                                             <div className="relative inline-block">
                                                 <select
                                                     value={order.status}
                                                     onChange={(e) => updateStatus(order.id, e.target.value)}
-                                                    className={`appearance-none pl-3 pr-8 py-2 rounded-xl text-sm font-semibold border cursor-pointer transition-colors ${config.bg} ${config.color} ${config.border} focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20`}
+                                                    className={`appearance-none pl-3 pr-7 py-1.5 rounded-lg text-xs font-medium border cursor-pointer transition-colors ${config.bg} ${config.color} ${config.border} focus:outline-none focus:ring-2 focus:ring-[#4A5568]/20`}
                                                 >
                                                     <option value="PENDING">Pending</option>
                                                     <option value="PROCESSING">Processing</option>
@@ -233,8 +233,8 @@ export function AdminOrdersPage() {
                                                     <option value="DELIVERED">Delivered</option>
                                                     <option value="CANCELLED">Cancelled</option>
                                                 </select>
-                                                <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                    <svg className={`w-4 h-4 ${config.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                                                    <svg className={`w-3 h-3 ${config.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                                     </svg>
                                                 </div>
@@ -248,12 +248,12 @@ export function AdminOrdersPage() {
                 </div>
 
                 {filteredOrders.length === 0 && (
-                    <div className="py-16 text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
-                            <ShoppingBag className="h-8 w-8 text-slate-400" />
+                    <div className="py-12 text-center">
+                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gray-100 mb-4">
+                            <ShoppingBag className="h-7 w-7 text-gray-400" />
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-900 mb-1">No orders found</h3>
-                        <p className="text-slate-500">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">No orders found</h3>
+                        <p className="text-gray-500">
                             {searchQuery || statusFilter !== 'ALL' 
                                 ? 'Try adjusting your filters' 
                                 : 'Orders will appear here when customers place them'}

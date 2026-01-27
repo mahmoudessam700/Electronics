@@ -81,8 +81,8 @@ export function AdminFilesPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
-                <span className="mt-4 text-slate-500">Loading files...</span>
+                <div className="w-12 h-12 border-4 border-[#4A5568]/30 border-t-[#4A5568] rounded-full animate-spin" />
+                <span className="mt-4 text-gray-500">Loading files...</span>
             </div>
         );
     }
@@ -92,15 +92,15 @@ export function AdminFilesPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                         File Manager
                     </h1>
-                    <p className="text-slate-500 mt-1">Manage uploaded files and media</p>
+                    <p className="text-gray-500 mt-1 text-sm">Manage uploaded files and media</p>
                 </div>
                 <Button 
                     onClick={fetchFiles} 
                     variant="outline" 
-                    className="rounded-xl border-slate-200 hover:bg-slate-50"
+                    className="rounded-lg border-gray-200 hover:bg-gray-50"
                 >
                     <RefreshCw className="mr-2 h-4 w-4" />
                     Refresh
@@ -108,37 +108,37 @@ export function AdminFilesPage() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-indigo-50">
-                            <File className="h-5 w-5 text-indigo-600" />
+                        <div className="p-2 rounded-lg bg-[#4A5568]">
+                            <File className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Total Files</p>
-                            <p className="text-2xl font-bold text-slate-900">{files.length}</p>
+                            <p className="text-sm text-gray-500">Total Files</p>
+                            <p className="text-xl font-bold text-gray-900">{files.length}</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-emerald-50">
-                            <ImageIcon className="h-5 w-5 text-emerald-600" />
+                        <div className="p-2 rounded-lg bg-[#718096]">
+                            <ImageIcon className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Images</p>
-                            <p className="text-2xl font-bold text-emerald-600">{imageCount}</p>
+                            <p className="text-sm text-gray-500">Images</p>
+                            <p className="text-xl font-bold text-gray-900">{imageCount}</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-purple-50">
-                            <HardDrive className="h-5 w-5 text-purple-600" />
+                        <div className="p-2 rounded-lg bg-[#2D3748]">
+                            <HardDrive className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Total Size</p>
-                            <p className="text-2xl font-bold text-purple-600">{formatSize(totalSize)}</p>
+                            <p className="text-sm text-gray-500">Total Size</p>
+                            <p className="text-xl font-bold text-gray-900">{formatSize(totalSize)}</p>
                         </div>
                     </div>
                 </div>
@@ -146,25 +146,25 @@ export function AdminFilesPage() {
 
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row gap-4 items-center">
-                <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <div className="relative flex-1 w-full sm:max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                         placeholder="Search files..."
-                        className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
+                        className="pl-10 bg-white border-gray-200 focus:border-[#4A5568] focus:ring-[#4A5568]/20 rounded-lg"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <div className="flex gap-2 bg-white border border-slate-200 rounded-xl p-1">
+                <div className="flex gap-2 bg-white border border-gray-200 rounded-lg p-1">
                     <button
                         onClick={() => setViewMode('grid')}
-                        className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[#4A5568] text-white' : 'text-gray-400 hover:text-gray-600'}`}
                     >
                         <Grid className="h-4 w-4" />
                     </button>
                     <button
                         onClick={() => setViewMode('list')}
-                        className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[#4A5568] text-white' : 'text-gray-400 hover:text-gray-600'}`}
                     >
                         <List className="h-4 w-4" />
                     </button>
@@ -173,27 +173,27 @@ export function AdminFilesPage() {
 
             {/* Files */}
             {filteredFiles.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
-                        <File className="h-8 w-8 text-slate-400" />
+                <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gray-100 mb-4">
+                        <File className="h-7 w-7 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
                         {searchQuery ? 'No files found' : 'No files uploaded'}
                     </h3>
-                    <p className="text-slate-500">
+                    <p className="text-gray-500">
                         {searchQuery ? 'Try adjusting your search' : 'Upload files through the product form'}
                     </p>
                 </div>
             ) : viewMode === 'grid' ? (
                 // Grid View
-                <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {filteredFiles.map((file) => (
                         <div 
                             key={file.name}
-                            className="group bg-white rounded-2xl border border-slate-100 hover:border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                            className="group bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-300 overflow-hidden"
                         >
                             {/* Preview */}
-                            <div className="aspect-square bg-slate-50 relative overflow-hidden">
+                            <div className="aspect-square bg-gray-50 relative overflow-hidden">
                                 {isImage(file.name) ? (
                                     <img 
                                         src={file.url} 
@@ -202,18 +202,18 @@ export function AdminFilesPage() {
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center">
-                                        <File className="h-16 w-16 text-slate-300" />
+                                        <File className="h-12 w-12 text-gray-300" />
                                     </div>
                                 )}
                                 
                                 {/* Overlay actions */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <div className="absolute bottom-3 left-3 right-3 flex gap-2">
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="absolute bottom-2 left-2 right-2 flex gap-2">
                                         <a
                                             href={file.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex-1 py-2 bg-white/90 backdrop-blur-sm rounded-lg text-center text-sm font-medium text-slate-700 hover:bg-white transition-colors"
+                                            className="flex-1 py-2 bg-white/90 rounded-md text-center text-sm font-medium text-gray-700 hover:bg-white transition-colors"
                                         >
                                             <ExternalLink className="h-4 w-4 inline mr-1" />
                                             View
@@ -221,7 +221,7 @@ export function AdminFilesPage() {
                                         <button
                                             onClick={() => handleDelete(file.name)}
                                             disabled={deleting === file.name}
-                                            className="p-2 bg-red-500/90 backdrop-blur-sm rounded-lg text-white hover:bg-red-600 transition-colors"
+                                            className="p-2 bg-red-500/90 rounded-md text-white hover:bg-red-600 transition-colors"
                                         >
                                             {deleting === file.name ? (
                                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -235,13 +235,13 @@ export function AdminFilesPage() {
                             
                             {/* File info */}
                             <div className="p-3">
-                                <p className="text-sm font-medium text-slate-900 truncate" title={file.name}>
+                                <p className="text-sm font-medium text-gray-900 truncate" title={file.name}>
                                     {file.name}
                                 </p>
                                 <div className="flex items-center justify-between mt-1">
-                                    <span className="text-xs text-slate-500">{formatSize(file.size)}</span>
+                                    <span className="text-xs text-gray-500">{formatSize(file.size)}</span>
                                     {file.date && (
-                                        <span className="text-xs text-slate-400">
+                                        <span className="text-xs text-gray-400">
                                             {new Date(file.date).toLocaleDateString()}
                                         </span>
                                     )}
@@ -252,69 +252,69 @@ export function AdminFilesPage() {
                 </div>
             ) : (
                 // List View
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="bg-slate-50/80 border-b border-slate-100">
-                                    <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Preview</th>
-                                    <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Filename</th>
-                                    <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Size</th>
-                                    <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Date</th>
-                                    <th className="text-right py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+                                <tr className="bg-gray-50 border-b border-gray-200">
+                                    <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Preview</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Filename</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden sm:table-cell">Size</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Date</th>
+                                    <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-gray-100">
                                 {filteredFiles.map((file) => (
-                                    <tr key={file.name} className="hover:bg-slate-50/50 transition-colors group">
-                                        <td className="py-4 px-6">
+                                    <tr key={file.name} className="hover:bg-gray-50 transition-colors group">
+                                        <td className="py-3 px-4">
                                             {isImage(file.name) ? (
                                                 <img 
                                                     src={file.url} 
                                                     alt={file.name} 
-                                                    className="h-14 w-14 object-cover rounded-xl border border-slate-100 shadow-sm group-hover:shadow-md transition-shadow" 
+                                                    className="h-12 w-12 object-cover rounded-lg border border-gray-100" 
                                                 />
                                             ) : (
-                                                <div className="h-14 w-14 bg-slate-100 rounded-xl flex items-center justify-center">
-                                                    <File className="h-6 w-6 text-slate-400" />
+                                                <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                    <File className="h-5 w-5 text-gray-400" />
                                                 </div>
                                             )}
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <p className="font-medium text-slate-900 truncate max-w-[200px]" title={file.name}>
+                                        <td className="py-3 px-4">
+                                            <p className="font-medium text-gray-900 truncate max-w-[150px] sm:max-w-[200px]" title={file.name}>
                                                 {file.name}
                                             </p>
                                             <a 
                                                 href={file.url} 
                                                 target="_blank" 
                                                 rel="noopener noreferrer" 
-                                                className="text-xs text-indigo-600 hover:text-indigo-700 flex items-center gap-1 mt-1"
+                                                className="text-xs text-[#4A5568] hover:text-[#2D3748] flex items-center gap-1 mt-1"
                                             >
                                                 <ExternalLink className="h-3 w-3" />
                                                 View file
                                             </a>
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <span className="px-2.5 py-1 bg-slate-100 rounded-lg text-sm text-slate-600">
+                                        <td className="py-3 px-4 hidden sm:table-cell">
+                                            <span className="px-2 py-1 bg-gray-100 rounded-md text-sm text-gray-600">
                                                 {formatSize(file.size)}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-6">
+                                        <td className="py-3 px-4 hidden md:table-cell">
                                             {file.date ? (
-                                                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                                                <div className="flex items-center gap-1.5 text-sm text-gray-500">
                                                     <Calendar className="h-4 w-4" />
                                                     {new Date(file.date).toLocaleDateString()}
                                                 </div>
                                             ) : (
-                                                <span className="text-slate-400">—</span>
+                                                <span className="text-gray-400">—</span>
                                             )}
                                         </td>
-                                        <td className="py-4 px-6">
+                                        <td className="py-3 px-4">
                                             <div className="flex justify-end gap-1">
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-9 w-9 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600"
+                                                    className="h-8 w-8 rounded-md text-red-500 hover:bg-red-50 hover:text-red-600"
                                                     onClick={() => handleDelete(file.name)}
                                                     disabled={deleting === file.name}
                                                 >

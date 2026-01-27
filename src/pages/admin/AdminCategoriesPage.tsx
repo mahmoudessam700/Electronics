@@ -217,14 +217,14 @@ export function AdminCategoriesPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                         Categories
                     </h1>
-                    <p className="text-slate-500 mt-1">Organize your products into categories</p>
+                    <p className="text-gray-500 mt-1 text-sm">Organize your products into categories</p>
                 </div>
                 <Button 
                     onClick={() => openAddForm()}
-                    className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md hover:shadow-lg transition-all"
+                    className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                 >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Category
@@ -245,14 +245,14 @@ export function AdminCategoriesPage() {
             </div>
 
             {/* Allowed Categories Info */}
-            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200/50 rounded-2xl p-5">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                     <div className="p-2 bg-amber-100 rounded-lg">
                         <Layers className="h-5 w-5 text-amber-600" />
                     </div>
                     <div>
-                        <p className="font-medium text-slate-900">Available Categories</p>
-                        <p className="text-sm text-slate-600 mt-1">
+                        <p className="font-medium text-gray-900">Available Categories</p>
+                        <p className="text-sm text-gray-600 mt-1">
                             {ALLOWED_CATEGORIES.join(' • ')}
                         </p>
                     </div>
@@ -260,87 +260,87 @@ export function AdminCategoriesPage() {
             </div>
 
             {/* Categories Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
-                    <p className="text-sm text-slate-500">Total Categories</p>
-                    <p className="text-2xl font-bold text-slate-900">{categories.length}</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <p className="text-sm text-gray-500">Total Categories</p>
+                    <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
                 </div>
-                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
-                    <p className="text-sm text-slate-500">With Products</p>
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <p className="text-sm text-gray-500">With Products</p>
                     <p className="text-2xl font-bold text-emerald-600">
                         {categories.filter(c => (c._count?.products || 0) > 0).length}
                     </p>
                 </div>
-                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
-                    <p className="text-sm text-slate-500">Empty</p>
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <p className="text-sm text-gray-500">Empty</p>
                     <p className="text-2xl font-bold text-amber-600">
                         {categories.filter(c => (c._count?.products || 0) === 0).length}
                     </p>
                 </div>
-                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
-                    <p className="text-sm text-slate-500">Total Products</p>
-                    <p className="text-2xl font-bold text-[#718096]">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <p className="text-sm text-gray-500">Total Products</p>
+                    <p className="text-2xl font-bold text-[#4A5568]">
                         {categories.reduce((acc, c) => acc + (c._count?.products || 0), 0)}
                     </p>
                 </div>
             </div>
 
             {/* Categories Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="bg-slate-50/80 border-b border-slate-100">
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Products</th>
-                                <th className="text-right py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+                            <tr className="bg-gray-50 border-b border-gray-200">
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Category</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Description</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Products</th>
+                                <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-gray-100">
                             {filteredCategories.map((category) => (
-                                <tr key={category.id} className="hover:bg-slate-50/50 transition-colors group">
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center gap-4">
+                                <tr key={category.id} className="hover:bg-gray-50 transition-colors group">
+                                    <td className="py-3 px-4">
+                                        <div className="flex items-center gap-3">
                                             <div className="relative">
                                                 {category.image ? (
                                                     <img 
                                                         src={category.image} 
                                                         alt={category.name} 
-                                                        className="h-14 w-14 object-cover rounded-xl border border-slate-100 shadow-sm group-hover:shadow-md transition-shadow" 
+                                                        className="h-10 w-10 md:h-12 md:w-12 object-cover rounded-lg border border-gray-200" 
                                                     />
                                                 ) : (
-                                                    <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-[#FFD814] to-[#F7CA00] flex items-center justify-center">
-                                                        <Folder className="h-6 w-6 text-[#0F1111]" />
+                                                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-lg bg-[#4A5568] flex items-center justify-center">
+                                                        <Folder className="h-5 w-5 text-white" />
                                                     </div>
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-slate-900">{category.name}</p>
-                                                <p className="text-xs text-slate-400 font-mono">/{category.slug}</p>
+                                                <p className="font-semibold text-gray-900">{category.name}</p>
+                                                <p className="text-xs text-gray-400 font-mono">/{category.slug}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <span className="text-sm text-slate-600 line-clamp-2">
-                                            {category.description || <span className="text-slate-400 italic">No description</span>}
+                                    <td className="py-3 px-4 hidden md:table-cell">
+                                        <span className="text-sm text-gray-600 line-clamp-2">
+                                            {category.description || <span className="text-gray-400 italic">No description</span>}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${
+                                    <td className="py-3 px-4">
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                                             (category._count?.products || 0) > 0 
-                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                : 'bg-slate-50 text-slate-500 border border-slate-200'
+                                                ? 'bg-emerald-100 text-emerald-700'
+                                                : 'bg-gray-100 text-gray-500'
                                         }`}>
                                             {category._count?.products || 0} products
                                         </span>
                                     </td>
-                                    <td className="py-4 px-6">
+                                    <td className="py-3 px-4">
                                         <div className="flex justify-end gap-1">
                                             <Button 
                                                 variant="ghost" 
                                                 size="icon" 
-                                                className="h-9 w-9 rounded-lg hover:bg-amber-50 hover:text-amber-600"
+                                                className="h-8 w-8 rounded-lg hover:bg-gray-100"
                                                 onClick={() => openEditForm(category)}
                                             >
                                                 <Pencil className="h-4 w-4" />
@@ -348,7 +348,7 @@ export function AdminCategoriesPage() {
                                             <Button 
                                                 variant="ghost" 
                                                 size="icon" 
-                                                className="h-9 w-9 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600" 
+                                                className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-50" 
                                                 onClick={() => openDeleteConfirm(category)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -362,18 +362,18 @@ export function AdminCategoriesPage() {
                 </div>
 
                 {filteredCategories.length === 0 && (
-                    <div className="py-16 text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
-                            <Folder className="h-8 w-8 text-slate-400" />
+                    <div className="py-12 text-center">
+                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gray-100 mb-4">
+                            <Folder className="h-7 w-7 text-gray-400" />
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-900 mb-1">No categories found</h3>
-                        <p className="text-slate-500 mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">No categories found</h3>
+                        <p className="text-gray-500 mb-6">
                             {searchQuery ? 'Try adjusting your search terms' : 'Get started by adding your first category'}
                         </p>
                         {!searchQuery && (
                             <Button 
                                 onClick={() => openAddForm()}
-                                className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md"
+                                className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                             >
                                 <Plus className="mr-2 h-4 w-4" /> Add First Category
                             </Button>
@@ -460,13 +460,13 @@ export function AdminCategoriesPage() {
                     </div>
 
                     <DialogFooter className="gap-2">
-                        <Button variant="outline" onClick={() => setIsFormOpen(false)} className="rounded-xl">
+                        <Button variant="outline" onClick={() => setIsFormOpen(false)} className="rounded-lg">
                             Cancel
                         </Button>
                         <Button 
                             onClick={handleSave} 
                             disabled={saving}
-                            className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold rounded-xl"
+                            className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
                         >
                             {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                             {editingCategory ? 'Update' : 'Create'}

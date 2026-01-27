@@ -16,12 +16,12 @@ interface Supplier {
 }
 
 const SUPPLIER_COLORS = [
-    'from-blue-500 to-indigo-600',
-    'from-emerald-500 to-teal-600',
-    'from-violet-500 to-purple-600',
-    'from-orange-500 to-amber-600',
-    'from-pink-500 to-rose-600',
-    'from-cyan-500 to-blue-600',
+    'bg-[#4A5568]',
+    'bg-[#718096]',
+    'bg-[#2D3748]',
+    'bg-gray-600',
+    'bg-gray-500',
+    'bg-gray-700',
 ];
 
 export function AdminSuppliersPage() {
@@ -154,28 +154,28 @@ export function AdminSuppliersPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                         Suppliers
                     </h1>
-                    <p className="text-slate-500 mt-1">Manage your product suppliers and vendors</p>
+                    <p className="text-gray-500 mt-1 text-sm">Manage your product suppliers and vendors</p>
                 </div>
                 <Button 
                     onClick={() => handleOpenDialog()}
-                    className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md hover:shadow-lg transition-all"
+                    className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                 >
                     <Plus className="mr-2 h-4 w-4" /> Add Supplier
                 </Button>
             </div>
 
             {/* Stats */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+            <div className="bg-white rounded-xl p-4 border border-gray-200">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#FFD814] to-[#F7CA00]">
+                    <div className="p-2 rounded-lg bg-[#4A5568]">
                         <Building2 className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                        <p className="text-sm text-slate-500">Total Suppliers</p>
-                        <p className="text-2xl font-bold text-slate-900">{suppliers.length}</p>
+                        <p className="text-sm text-gray-500">Total Suppliers</p>
+                        <p className="text-xl font-bold text-gray-900">{suppliers.length}</p>
                     </div>
                 </div>
             </div>
@@ -193,20 +193,20 @@ export function AdminSuppliersPage() {
 
             {/* Suppliers Grid */}
             {filteredSuppliers.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
-                        <Building2 className="h-8 w-8 text-slate-400" />
+                <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gray-100 mb-4">
+                        <Building2 className="h-7 w-7 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
                         {searchQuery ? 'No suppliers found' : 'No suppliers yet'}
                     </h3>
-                    <p className="text-slate-500 mb-6">
+                    <p className="text-gray-500 mb-6">
                         {searchQuery ? 'Try adjusting your search' : 'Add your first supplier to get started'}
                     </p>
                     {!searchQuery && (
                         <Button 
                             onClick={() => handleOpenDialog()}
-                            className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold"
+                            className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                         >
                             <Plus className="mr-2 h-4 w-4" /> Add First Supplier
                         </Button>
@@ -220,27 +220,27 @@ export function AdminSuppliersPage() {
                         return (
                             <div 
                                 key={supplier.id}
-                                className="group bg-white rounded-2xl border border-slate-100 hover:border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                                className="group bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-300 overflow-hidden"
                             >
-                                {/* Header with gradient */}
-                                <div className={`h-20 bg-gradient-to-br ${colorClass} relative`}>
-                                    <div className="absolute -bottom-6 left-5">
-                                        <div className="w-14 h-14 rounded-2xl bg-white shadow-lg flex items-center justify-center border-4 border-white">
-                                            <Building2 className="h-6 w-6 text-slate-600" />
+                                {/* Header with color */}
+                                <div className={`h-16 ${colorClass} relative`}>
+                                    <div className="absolute -bottom-5 left-4">
+                                        <div className="w-12 h-12 rounded-lg bg-white shadow flex items-center justify-center border border-gray-100">
+                                            <Building2 className="h-5 w-5 text-gray-600" />
                                         </div>
                                     </div>
                                     
                                     {/* Actions on hover */}
-                                    <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
                                             onClick={() => handleOpenDialog(supplier)}
-                                            className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors shadow-sm"
+                                            className="p-1.5 bg-white/90 rounded-md hover:bg-white transition-colors"
                                         >
-                                            <Pencil className="h-4 w-4 text-slate-700" />
+                                            <Pencil className="h-4 w-4 text-gray-700" />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(supplier.id)}
-                                            className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-red-50 transition-colors shadow-sm"
+                                            className="p-1.5 bg-white/90 rounded-md hover:bg-red-50 transition-colors"
                                         >
                                             <Trash2 className="h-4 w-4 text-red-500" />
                                         </button>
@@ -248,36 +248,36 @@ export function AdminSuppliersPage() {
                                 </div>
 
                                 {/* Content */}
-                                <div className="pt-10 pb-5 px-5">
-                                    <h3 className="font-semibold text-lg text-slate-900 mb-3">{supplier.name}</h3>
+                                <div className="pt-8 pb-4 px-4">
+                                    <h3 className="font-semibold text-gray-900 mb-2">{supplier.name}</h3>
                                     
-                                    <div className="space-y-2">
+                                    <div className="space-y-1.5">
                                         {supplier.contact && (
-                                            <div className="flex items-center gap-2 text-sm text-slate-600">
-                                                <User className="h-4 w-4 text-slate-400" />
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <User className="h-3.5 w-3.5 text-gray-400" />
                                                 {supplier.contact}
                                             </div>
                                         )}
                                         {supplier.email && (
-                                            <div className="flex items-center gap-2 text-sm text-slate-600">
-                                                <Mail className="h-4 w-4 text-slate-400" />
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Mail className="h-3.5 w-3.5 text-gray-400" />
                                                 {supplier.email}
                                             </div>
                                         )}
                                         {supplier.phone && (
-                                            <div className="flex items-center gap-2 text-sm text-slate-600">
-                                                <Phone className="h-4 w-4 text-slate-400" />
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Phone className="h-3.5 w-3.5 text-gray-400" />
                                                 {supplier.phone}
                                             </div>
                                         )}
                                         {supplier.address && (
-                                            <div className="flex items-start gap-2 text-sm text-slate-600">
-                                                <MapPin className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                                            <div className="flex items-start gap-2 text-sm text-gray-600">
+                                                <MapPin className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
                                                 <span className="line-clamp-2">{supplier.address}</span>
                                             </div>
                                         )}
                                         {!supplier.contact && !supplier.email && !supplier.phone && !supplier.address && (
-                                            <p className="text-sm text-slate-400 italic">No contact information</p>
+                                            <p className="text-sm text-gray-400 italic">No contact information</p>
                                         )}
                                     </div>
                                 </div>
@@ -351,13 +351,13 @@ export function AdminSuppliersPage() {
                             />
                         </div>
                         <DialogFooter className="pt-4 gap-2">
-                            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">
+                            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-lg">
                                 Cancel
                             </Button>
                             <Button 
                                 type="submit" 
                                 disabled={isSaving}
-                                className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold rounded-xl"
+                                className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
                             >
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {editingSupplier ? 'Update Supplier' : 'Create Supplier'}

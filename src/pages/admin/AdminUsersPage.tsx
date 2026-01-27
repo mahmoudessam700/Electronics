@@ -151,45 +151,45 @@ export function AdminUsersPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                         User Management
                     </h1>
-                    <p className="text-slate-500 mt-1">Manage customers and administrators</p>
+                    <p className="text-gray-500 mt-1 text-sm">Manage customers and administrators</p>
                 </div>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+            <div className="grid grid-cols-3 gap-3">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-indigo-50">
-                            <Users className="h-5 w-5 text-indigo-600" />
+                        <div className="p-2 rounded-lg bg-[#4A5568]">
+                            <Users className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Total Users</p>
-                            <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+                            <p className="text-sm text-gray-500">Total Users</p>
+                            <p className="text-xl font-bold text-gray-900">{stats.total}</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-purple-50">
+                        <div className="p-2 rounded-lg bg-purple-100">
                             <Crown className="h-5 w-5 text-purple-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Administrators</p>
-                            <p className="text-2xl font-bold text-purple-600">{stats.admins}</p>
+                            <p className="text-sm text-gray-500">Administrators</p>
+                            <p className="text-xl font-bold text-purple-600">{stats.admins}</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-emerald-50">
+                        <div className="p-2 rounded-lg bg-emerald-100">
                             <UserCheck className="h-5 w-5 text-emerald-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500">Customers</p>
-                            <p className="text-2xl font-bold text-emerald-600">{stats.customers}</p>
+                            <p className="text-sm text-gray-500">Customers</p>
+                            <p className="text-xl font-bold text-emerald-600">{stats.customers}</p>
                         </div>
                     </div>
                 </div>
@@ -198,10 +198,10 @@ export function AdminUsersPage() {
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                         placeholder="Search users..."
-                        className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
+                        className="pl-10 bg-white border-gray-200 focus:border-[#4A5568] rounded-lg"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -211,10 +211,10 @@ export function AdminUsersPage() {
                         <button
                             key={role}
                             onClick={() => setRoleFilter(role)}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                                 roleFilter === role
-                                    ? 'bg-[#4A5568] text-white shadow-lg shadow-[#4A5568]/25'
-                                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                                    ? 'bg-[#4A5568] text-white'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                             }`}
                         >
                             {role === 'ALL' ? 'All Users' : role === 'ADMIN' ? 'Admins' : 'Customers'}
@@ -224,82 +224,77 @@ export function AdminUsersPage() {
             </div>
 
             {/* Users Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="bg-slate-50/80 border-b border-slate-100">
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">User</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Role</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Contact</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Location</th>
-                                <th className="text-right py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+                            <tr className="bg-gray-50 border-b border-gray-200">
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">User</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Role</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Contact</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">Location</th>
+                                <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-gray-100">
                             {filteredUsers.map((user) => (
-                                <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
-                                    <td className="py-4 px-6">
+                                <tr key={user.id} className="hover:bg-gray-50 transition-colors group">
+                                    <td className="py-3 px-4">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white font-semibold shadow-lg ${
+                                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white font-semibold text-sm ${
                                                 user.role === 'ADMIN' 
-                                                    ? 'bg-gradient-to-br from-purple-500 to-indigo-600' 
-                                                    : 'bg-gradient-to-br from-emerald-500 to-teal-600'
+                                                    ? 'bg-purple-500' 
+                                                    : 'bg-[#4A5568]'
                                             }`}>
                                                 {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-slate-900">{user.name || 'Unnamed User'}</p>
-                                                <div className="flex items-center gap-1 text-sm text-slate-500">
-                                                    <Mail className="h-3.5 w-3.5" />
-                                                    {user.email}
+                                                <p className="font-semibold text-gray-900 text-sm">{user.name || 'Unnamed User'}</p>
+                                                <div className="flex items-center gap-1 text-xs text-gray-500">
+                                                    <Mail className="h-3 w-3" />
+                                                    <span className="truncate max-w-[150px]">{user.email}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${
+                                    <td className="py-3 px-4">
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                                             user.role === 'ADMIN'
-                                                ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                ? 'bg-purple-100 text-purple-700'
+                                                : 'bg-emerald-100 text-emerald-700'
                                         }`}>
-                                            {user.role === 'ADMIN' ? <Crown className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
+                                            {user.role === 'ADMIN' ? <Crown className="h-3 w-3" /> : <User className="h-3 w-3" />}
                                             {user.role}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-6">
+                                    <td className="py-3 px-4 hidden md:table-cell">
                                         {user.phone ? (
-                                            <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                                                <Phone className="h-3.5 w-3.5 text-slate-400" />
+                                            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                                                <Phone className="h-3.5 w-3.5 text-gray-400" />
                                                 {user.phone}
                                             </div>
                                         ) : (
-                                            <span className="text-slate-400">—</span>
+                                            <span className="text-gray-400">—</span>
                                         )}
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <div className="max-w-[200px]">
+                                    <td className="py-3 px-4 hidden lg:table-cell">
+                                        <div className="max-w-[180px]">
                                             {user.address ? (
-                                                <div className="flex items-start gap-1.5 text-sm text-slate-600">
-                                                    <MapPin className="h-3.5 w-3.5 mt-0.5 text-slate-400 flex-shrink-0" />
+                                                <div className="flex items-start gap-1.5 text-sm text-gray-600">
+                                                    <MapPin className="h-3.5 w-3.5 mt-0.5 text-gray-400 flex-shrink-0" />
                                                     <span className="truncate">{user.address}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-slate-400">—</span>
-                                            )}
-                                            {user.latitude && user.longitude && (
-                                                <div className="text-[10px] text-slate-400 font-mono mt-1 ml-5">
-                                                    {user.latitude.toFixed(4)}, {user.longitude.toFixed(4)}
-                                                </div>
+                                                <span className="text-gray-400">—</span>
                                             )}
                                         </div>
                                     </td>
-                                    <td className="py-4 px-6">
+                                    <td className="py-3 px-4">
                                         <div className="flex justify-end gap-1">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-9 w-9 rounded-lg hover:bg-indigo-50 hover:text-indigo-600"
+                                                className="h-8 w-8 rounded-lg hover:bg-gray-100"
                                                 onClick={() => handleOpenDialog(user)}
                                             >
                                                 <Pencil className="h-4 w-4" />
@@ -307,7 +302,7 @@ export function AdminUsersPage() {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-9 w-9 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600"
+                                                className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-50"
                                                 onClick={() => handleDelete(user.id)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -321,12 +316,12 @@ export function AdminUsersPage() {
                 </div>
 
                 {filteredUsers.length === 0 && (
-                    <div className="py-16 text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
-                            <Users className="h-8 w-8 text-slate-400" />
+                    <div className="py-12 text-center">
+                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gray-100 mb-4">
+                            <Users className="h-7 w-7 text-gray-400" />
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-900 mb-1">No users found</h3>
-                        <p className="text-slate-500">Try adjusting your search or filter criteria</p>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">No users found</h3>
+                        <p className="text-gray-500">Try adjusting your search or filter criteria</p>
                     </div>
                 )}
             </div>
@@ -378,13 +373,13 @@ export function AdminUsersPage() {
                             </select>
                         </div>
                         <DialogFooter className="pt-4 gap-2">
-                            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">
+                            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-lg">
                                 Cancel
                             </Button>
                             <Button 
                                 type="submit" 
                                 disabled={isSaving}
-                                className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold rounded-xl"
+                                className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
                             >
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Save Changes
