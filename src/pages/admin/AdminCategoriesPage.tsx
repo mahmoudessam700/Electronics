@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, Folder, Loader2, Layers, Search, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, Trash2, Folder, Loader2, Layers, Search, Image as ImageIcon, Camera } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -21,6 +21,7 @@ import {
     AlertDialogTitle,
 } from '../../components/ui/alert-dialog';
 import { toast } from 'sonner';
+import { CameraCapture } from '../../components/CameraCapture';
 
 interface Category {
     id: string;
@@ -110,8 +111,8 @@ export function AdminCategoriesPage() {
         setIsDeleteOpen(true);
     }
 
-    async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0];
+    async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement> | File) {
+        const file = e instanceof File ? e : e.target.files?.[0];
         if (!file) return;
 
         setSaving(true);
@@ -457,6 +458,22 @@ export function AdminCategoriesPage() {
                                         {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ImageIcon className="h-4 w-4 mr-2" />}
                                         Choose File
                                     </Button>
+
+                                    <CameraCapture 
+                                        onCapture={(file) => handleImageUpload(file)}
+                                        trigger={
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                className="w-full gap-2 rounded-lg"
+                                                disabled={saving}
+                                            >
+                                                <Camera className="h-4 w-4" />
+                                                Take Photo
+                                            </Button>
+                                        }
+                                    />
+
                                     <p className="text-xs text-slate-400">Or paste an image URL:</p>
                                     <Input
                                         id="image"
