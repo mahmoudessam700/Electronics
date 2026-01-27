@@ -68,24 +68,19 @@ export function AdminLayout() {
                             <button
                                 key={item.path}
                                 onClick={() => handleNavClick(item.path)}
-                                className={`w-full group flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer relative ${
+                                className={`w-full group flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
                                     isActive
-                                        ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/30'
+                                        ? 'bg-gray-200/90 text-gray-900 shadow-md'
                                         : 'text-white/70 hover:text-white hover:bg-white/10'
                                 }`}
                             >
+                                <Icon className={`h-5 w-5 flex-shrink-0 transition-transform duration-300 ${
+                                    isActive ? 'scale-110' : 'group-hover:scale-110'
+                                }`} />
+                                <span className="flex-1 text-left">{item.name}</span>
                                 {isActive && (
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-400 rounded-xl blur opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                                    <ChevronRight className="h-4 w-4" />
                                 )}
-                                <div className="relative flex items-center gap-3 w-full">
-                                    <Icon className={`h-5 w-5 flex-shrink-0 transition-transform duration-300 ${
-                                        isActive ? 'scale-110' : 'group-hover:scale-110'
-                                    }`} />
-                                    <span className="flex-1 text-left">{item.name}</span>
-                                    {isActive && (
-                                        <ChevronRight className="h-4 w-4 animate-pulse" />
-                                    )}
-                                </div>
                             </button>
                         );
                     })}
@@ -171,7 +166,7 @@ export function AdminLayout() {
             </aside>
 
             {/* Main Content Area with improved spacing */}
-            <main className="min-h-screen pt-16 lg:pt-0 lg:ml-72 bg-gradient-to-br from-gray-50 to-gray-100">
+            <main className="min-h-screen pt-16 lg:pt-0 lg:ml-72 bg-gradient-to-br from-gray-50 to-gray-100 w-full">
                 <div className="p-4 lg:p-8">
                     <Outlet />
                 </div>
