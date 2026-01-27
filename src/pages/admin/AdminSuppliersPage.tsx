@@ -143,7 +143,7 @@ export function AdminSuppliersPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
                 <span className="mt-4 text-slate-500">Loading suppliers...</span>
             </div>
         );
@@ -161,7 +161,7 @@ export function AdminSuppliersPage() {
                 </div>
                 <Button 
                     onClick={() => handleOpenDialog()}
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+                    className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md hover:shadow-lg transition-all"
                 >
                     <Plus className="mr-2 h-4 w-4" /> Add Supplier
                 </Button>
@@ -170,7 +170,7 @@ export function AdminSuppliersPage() {
             {/* Stats */}
             <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600">
+                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#FFD814] to-[#F7CA00]">
                         <Building2 className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -185,7 +185,7 @@ export function AdminSuppliersPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
                     placeholder="Search suppliers..."
-                    className="pl-10 bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                    className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -206,7 +206,7 @@ export function AdminSuppliersPage() {
                     {!searchQuery && (
                         <Button 
                             onClick={() => handleOpenDialog()}
-                            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+                            className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold"
                         >
                             <Plus className="mr-2 h-4 w-4" /> Add First Supplier
                         </Button>
@@ -344,7 +344,7 @@ export function AdminSuppliersPage() {
                             <Label htmlFor="address" className="text-sm font-medium">Address</Label>
                             <textarea
                                 id="address"
-                                className="w-full min-h-[80px] p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                                className="w-full min-h-[80px] p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors"
                                 value={formData.address}
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                 placeholder="e.g. 123 Business St, Cairo, Egypt"
@@ -357,7 +357,7 @@ export function AdminSuppliersPage() {
                             <Button 
                                 type="submit" 
                                 disabled={isSaving}
-                                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl"
+                                className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold rounded-xl"
                             >
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {editingSupplier ? 'Update Supplier' : 'Create Supplier'}

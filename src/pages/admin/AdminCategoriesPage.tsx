@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, GripVertical, Folder, Loader2, Layers, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, Trash2, Folder, Loader2, Layers, Search, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -44,17 +44,6 @@ const ALLOWED_CATEGORIES = [
     'Hard Drives'
 ];
 
-const CATEGORY_COLORS = [
-    'from-blue-500 to-indigo-600',
-    'from-purple-500 to-pink-600',
-    'from-emerald-500 to-teal-600',
-    'from-orange-500 to-amber-600',
-    'from-red-500 to-rose-600',
-    'from-cyan-500 to-blue-600',
-    'from-violet-500 to-purple-600',
-    'from-green-500 to-emerald-600',
-];
-
 export function AdminCategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
@@ -72,10 +61,7 @@ export function AdminCategoriesPage() {
         image: ''
     });
     const [saving, setSaving] = useState(false);
-
-    // Drag state
-    const [draggedItem, setDraggedItem] = useState<Category | null>(null);
-    const [dragOverId, setDragOverId] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchCategories();
@@ -212,61 +198,15 @@ export function AdminCategoriesPage() {
         }
     }
 
-    // Drag and Drop handlers
-    function handleDragStart(e: React.DragEvent, category: Category) {
-        setDraggedItem(category);
-        e.dataTransfer.effectAllowed = 'move';
-    }
-
-    function handleDragOver(e: React.DragEvent, category: Category) {
-        e.preventDefault();
-        if (draggedItem?.id !== category.id) {
-            setDragOverId(category.id);
-        }
-    }
-
-    function handleDragLeave() {
-        setDragOverId(null);
-    }
-
-    async function handleDrop(e: React.DragEvent, targetCategory: Category) {
-        e.preventDefault();
-        setDragOverId(null);
-
-        if (!draggedItem || draggedItem.id === targetCategory.id) {
-            setDraggedItem(null);
-            return;
-        }
-
-        // Find all categories and reorder
-        const newOrder = categories.filter(c => c.id !== draggedItem.id);
-        const targetIndex = newOrder.findIndex(c => c.id === targetCategory.id);
-        newOrder.splice(targetIndex, 0, draggedItem);
-
-        // Update sort orders
-        const updates = newOrder.map((cat, idx) => ({
-            id: cat.id,
-            sortOrder: idx
-        }));
-
-        try {
-            await fetch('/api/categories', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ categories: updates })
-            });
-            fetchCategories();
-        } catch (error) {
-            toast.error('Failed to reorder');
-        }
-
-        setDraggedItem(null);
-    }
+    const filteredCategories = categories.filter(category =>
+        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (category.description?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+    );
 
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
                 <span className="mt-4 text-slate-500">Loading categories...</span>
             </div>
         );
@@ -284,18 +224,31 @@ export function AdminCategoriesPage() {
                 </div>
                 <Button 
                     onClick={() => openAddForm()}
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+                    className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md hover:shadow-lg transition-all"
                 >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Category
                 </Button>
             </div>
 
+            {/* Filters Bar */}
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                        placeholder="Search categories..."
+                        className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            </div>
+
             {/* Allowed Categories Info */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50 rounded-2xl p-5">
+            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200/50 rounded-2xl p-5">
                 <div className="flex items-start gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                        <Layers className="h-5 w-5 text-blue-600" />
+                    <div className="p-2 bg-amber-100 rounded-lg">
+                        <Layers className="h-5 w-5 text-amber-600" />
                     </div>
                     <div>
                         <p className="font-medium text-slate-900">Available Categories</p>
@@ -306,103 +259,128 @@ export function AdminCategoriesPage() {
                 </div>
             </div>
 
-            {/* Categories Grid */}
-            {categories.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
-                        <Folder className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-1">No categories yet</h3>
-                    <p className="text-slate-500 mb-6">Create your first category to organize products</p>
-                    <Button 
-                        onClick={() => openAddForm()}
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create First Category
-                    </Button>
+            {/* Categories Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                    <p className="text-sm text-slate-500">Total Categories</p>
+                    <p className="text-2xl font-bold text-slate-900">{categories.length}</p>
                 </div>
-            ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {categories.map((category, index) => {
-                        const isDragOver = dragOverId === category.id;
-                        const colorClass = CATEGORY_COLORS[index % CATEGORY_COLORS.length];
+                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                    <p className="text-sm text-slate-500">With Products</p>
+                    <p className="text-2xl font-bold text-emerald-600">
+                        {categories.filter(c => (c._count?.products || 0) > 0).length}
+                    </p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                    <p className="text-sm text-slate-500">Empty</p>
+                    <p className="text-2xl font-bold text-amber-600">
+                        {categories.filter(c => (c._count?.products || 0) === 0).length}
+                    </p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                    <p className="text-sm text-slate-500">Total Products</p>
+                    <p className="text-2xl font-bold text-[#718096]">
+                        {categories.reduce((acc, c) => acc + (c._count?.products || 0), 0)}
+                    </p>
+                </div>
+            </div>
 
-                        return (
-                            <div
-                                key={category.id}
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, category)}
-                                onDragOver={(e) => handleDragOver(e, category)}
-                                onDragLeave={handleDragLeave}
-                                onDrop={(e) => handleDrop(e, category)}
-                                className={`
-                                    group relative bg-white rounded-2xl border overflow-hidden
-                                    hover:shadow-lg transition-all duration-300 cursor-move
-                                    ${isDragOver ? 'border-indigo-500 ring-2 ring-indigo-500/20 scale-[1.02]' : 'border-slate-100 hover:border-slate-200'}
-                                `}
+            {/* Categories Table */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="bg-slate-50/80 border-b border-slate-100">
+                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</th>
+                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
+                                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Products</th>
+                                <th className="text-right py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {filteredCategories.map((category) => (
+                                <tr key={category.id} className="hover:bg-slate-50/50 transition-colors group">
+                                    <td className="py-4 px-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="relative">
+                                                {category.image ? (
+                                                    <img 
+                                                        src={category.image} 
+                                                        alt={category.name} 
+                                                        className="h-14 w-14 object-cover rounded-xl border border-slate-100 shadow-sm group-hover:shadow-md transition-shadow" 
+                                                    />
+                                                ) : (
+                                                    <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-[#FFD814] to-[#F7CA00] flex items-center justify-center">
+                                                        <Folder className="h-6 w-6 text-[#0F1111]" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold text-slate-900">{category.name}</p>
+                                                <p className="text-xs text-slate-400 font-mono">/{category.slug}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <span className="text-sm text-slate-600 line-clamp-2">
+                                            {category.description || <span className="text-slate-400 italic">No description</span>}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${
+                                            (category._count?.products || 0) > 0 
+                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                : 'bg-slate-50 text-slate-500 border border-slate-200'
+                                        }`}>
+                                            {category._count?.products || 0} products
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div className="flex justify-end gap-1">
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="h-9 w-9 rounded-lg hover:bg-amber-50 hover:text-amber-600"
+                                                onClick={() => openEditForm(category)}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="h-9 w-9 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600" 
+                                                onClick={() => openDeleteConfirm(category)}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {filteredCategories.length === 0 && (
+                    <div className="py-16 text-center">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
+                            <Folder className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-slate-900 mb-1">No categories found</h3>
+                        <p className="text-slate-500 mb-6">
+                            {searchQuery ? 'Try adjusting your search terms' : 'Get started by adding your first category'}
+                        </p>
+                        {!searchQuery && (
+                            <Button 
+                                onClick={() => openAddForm()}
+                                className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md"
                             >
-                                {/* Category Image or Gradient */}
-                                <div className="relative h-32 overflow-hidden">
-                                    {category.image ? (
-                                        <img
-                                            src={category.image}
-                                            alt={category.name}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <div className={`w-full h-full bg-gradient-to-br ${colorClass} opacity-90`} />
-                                    )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                                    
-                                    {/* Drag Handle */}
-                                    <div className="absolute top-3 left-3 p-2 bg-white/20 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <GripVertical className="h-4 w-4 text-white" />
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onClick={() => openEditForm(category)}
-                                            className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors shadow-sm"
-                                        >
-                                            <Edit2 className="h-4 w-4 text-slate-700" />
-                                        </button>
-                                        <button
-                                            onClick={() => openDeleteConfirm(category)}
-                                            className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-red-50 transition-colors shadow-sm"
-                                        >
-                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                        </button>
-                                    </div>
-
-                                    {/* Product Count Badge */}
-                                    {category._count && (
-                                        <div className="absolute bottom-3 right-3">
-                                            <span className="px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-slate-700 shadow-sm">
-                                                {category._count.products} products
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Category Info */}
-                                <div className="p-4">
-                                    <div className="flex items-center gap-2">
-                                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${colorClass}`}>
-                                            <Folder className="h-4 w-4 text-white" />
-                                        </div>
-                                        <h3 className="font-semibold text-slate-900">{category.name}</h3>
-                                    </div>
-                                    {category.description && (
-                                        <p className="text-sm text-slate-500 mt-2 line-clamp-2">{category.description}</p>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
+                                <Plus className="mr-2 h-4 w-4" /> Add First Category
+                            </Button>
+                        )}
+                    </div>
+                )}
+            </div>
 
             {/* Add/Edit Modal */}
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
@@ -429,7 +407,7 @@ export function AdminCategoriesPage() {
                                     id="name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors"
                                 >
                                     <option value="">Select a category...</option>
                                     {ALLOWED_CATEGORIES.map(cat => (
@@ -488,7 +466,7 @@ export function AdminCategoriesPage() {
                         <Button 
                             onClick={handleSave} 
                             disabled={saving}
-                            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl"
+                            className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold rounded-xl"
                         >
                             {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                             {editingCategory ? 'Update' : 'Create'}

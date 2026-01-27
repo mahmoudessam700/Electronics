@@ -76,7 +76,7 @@ export function AdminOrdersPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
                 <span className="mt-4 text-slate-500">Loading orders...</span>
             </div>
         );
@@ -148,7 +148,7 @@ export function AdminOrdersPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                         placeholder="Search orders..."
-                        className="pl-10 bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                        className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -160,7 +160,7 @@ export function AdminOrdersPage() {
                             onClick={() => setStatusFilter(status)}
                             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                                 statusFilter === status
-                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+                                    ? 'bg-[#4A5568] text-white shadow-lg shadow-[#4A5568]/25'
                                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                             }`}
                         >
@@ -225,7 +225,7 @@ export function AdminOrdersPage() {
                                                 <select
                                                     value={order.status}
                                                     onChange={(e) => updateStatus(order.id, e.target.value)}
-                                                    className={`appearance-none pl-3 pr-8 py-2 rounded-xl text-sm font-semibold border cursor-pointer transition-colors ${config.bg} ${config.color} ${config.border} focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
+                                                    className={`appearance-none pl-3 pr-8 py-2 rounded-xl text-sm font-semibold border cursor-pointer transition-colors ${config.bg} ${config.color} ${config.border} focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20`}
                                                 >
                                                     <option value="PENDING">Pending</option>
                                                     <option value="PROCESSING">Processing</option>

@@ -235,7 +235,7 @@ export function AdminProductFormPage() {
                             <Label htmlFor="description" className="text-sm font-medium">Description</Label>
                             <textarea
                                 id="description"
-                                className="w-full min-h-[120px] p-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors resize-none"
+                                className="w-full min-h-[120px] p-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors resize-none"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 placeholder="Describe your product..."
@@ -310,7 +310,7 @@ export function AdminProductFormPage() {
                                         const selected = flatCategories.find(c => c.id === e.target.value);
                                         setCategory(selected?.name.trim() || '');
                                     }}
-                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors bg-white"
+                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors bg-white"
                                 >
                                     <option value="">Select a category</option>
                                     {flatCategories.map((cat) => (
@@ -327,7 +327,7 @@ export function AdminProductFormPage() {
                                     id="supplierId"
                                     value={supplierId}
                                     onChange={(e) => setSupplierId(e.target.value)}
-                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors bg-white"
+                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors bg-white"
                                 >
                                     <option value="">Select a supplier</option>
                                     {suppliers.map((sup) => (
@@ -433,7 +433,7 @@ export function AdminProductFormPage() {
                                     onChange={(e) => setInStock(e.target.checked)}
                                     className="peer sr-only"
                                 />
-                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-500/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#FFD814]/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                             </div>
                             <div>
                                 <span className="text-sm font-medium text-slate-900">
@@ -460,7 +460,7 @@ export function AdminProductFormPage() {
                     <Button 
                         type="submit" 
                         disabled={loading || uploading} 
-                        className="flex-1 h-12 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+                        className="flex-1 h-12 rounded-xl bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md hover:shadow-lg transition-all"
                     >
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {isEditing ? 'Update Product' : 'Create Product'}

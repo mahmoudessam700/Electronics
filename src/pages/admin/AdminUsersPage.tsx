@@ -140,7 +140,7 @@ export function AdminUsersPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
                 <span className="mt-4 text-slate-500">Loading users...</span>
             </div>
         );
@@ -201,7 +201,7 @@ export function AdminUsersPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                         placeholder="Search users..."
-                        className="pl-10 bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                        className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -213,7 +213,7 @@ export function AdminUsersPage() {
                             onClick={() => setRoleFilter(role)}
                             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                                 roleFilter === role
-                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+                                    ? 'bg-[#4A5568] text-white shadow-lg shadow-[#4A5568]/25'
                                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                             }`}
                         >
@@ -369,7 +369,7 @@ export function AdminUsersPage() {
                             <Label htmlFor="role" className="text-sm font-medium">User Role</Label>
                             <select
                                 id="role"
-                                className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                                className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814]"
                                 value={formData.role}
                                 onChange={(e) => setFormData({ ...formData, role: e.target.value as 'ADMIN' | 'CUSTOMER' })}
                             >
@@ -384,7 +384,7 @@ export function AdminUsersPage() {
                             <Button 
                                 type="submit" 
                                 disabled={isSaving}
-                                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl"
+                                className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold rounded-xl"
                             >
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Save Changes

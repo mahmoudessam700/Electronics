@@ -63,7 +63,7 @@ export function AdminProductsPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
                 <span className="mt-4 text-slate-500">Loading products...</span>
             </div>
         );
@@ -80,7 +80,7 @@ export function AdminProductsPage() {
                     <p className="text-slate-500 mt-1">Manage your product inventory</p>
                 </div>
                 <Link to="/admin/products/new">
-                    <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all">
+                    <Button className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md hover:shadow-lg transition-all">
                         <Plus className="mr-2 h-4 w-4" /> Add Product
                     </Button>
                 </Link>
@@ -92,7 +92,7 @@ export function AdminProductsPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                         placeholder="Search products..."
-                        className="pl-10 bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                        className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -238,7 +238,7 @@ export function AdminProductsPage() {
                         </p>
                         {!searchQuery && (
                             <Link to="/admin/products/new">
-                                <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg">
+                                <Button className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md">
                                     <Plus className="mr-2 h-4 w-4" /> Add First Product
                                 </Button>
                             </Link>
