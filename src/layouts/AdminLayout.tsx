@@ -35,22 +35,22 @@ export function AdminLayout() {
     ];
 
     const renderSidebarContent = () => (
-        <div className="flex flex-col h-full w-full">
+        <div className="flex flex-col h-full w-full bg-white border-r border-slate-200">
             {/* Logo Section */}
-            <div className="h-20 flex items-center gap-3 px-6 border-b border-white/10 flex-shrink-0">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-600 shadow-lg">
+            <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-100 flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-600 shadow-lg shadow-indigo-200">
                     <Zap className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h1 className="font-bold text-white text-base truncate">Adsolutions</h1>
-                    <p className="text-xs text-purple-300 font-medium tracking-wider uppercase">Admin</p>
+                    <h1 className="font-bold text-slate-900 text-base truncate">Adsolutions</h1>
+                    <p className="text-[10px] text-indigo-600 font-bold tracking-wider uppercase">Admin Panel</p>
                 </div>
             </div>
 
             {/* Navigation */}
-            <div className="flex-1 py-6 px-4 overflow-y-auto scrollbar-thin">
+            <div className="flex-1 py-6 px-4 overflow-y-auto">
                 <div className="mb-4">
-                    <span className="px-3 text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Dashboard</span>
+                    <span className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Dashboard</span>
                 </div>
                 <nav className="space-y-1">
                     {navItems.map((item) => {
@@ -63,15 +63,17 @@ export function AdminLayout() {
                                     navigate(item.path);
                                     setIsSidebarOpen(false);
                                 }}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
                                     isActive
-                                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20'
-                                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100'
+                                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                                 }`}
                             >
-                                <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white'}`} />
+                                <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'}`} />
                                 <span className="flex-1 text-left">{item.name}</span>
-                                {isActive && <div className="w-1.5 h-1.5 rounded-full bg-white shadow-glow" />}
+                                {isActive && (
+                                    <ChevronRight className="h-4 w-4 text-white/70" />
+                                )}
                             </button>
                         );
                     })}
@@ -79,28 +81,28 @@ export function AdminLayout() {
             </div>
 
             {/* Footer / User Section */}
-            <div className="p-4 border-t border-white/10 space-y-4">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50 space-y-4">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-indigo-600 font-bold text-sm flex-shrink-0 border border-slate-200">
                         {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{user.name || 'Admin User'}</p>
-                        <p className="text-[11px] text-white/40 truncate">{user.email}</p>
+                        <p className="text-sm font-semibold text-slate-900 truncate">{user.name || 'Admin'}</p>
+                        <p className="text-[11px] text-slate-500 truncate hover:text-clip" title={user.email}>{user.email}</p>
                     </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex gap-2">
                     <button
                         onClick={() => navigate('/')}
-                        className="flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all"
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-lg border border-slate-200 transition-all shadow-sm"
                     >
                         <Home className="h-4 w-4" />
                         <span>Store</span>
                     </button>
                     <button
                         onClick={logout}
-                        className="flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg border border-red-500/20 transition-all"
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-red-600 hover:text-red-700 bg-white hover:bg-red-50 rounded-lg border border-red-100 transition-all shadow-sm"
                     >
                         <LogOut className="h-4 w-4" />
                         <span>Exit</span>
@@ -118,6 +120,7 @@ export function AdminLayout() {
                     .admin-desktop-sidebar {
                         display: flex !important;
                         width: 18rem !important;
+                        background-color: white !important;
                     }
                     .admin-main-content {
                         margin-left: 18rem !important;
@@ -126,7 +129,7 @@ export function AdminLayout() {
             `}</style>
 
             {/* Desktop Static Sidebar */}
-            <aside className="admin-desktop-sidebar hidden fixed inset-y-0 left-0 bg-[#1e1b4b] flex-col z-[40]">
+            <aside className="admin-desktop-sidebar hidden fixed inset-y-0 left-0 bg-white flex-col z-[40]">
                 {renderSidebarContent()}
             </aside>
 
@@ -139,10 +142,10 @@ export function AdminLayout() {
                         onClick={() => setIsSidebarOpen(false)}
                     />
                     {/* Drawer */}
-                    <aside className="absolute inset-y-0 left-0 w-80 bg-[#1e1b4b] shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
+                    <aside className="absolute inset-y-0 left-0 w-80 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
                         <button
                             onClick={() => setIsSidebarOpen(false)}
-                            className="absolute top-5 right-5 p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-xl transition-all z-50"
+                            className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all z-50"
                         >
                             <X className="h-6 w-6" />
                         </button>
