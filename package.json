@@ -58,7 +58,8 @@
         "recharts": "^2.15.2",
         "sonner": "^2.0.3",
         "tailwind-merge": "*",
-        "vaul": "^1.1.2"
+        "vaul": "^1.1.2",
+        "vercel": "^39.4.2"
     },
     "devDependencies": {
         "@types/bcryptjs": "^2.4.6",
@@ -74,6 +75,7 @@
     },
     "scripts": {
         "dev": "vite",
+        "dev:api": "vercel dev",
         "build": "vite build"
     }
 }
