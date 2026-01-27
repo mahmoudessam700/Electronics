@@ -430,21 +430,21 @@ export function AdminCategoriesPage() {
 
                         <div className="space-y-2">
                             <Label className="text-sm font-medium">Image</Label>
-                            <div className="flex items-start gap-4">
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
                                 {formData.image ? (
-                                    <img src={formData.image} alt="Preview" className="h-20 w-20 object-cover rounded-xl border shadow-sm" />
+                                    <img src={formData.image} alt="Preview" className="h-24 w-24 object-cover rounded-xl border shadow-sm flex-shrink-0" />
                                 ) : (
-                                    <div className="h-20 w-20 rounded-xl border-2 border-dashed border-slate-200 flex items-center justify-center">
+                                    <div className="h-24 w-24 rounded-xl border-2 border-dashed border-slate-200 flex items-center justify-center flex-shrink-0">
                                         <ImageIcon className="h-6 w-6 text-slate-300" />
                                     </div>
                                 )}
-                                <div className="flex-1 space-y-3">
+                                <div className="flex-1 w-full space-y-3">
                                     <Input
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageUpload}
                                         disabled={saving}
-                                        className="rounded-xl"
+                                        className="rounded-xl w-full"
                                     />
                                     <p className="text-xs text-slate-400">Or paste an image URL:</p>
                                     <Input
@@ -452,7 +452,7 @@ export function AdminCategoriesPage() {
                                         value={formData.image}
                                         onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                                         placeholder="https://..."
-                                        className="rounded-xl"
+                                        className="rounded-xl w-full"
                                     />
                                 </div>
                             </div>
