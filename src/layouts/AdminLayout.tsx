@@ -132,9 +132,9 @@ export function AdminLayout() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
-            {/* Mobile Header */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#4A5568] h-14 flex items-center justify-between px-4">
+        <div className="min-h-screen bg-gray-100">
+            {/* Mobile Header - fixed at top */}
+            <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#4A5568] h-14 flex items-center justify-between px-4">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-[#718096] flex items-center justify-center">
                         <Zap className="h-4 w-4 text-white" />
@@ -147,31 +147,43 @@ export function AdminLayout() {
                 >
                     {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </button>
-            </div>
+            </header>
 
             {/* Mobile Sidebar Overlay */}
-            {isSidebarOpen && (
-                <div 
-                    className="lg:hidden fixed inset-0 z-40 bg-black/50"
-                    onClick={() => setIsSidebarOpen(false)}
-                />
-            )}
+            <div 
+                className={`lg:hidden fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
+                    isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
+                onClick={() => setIsSidebarOpen(false)}
+            />
 
-            {/* Sidebar - Desktop (static in flex layout) */}
-            <aside className="hidden lg:flex w-64 bg-[#4A5568] flex-col min-h-screen flex-shrink-0">
+            {/* Mobile Sidebar */}
+            <aside 
+                className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 bg-[#4A5568] flex flex-col z-50 transition-transform duration-300 ease-in-out ${
+                    isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                }`}
+            >
                 <SidebarContent />
             </aside>
 
-            {/* Sidebar - Mobile (fixed overlay) */}
-            <aside className={`lg:hidden fixed left-0 top-14 bottom-0 w-64 bg-[#4A5568] flex flex-col z-50 transform transition-transform duration-300 ${
-                isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            }`}>
-                <SidebarContent />
-            </aside>
+            {/* Desktop Layout */}
+            <div className="hidden lg:flex min-h-screen">
+                {/* Desktop Sidebar */}
+                <aside className="w-64 bg-[#4A5568] flex flex-col flex-shrink-0 sticky top-0 h-screen">
+                    <SidebarContent />
+                </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 min-h-screen pt-14 lg:pt-0">
-                <div className="p-4 md:p-6 lg:p-8">
+                {/* Desktop Main Content */}
+                <main className="flex-1 min-h-screen">
+                    <div className="p-6 lg:p-8">
+                        <Outlet />
+                    </div>
+                </main>
+            </div>
+
+            {/* Mobile Main Content */}
+            <main className="lg:hidden min-h-screen pt-14">
+                <div className="p-4">
                     <Outlet />
                 </div>
             </main>
