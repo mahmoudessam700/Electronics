@@ -261,7 +261,7 @@ export function AdminProductFormPage() {
                             <div className="space-y-2">
                                 <Label htmlFor="price" className="text-sm font-medium">Sale Price (E£) *</Label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">E£</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs pointer-events-none z-10">E£</span>
                                     <Input
                                         id="price"
                                         type="number"
@@ -270,14 +270,14 @@ export function AdminProductFormPage() {
                                         value={price}
                                         onChange={(e) => setPrice(e.target.value)}
                                         placeholder="0.00"
-                                        className="pl-10 rounded-xl h-11"
+                                        className="pl-14 rounded-xl h-11"
                                     />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="costPrice" className="text-sm font-medium">Cost Price (E£)</Label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">E£</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs pointer-events-none z-10">E£</span>
                                     <Input
                                         id="costPrice"
                                         type="number"
@@ -285,14 +285,14 @@ export function AdminProductFormPage() {
                                         value={costPrice}
                                         onChange={(e) => setCostPrice(e.target.value)}
                                         placeholder="0.00"
-                                        className="pl-10 rounded-xl h-11"
+                                        className="pl-14 rounded-xl h-11"
                                     />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="originalPrice" className="text-sm font-medium">Original Price</Label>
+                                <Label htmlFor="originalPrice" className="text-sm font-medium">Original Price (E£)</Label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">E£</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs pointer-events-none z-10">E£</span>
                                     <Input
                                         id="originalPrice"
                                         type="number"
@@ -300,7 +300,7 @@ export function AdminProductFormPage() {
                                         value={originalPrice}
                                         onChange={(e) => setOriginalPrice(e.target.value)}
                                         placeholder="0.00"
-                                        className="pl-10 rounded-xl h-11"
+                                        className="pl-14 rounded-xl h-11"
                                     />
                                 </div>
                             </div>
