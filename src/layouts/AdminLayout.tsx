@@ -155,23 +155,21 @@ export function AdminLayout() {
                     />
                     {/* Sidebar with slide-in animation */}
                     <aside className="lg:hidden fixed top-0 left-0 bottom-0 w-72 flex flex-col z-[9999] shadow-2xl overflow-hidden bg-[#1e1b4b]">
+                        {/* Close button for mobile sidebar */}
+                        <button
+                            onClick={() => setIsSidebarOpen(false)}
+                            className="absolute top-4 right-4 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors z-10"
+                            aria-label="Close sidebar"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
                         <SidebarContent />
                     </aside>
                 </>
             )}
 
-            {/* Desktop Sidebar - CSS handles responsive display */}
-            <style>{`
-                .admin-desktop-sidebar {
-                    display: none;
-                }
-                @media (min-width: 1024px) {
-                    .admin-desktop-sidebar {
-                        display: flex !important;
-                    }
-                }
-            `}</style>
-            <aside className="admin-desktop-sidebar fixed top-0 left-0 h-screen w-72 flex-col flex-shrink-0 shadow-2xl z-[100] overflow-hidden bg-[#1e1b4b]">
+            {/* Desktop Sidebar - uses Tailwind responsive classes */}
+            <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-72 flex-col flex-shrink-0 shadow-2xl z-[100] overflow-hidden bg-[#1e1b4b]">
                 <SidebarContent />
             </aside>
 
