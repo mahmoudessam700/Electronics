@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Loader2, ArrowLeft, Package, DollarSign, Tag, Building2, ImageIcon, CheckSquare, FileText, Upload } from 'lucide-react';
+import { Loader2, ArrowLeft, Package, DollarSign, Tag, Building2, ImageIcon, CheckSquare, FileText, Upload, Camera } from 'lucide-react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { CameraCapture } from '../../components/CameraCapture';
 
 interface Category {
     id: string;
@@ -91,8 +92,8 @@ export function AdminProductFormPage() {
         }
     };
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement> | File) => {
+        const file = e instanceof File ? e : e.target.files?.[0];
         if (!file) return;
 
         setUploading(true);
@@ -410,6 +411,23 @@ export function AdminProductFormPage() {
                                         </div>
                                         {uploading && <Loader2 className="h-5 w-5 animate-spin text-indigo-600 ml-auto" />}
                                     </div>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <CameraCapture 
+                                        onCapture={(file) => handleImageUpload(file)}
+                                        trigger={
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                className="flex-1 gap-2 border-slate-200 hover:bg-slate-50 h-11 rounded-xl"
+                                                disabled={uploading}
+                                            >
+                                                <Camera className="h-4 w-4" />
+                                                Take Photo
+                                            </Button>
+                                        }
+                                    />
                                 </div>
                                 
                                 <div className="relative">
