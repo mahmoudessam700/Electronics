@@ -475,13 +475,18 @@ export function AdminCategoriesPage() {
                                     />
 
                                     <p className="text-xs text-slate-400">Or paste an image URL:</p>
-                                    <Input
-                                        id="image"
-                                        value={formData.image}
-                                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                        placeholder="https://..."
-                                        className="rounded-xl w-full"
-                                    />
+                                    <div className="flex items-center">
+                                        <div className="bg-slate-50 border border-slate-200 px-3 h-11 flex items-center justify-center rounded-l-xl text-slate-500 font-bold text-[10px] border-r-0 whitespace-nowrap">
+                                            URL
+                                        </div>
+                                        <Input
+                                            id="image"
+                                            value={formData.image}
+                                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                            placeholder="https://..."
+                                            className="rounded-l-none rounded-r-xl h-11 border-l-0 w-full"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

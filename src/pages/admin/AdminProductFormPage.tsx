@@ -259,9 +259,11 @@ export function AdminProductFormPage() {
                     <div className="p-6">
                         <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="price" className="text-sm font-medium">Sale Price (E£) *</Label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs pointer-events-none z-10">E£</span>
+                                <Label htmlFor="price" className="text-sm font-medium">Sale Price *</Label>
+                                <div className="flex items-center">
+                                    <div className="bg-slate-50 border border-slate-200 px-3 h-11 flex items-center justify-center rounded-l-xl text-slate-500 font-bold text-xs border-r-0">
+                                        E£
+                                    </div>
                                     <Input
                                         id="price"
                                         type="number"
@@ -270,14 +272,16 @@ export function AdminProductFormPage() {
                                         value={price}
                                         onChange={(e) => setPrice(e.target.value)}
                                         placeholder="0.00"
-                                        className="pl-14 rounded-xl h-11"
+                                        className="rounded-l-none rounded-r-xl h-11 border-l-0 flex-1 focus-visible:ring-0 focus-visible:border-slate-300"
                                     />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="costPrice" className="text-sm font-medium">Cost Price (E£)</Label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs pointer-events-none z-10">E£</span>
+                                <Label htmlFor="costPrice" className="text-sm font-medium">Cost Price</Label>
+                                <div className="flex items-center">
+                                    <div className="bg-slate-50 border border-slate-200 px-3 h-11 flex items-center justify-center rounded-l-xl text-slate-500 font-bold text-xs border-r-0">
+                                        E£
+                                    </div>
                                     <Input
                                         id="costPrice"
                                         type="number"
@@ -285,14 +289,16 @@ export function AdminProductFormPage() {
                                         value={costPrice}
                                         onChange={(e) => setCostPrice(e.target.value)}
                                         placeholder="0.00"
-                                        className="pl-14 rounded-xl h-11"
+                                        className="rounded-l-none rounded-r-xl h-11 border-l-0 flex-1 focus-visible:ring-0 focus-visible:border-slate-300"
                                     />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="originalPrice" className="text-sm font-medium">Original Price (E£)</Label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs pointer-events-none z-10">E£</span>
+                                <Label htmlFor="originalPrice" className="text-sm font-medium">Original Price</Label>
+                                <div className="flex items-center">
+                                    <div className="bg-slate-50 border border-slate-200 px-3 h-11 flex items-center justify-center rounded-l-xl text-slate-500 font-bold text-xs border-r-0">
+                                        E£
+                                    </div>
                                     <Input
                                         id="originalPrice"
                                         type="number"
@@ -300,7 +306,7 @@ export function AdminProductFormPage() {
                                         value={originalPrice}
                                         onChange={(e) => setOriginalPrice(e.target.value)}
                                         placeholder="0.00"
-                                        className="pl-14 rounded-xl h-11"
+                                        className="rounded-l-none rounded-r-xl h-11 border-l-0 flex-1 focus-visible:ring-0 focus-visible:border-slate-300"
                                     />
                                 </div>
                             </div>
