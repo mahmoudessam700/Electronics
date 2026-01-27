@@ -160,8 +160,18 @@ export function AdminLayout() {
                 </>
             )}
 
-            {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex w-72 flex-col flex-shrink-0 fixed top-0 left-0 h-screen shadow-2xl z-[100] overflow-hidden bg-[#1e1b4b]">
+            {/* Desktop Sidebar - CSS handles responsive display */}
+            <style>{`
+                .admin-desktop-sidebar {
+                    display: none;
+                }
+                @media (min-width: 1024px) {
+                    .admin-desktop-sidebar {
+                        display: flex !important;
+                    }
+                }
+            `}</style>
+            <aside className="admin-desktop-sidebar fixed top-0 left-0 h-screen w-72 flex-col flex-shrink-0 shadow-2xl z-[100] overflow-hidden bg-[#1e1b4b]">
                 <SidebarContent />
             </aside>
 
