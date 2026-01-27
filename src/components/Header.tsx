@@ -23,17 +23,22 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   const [isHoverCardOpen, setIsHoverCardOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSignInClick = () => {
     setAuthView('signin');
     setIsHoverCardOpen(false);
-    setIsAuthModalOpen(true);
+    setIsMobileMenuOpen(false);
+    // Small delay to let the sheet close first
+    setTimeout(() => setIsAuthModalOpen(true), 100);
   };
 
   const handleSignUpClick = () => {
     setAuthView('signup');
     setIsHoverCardOpen(false);
-    setIsAuthModalOpen(true);
+    setIsMobileMenuOpen(false);
+    // Small delay to let the sheet close first
+    setTimeout(() => setIsAuthModalOpen(true), 100);
   };
 
   return (
@@ -46,7 +51,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
             {/* Mobile Menu & Logo Group */}
             <div className="flex items-center gap-2">
               {/* Mobile Menu */}
-              <Sheet>
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <button className="lg:hidden text-white p-2 hover:outline hover:outline-1 hover:outline-white">
                     <Menu className="h-6 w-6" />
@@ -64,24 +69,28 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           className="text-sm p-0 h-auto text-red-600 mt-1"
                           onClick={() => {
                             logout();
+                            setIsMobileMenuOpen(false);
                           }}
                         >
                           Sign Out
                         </Button>
                       </div>
                     ) : (
-                      <SheetClose asChild>
-                        <div className="w-full">
-                          <AuthModal defaultView="signin">
-                            <Button
-                              variant="ghost"
-                              className="justify-start font-bold w-full"
-                            >
-                              Sign In
-                            </Button>
-                          </AuthModal>
-                        </div>
-                      </SheetClose>
+                      <div className="flex flex-col gap-2 px-4 py-2">
+                        <Button
+                          className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] w-full font-bold"
+                          onClick={handleSignInClick}
+                        >
+                          Sign In
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={handleSignUpClick}
+                        >
+                          Create Account
+                        </Button>
+                      </div>
                     )}
                     <SheetClose asChild>
                       <Button
