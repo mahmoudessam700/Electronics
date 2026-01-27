@@ -232,24 +232,16 @@ export function AdminLayout() {
                 </>
             )}
 
-            {/* Desktop Layout */}
-            <div className="hidden lg:flex min-h-screen">
-                {/* Desktop Sidebar */}
-                <aside className="w-64 bg-[#4A5568] flex flex-col flex-shrink-0 sticky top-0 h-screen">
-                    <SidebarContent />
-                </aside>
+            {/* Desktop Sidebar - hidden on mobile */}
+            <aside className="hidden lg:flex w-64 bg-[#4A5568] flex-col flex-shrink-0 fixed top-0 left-0 h-screen">
+                <SidebarContent />
+            </aside>
 
-                {/* Desktop Main Content */}
-                <main className="flex-1 min-h-screen">
-                    <div className="p-6 lg:p-8">
-                        <Outlet />
-                    </div>
-                </main>
-            </div>
-
-            {/* Mobile Main Content */}
-            <main className="lg:hidden min-h-screen bg-gray-100" style={{ paddingTop: '70px' }}>
-                <div className="p-4">
+            {/* Main Content Area */}
+            <main className="min-h-screen lg:ml-64">
+                {/* Mobile spacer for fixed header */}
+                <div className="h-14 lg:hidden" />
+                <div className="p-4 lg:p-8">
                     <Outlet />
                 </div>
             </main>
