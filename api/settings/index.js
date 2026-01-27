@@ -1,41 +1,40 @@
 const { Pool } = require('pg');
 
-let pool;
-
-const getPool = () => {
-    if (!pool) {
-        pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
-            ssl: { rejectUnauthorized: false }
-        });
-    }
-    return pool;
-};
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+});
 
 module.exports = async (req, res) => {
-    const { type } = req.query;
-    const client = getPool();
-
+    // Standard Headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Cache-Control', 'no-store, max-age=0, must-revalidate');
+
+    if (req.method === 'OPTIONS') return res.status(200).end();
+
+    const { type } = req.query;
 
     try {
         if (!process.env.DATABASE_URL) {
-            return res.status(500).json({ error: 'DATABASE_URL is missing' });
+            return res.status(500).json({ error: 'Config Error: DATABASE_URL is not set' });
         }
 
         if (req.method === 'GET') {
             if (type === 'homepage') {
                 try {
-                    const { rows } = await client.query('SELECT value FROM "Setting" WHERE key = $1', ['homepage_sections']);
+                    const { rows } = await pool.query('SELECT value FROM "Setting" WHERE key = $1', ['homepage_sections']);
                     
                     if (rows.length > 0) {
                         let data = rows[0].value;
                         if (typeof data === 'string') {
                             try { data = JSON.parse(data); } catch (e) {}
                         }
-                        return res.status(200).json(data);
+                        return res.json(data);
                     } else {
-                        return res.status(200).json({
+                        // Return Defaults if row doesn't exist
+                        return res.json({
                             sections: [
                                 { id: 'deals-of-the-day', isEnabled: true, name: 'Deals of the Day', description: 'Shows products that have an original price higher than their current price.', showBadge: true, badgeText: 'Ends in 12:34:56' },
                                 { id: 'inspired-browsing', isEnabled: true, name: 'Inspired by your browsing history', description: 'Shows a carousel of recommended products for the user.' },
@@ -46,8 +45,14 @@ module.exports = async (req, res) => {
                         });
                     }
                 } catch (dbError) {
-                    console.error('DB GET Error:', dbError);
-                    return res.status(500).json({ error: `Database Error (GET): ${dbError.message}` });
+                    // Check if table missing
+                    if (dbError.message.includes('Setting" does not exist')) {
+                        return res.status(400).json({ 
+                            error: 'Table Missing', 
+                            message: 'The "Setting" table does not exist in your database yet. Please run: npx prisma db push' 
+                        });
+                    }
+                    throw dbError;
                 }
             }
         }
@@ -57,29 +62,27 @@ module.exports = async (req, res) => {
                 const { sections } = req.body;
                 
                 if (!sections || !Array.isArray(sections)) {
-                    return res.status(400).json({ error: 'Invalid data format' });
+                    return res.status(400).json({ error: 'Invalid data: sections must be an array' });
                 }
 
-                try {
-                    const value = JSON.stringify({ sections });
-                    
-                    await client.query(`
-                        INSERT INTO "Setting" (key, value, "updatedAt") 
-                        VALUES ($1, $2, NOW())
-                        ON CONFLICT (key) DO UPDATE SET value = $2, "updatedAt" = NOW()
-                    `, ['homepage_sections', value]);
+                const payload = JSON.stringify({ sections });
 
-                    return res.status(200).json({ success: true });
-                } catch (dbError) {
-                    console.error('DB POST Error:', dbError);
-                    return res.status(500).json({ error: `Database Error (POST): ${dbError.message}` });
-                }
+                await pool.query(`
+                    INSERT INTO "Setting" (key, value, "updatedAt") 
+                    VALUES ($1, $2, NOW())
+                    ON CONFLICT (key) DO UPDATE SET value = $2, "updatedAt" = NOW()
+                `, ['homepage_sections', payload]);
+
+                return res.json({ success: true });
             }
         }
 
         return res.status(405).json({ error: 'Method not allowed' });
-    } catch (e) {
-        console.error('Settings API Error:', e);
-        return res.status(500).json({ error: `General API Error: ${e.message}` });
+    } catch (error) {
+        console.error('Settings API Critical Error:', error);
+        return res.status(500).json({ 
+            error: 'Database Error', 
+            details: error.message 
+        });
     }
 };
