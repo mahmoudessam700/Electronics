@@ -26,12 +26,12 @@ export function AdminLayout() {
 
     const navItems = [
         { name: 'Admin Overview', path: '/admin', icon: LayoutDashboard },
-        { name: 'Management Financial', path: '/admin/financial', icon: DollarSign },
         { name: 'Categories', path: '/admin/categories', icon: Folder },
         { name: 'Products', path: '/admin/products', icon: Package },
         { name: 'Suppliers', path: '/admin/suppliers', icon: Building2 },
         { name: 'Customers', path: '/admin/users', icon: Users },
         { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
+        { name: 'Management Financial', path: '/admin/financial', icon: DollarSign },
         { name: 'Files', path: '/admin/files', icon: FolderOpen },
     ];
 
