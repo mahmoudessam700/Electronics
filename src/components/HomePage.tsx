@@ -76,8 +76,28 @@ export function HomePage({ onNavigate }: HomePageProps) {
     };
   };
 
+  // Get deals section settings for manual product selection
+  const getDealsProducts = () => {
+    if (!settings || !settings.sections) {
+      return products.filter(p => p.originalPrice && p.originalPrice > p.price).slice(0, 5);
+    }
+    
+    const dealsSection = settings.sections.find((s: any) => s.id === 'deals-of-the-day');
+    
+    // If manual selection is enabled and products are selected
+    if (dealsSection?.useManualSelection && dealsSection?.selectedProducts?.length > 0) {
+      // Return products in the order they were selected
+      return dealsSection.selectedProducts
+        .map((id: string) => products.find(p => p.id === id))
+        .filter(Boolean);
+    }
+    
+    // Default: automatic selection based on discount
+    return products.filter(p => p.originalPrice && p.originalPrice > p.price).slice(0, 5);
+  };
+
   // Filter products for different sections
-  const dealsOfTheDay = products.filter(p => p.originalPrice && p.originalPrice > p.price).slice(0, 5);
+  const dealsOfTheDay = getDealsProducts();
   const recommendedProducts = products.slice(0, 10);
   const trendingProducts = products.filter(p => p.price > 1000).slice(0, 10);
   const peripherals = products.filter(p =>
@@ -195,30 +215,34 @@ export function HomePage({ onNavigate }: HomePageProps) {
                           transition: 'transform 0.2s'
                         }}
                       />
-                      {/* Discount Badge */}
-                      <div style={{
-                        position: 'absolute',
-                        top: 8,
-                        left: 8,
-                        backgroundColor: '#CC0C39',
-                        color: '#ffffff',
-                        fontSize: 12,
-                        fontWeight: 600,
-                        padding: '4px 10px',
-                        borderRadius: 4
-                      }}>
-                        -{Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)}%
-                      </div>
+                      {/* Discount Badge - only show if there's a discount */}
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <div style={{
+                          position: 'absolute',
+                          top: 8,
+                          left: 8,
+                          backgroundColor: '#CC0C39',
+                          color: '#ffffff',
+                          fontSize: 12,
+                          fontWeight: 600,
+                          padding: '4px 10px',
+                          borderRadius: 4
+                        }}>
+                          -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                        </div>
+                      )}
                     </div>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                        <span style={{
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: '#CC0C39'
-                        }}>
-                          -{Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)}%
-                        </span>
+                        {product.originalPrice && product.originalPrice > product.price && (
+                          <span style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: '#CC0C39'
+                          }}>
+                            -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                          </span>
+                        )}
                         <span style={{ fontSize: 18, fontWeight: 700, color: '#0F1111' }}>
                           E£{product.price.toLocaleString()}
                         </span>
