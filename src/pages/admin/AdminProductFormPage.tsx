@@ -31,6 +31,7 @@ export function AdminProductFormPage() {
     // Form fields
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
+    const [costPrice, setCostPrice] = useState('');
     const [originalPrice, setOriginalPrice] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
@@ -76,6 +77,7 @@ export function AdminProductFormPage() {
             if (res.ok && data) {
                 setName(data.name);
                 setPrice(data.price.toString());
+                setCostPrice(data.costPrice?.toString() || '');
                 setOriginalPrice(data.originalPrice?.toString() || '');
                 setDescription(data.description || '');
                 setCategory(data.category || '');
@@ -138,6 +140,7 @@ export function AdminProductFormPage() {
         const productData = {
             name,
             price: parseFloat(price),
+            costPrice: costPrice ? parseFloat(costPrice) : 0,
             originalPrice: originalPrice ? parseFloat(originalPrice) : null,
             description,
             category,
@@ -253,9 +256,9 @@ export function AdminProductFormPage() {
                         </div>
                     </div>
                     <div className="p-6">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="price" className="text-sm font-medium">Price (E£) *</Label>
+                                <Label htmlFor="price" className="text-sm font-medium">Sale Price (E£) *</Label>
                                 <div className="relative">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">E£</span>
                                     <Input
@@ -271,7 +274,22 @@ export function AdminProductFormPage() {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="originalPrice" className="text-sm font-medium">Original Price (Optional)</Label>
+                                <Label htmlFor="costPrice" className="text-sm font-medium">Cost Price (E£)</Label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">E£</span>
+                                    <Input
+                                        id="costPrice"
+                                        type="number"
+                                        step="0.01"
+                                        value={costPrice}
+                                        onChange={(e) => setCostPrice(e.target.value)}
+                                        placeholder="0.00"
+                                        className="pl-10 rounded-xl h-11"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="originalPrice" className="text-sm font-medium">Original Price</Label>
                                 <div className="relative">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">E£</span>
                                     <Input
@@ -284,7 +302,6 @@ export function AdminProductFormPage() {
                                         className="pl-10 rounded-xl h-11"
                                     />
                                 </div>
-                                <p className="text-xs text-slate-400">Set this to show a discount label</p>
                             </div>
                         </div>
                     </div>

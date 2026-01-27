@@ -41,6 +41,7 @@ model Product {
   supplierId    String?
   supplier      Supplier?    @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   description   String?
+  costPrice     Float       @default(0)
   inStock       Boolean     @default(true)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
@@ -133,6 +134,7 @@ model Supplier {
   phone     String?
   address   String?
   products  Product[]
+  payouts   SupplierPayout[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -140,4 +142,52 @@ model Supplier {
 enum Role {
   CUSTOMER
   ADMIN
+}
+
+model FinancialCycle {
+  id            String    @id @default(cuid())
+  name          String
+  startDate     DateTime
+  endDate       DateTime?
+  status        FinancialCycleStatus @default(OPEN)
+  totalRevenue  Float     @default(0)
+  totalExpenses Float     @default(0)
+  totalTax      Float     @default(0)
+  netProfit     Float     @default(0)
+  expenses      Expense[]
+  payouts       SupplierPayout[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum FinancialCycleStatus {
+  OPEN
+  CLOSED
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  description String
+  amount      Float
+  category    String
+  cycleId     String
+  cycle       FinancialCycle @relation(fields: [cycleId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model SupplierPayout {
+  id         String   @id @default(cuid())
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  amount     Float
+  status     PayoutStatus @default(PENDING)
+  cycleId    String
+  cycle      FinancialCycle @relation(fields: [cycleId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+  CANCELLED
 }

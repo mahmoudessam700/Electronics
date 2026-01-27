@@ -1,6 +1,6 @@
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, Users, Zap, ChevronRight, Menu, X, Settings, Bell } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, Users, Zap, ChevronRight, Menu, X, Settings, Bell, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 
 export function AdminLayout() {
@@ -31,6 +31,7 @@ export function AdminLayout() {
         { name: 'Suppliers', path: '/admin/suppliers', icon: Building2 },
         { name: 'Customers', path: '/admin/users', icon: Users },
         { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
+        { name: 'Financial', path: '/admin/financial', icon: DollarSign },
         { name: 'Files', path: '/admin/files', icon: FolderOpen },
     ];
 

@@ -26,6 +26,7 @@ import { AdminFilesPage } from './pages/admin/AdminFilesPage';
 import { AdminCategoriesPage } from './pages/admin/AdminCategoriesPage';
 import { AdminSuppliersPage } from './pages/admin/AdminSuppliersPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
+import { AdminFinancialPage } from './pages/admin/AdminFinancialPage';
 import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
@@ -191,6 +192,7 @@ function AppContent() {
           <Route path="suppliers" element={<AdminSuppliersPage />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="financial" element={<AdminFinancialPage />} />
           <Route path="files" element={<AdminFilesPage />} />
         </Route>
 

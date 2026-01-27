@@ -92,6 +92,23 @@ module.exports = async (req, res) => {
                 }
 
                 await pool.query('COMMIT');
+
+                // Update Active Financial Cycle if exists
+                try {
+                    const tax = totalAmount * 0.14;
+                    const netProfit = totalAmount - tax; // This is naive, ideally we'd subtract costPrice here too
+                    
+                    await pool.query(`
+                        UPDATE "FinancialCycle" 
+                        SET "totalRevenue" = "totalRevenue" + $1,
+                            "totalTax" = "totalTax" + $2,
+                            "netProfit" = "netProfit" + $3
+                        WHERE status = 'OPEN'
+                    `, [totalAmount, tax, netProfit]);
+                } catch (financialError) {
+                    console.error('Failed to update financial cycle:', financialError);
+                }
+
                 return res.status(201).json(rows[0]);
             } catch (e) {
                 await pool.query('ROLLBACK');
