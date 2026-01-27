@@ -248,7 +248,7 @@ export function AdminLayout() {
             </div>
 
             {/* Mobile Main Content */}
-            <main className="lg:hidden min-h-screen bg-gray-100 pt-16">
+            <main className="lg:hidden min-h-screen bg-gray-100" style={{ paddingTop: '70px' }}>
                 <div className="p-4">
                     <Outlet />
                 </div>
