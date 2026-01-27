@@ -41,22 +41,22 @@ export function AdminLayout() {
 
     const SidebarContent = () => (
         <>
-            {/* Logo Section with Gradient */}
-            <div className="h-20 flex items-center gap-3 px-6 bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-b border-white/10">
+            {/* Logo Section */}
+            <div className="h-20 flex items-center gap-3 px-6 border-b border-white/10">
                 <div className="relative">
-                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #a855f7, #3b82f6)' }}>
                         <Zap className="h-6 w-6 text-white" />
                     </div>
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900"></div>
                 </div>
                 <div className="flex-1">
                     <h1 className="font-bold text-white text-base">Adsolutions</h1>
-                    <p className="text-xs text-purple-300/70 font-medium">Admin Panel</p>
+                    <p className="text-xs text-purple-300 font-medium">Admin Panel</p>
                 </div>
             </div>
 
             {/* Navigation */}
-            <div className="flex-1 py-6 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+            <div className="flex-1 py-6 px-4 overflow-y-auto">
                 <div className="mb-4">
                     <span className="px-3 text-[11px] font-bold text-white/40 uppercase tracking-wider">Navigation</span>
                 </div>
@@ -70,7 +70,7 @@ export function AdminLayout() {
                                 onClick={() => handleNavClick(item.path)}
                                 className={`w-full group flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
                                     isActive
-                                        ? 'bg-gray-200/90 text-gray-900 shadow-md'
+                                        ? 'bg-white/90 text-gray-900 shadow-md'
                                         : 'text-white/70 hover:text-white hover:bg-white/10'
                                 }`}
                             >
@@ -87,12 +87,12 @@ export function AdminLayout() {
                 </nav>
             </div>
 
-            {/* User Section with Modern Card */}
-            <div className="border-t border-white/10 p-4 bg-gradient-to-t from-black/20 to-transparent">
+            {/* User Section */}
+            <div className="border-t border-white/10 p-4">
                 {/* User Card */}
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10 mb-3 hover:from-white/15 hover:to-white/10 transition-all duration-300">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/10 border border-white/10 mb-3">
                     <div className="relative">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg" style={{ background: 'linear-gradient(to bottom right, #a855f7, #3b82f6)' }}>
                             {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                         </div>
                         <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900"></div>
@@ -110,14 +110,14 @@ export function AdminLayout() {
                 <div className="grid grid-cols-2 gap-2">
                     <button
                         onClick={() => navigate('/')}
-                        className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium text-white/80 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-all duration-200 border border-white/10 hover:border-white/20"
+                        className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium text-white/80 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-all duration-200 border border-white/10"
                     >
                         <Home className="h-4 w-4" />
                         <span>Store</span>
                     </button>
                     <button
                         onClick={logout}
-                        className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200 border border-red-500/20 hover:border-red-500/30"
+                        className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200 border border-red-500/20"
                     >
                         <LogOut className="h-4 w-4" />
                         <span>Logout</span>
