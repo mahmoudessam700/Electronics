@@ -152,31 +152,13 @@ export function AdminLayout() {
                 {renderSidebarContent()}
             </aside>
 
-            {/* Mobile Sidebar Modal */}
-            {isSidebarOpen && (
-                <div className="lg:hidden fixed inset-0 z-[10000]">
-                    {/* Backdrop */}
-                    <div 
-                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
-                        onClick={() => setIsSidebarOpen(false)}
-                    />
-                    {/* Drawer */}
-                    <aside className="absolute inset-y-0 left-0 w-80 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-300 z-[10001]">
-                        <button
-                            onClick={() => setIsSidebarOpen(false)}
-                            className="absolute top-4 right-4 p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all z-[10002]"
-                        >
-                            <X className="h-6 w-6" />
-                        </button>
-                        {renderSidebarContent(true)}
-                    </aside>
-                </div>
-            )}
-
             {/* Main Page Layout */}
-            <div className="admin-main-content flex-1 flex flex-col min-w-0 transition-all duration-300">
-                {/* Top Mobile Nav Bar - Always at the top */}
-                <header className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-[9999]">
+            <div className="admin-main-content flex-1 flex flex-col min-w-0 transition-all duration-300 overflow-visible">
+                {/* Top Mobile Nav Bar - Fixed at top with highest possible layer for header */}
+                <header 
+                    className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0"
+                    style={{ zIndex: 99999 }}
+                >
                     <div className="flex items-center gap-3">
                         <div 
                             className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg"
@@ -195,12 +177,41 @@ export function AdminLayout() {
                 </header>
 
                 {/* Content Outlet */}
-                <main className="flex-1 p-4 md:p-8 lg:p-10 relative">
+                <main className="flex-1 p-4 md:p-8 lg:p-10 relative z-0">
                     <div className="max-w-7xl mx-auto">
                         <Outlet />
                     </div>
                 </main>
             </div>
+
+            {/* Mobile Sidebar Modal - Using massive z-index to ensure it is above EVERYTHING */}
+            {isSidebarOpen && (
+                <div 
+                    className="lg:hidden fixed inset-0" 
+                    style={{ zIndex: 99999999 }}
+                >
+                    {/* Backdrop */}
+                    <div 
+                        className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-300"
+                        onClick={() => setIsSidebarOpen(false)}
+                        style={{ pointerEvents: 'auto' }}
+                    />
+                    {/* Drawer */}
+                    <aside 
+                        className="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-300"
+                        style={{ zIndex: 100000000 }}
+                    >
+                        <button
+                            onClick={() => setIsSidebarOpen(false)}
+                            className="absolute top-4 right-4 p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all"
+                            style={{ zIndex: 100000001 }}
+                        >
+                            <X className="h-6 w-6" />
+                        </button>
+                        {renderSidebarContent(true)}
+                    </aside>
+                </div>
+            )}
         </div>
     );
 }
