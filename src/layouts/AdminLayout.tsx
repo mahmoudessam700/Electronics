@@ -40,23 +40,23 @@ export function AdminLayout() {
     };
 
     const SidebarContent = () => (
-        <>
+        <div className="flex flex-col h-full w-full overflow-hidden">
             {/* Logo Section */}
-            <div className="h-20 flex items-center gap-3 px-6 border-b border-white/10">
+            <div className="h-20 flex items-center gap-3 px-6 border-b border-white/10 flex-shrink-0">
                 <div className="relative">
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #a855f7, #3b82f6)' }}>
                         <Zap className="h-6 w-6 text-white" />
                     </div>
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900"></div>
                 </div>
-                <div className="flex-1">
-                    <h1 className="font-bold text-white text-base">Adsolutions</h1>
+                <div className="flex-1 min-w-0">
+                    <h1 className="font-bold text-white text-base truncate">Adsolutions</h1>
                     <p className="text-xs text-purple-300 font-medium">Admin Panel</p>
                 </div>
             </div>
 
             {/* Navigation */}
-            <div className="flex-1 py-6 px-4 overflow-y-auto">
+            <div className="flex-1 py-6 px-4 overflow-y-auto overflow-x-hidden">
                 <div className="mb-4">
                     <span className="px-3 text-[11px] font-bold text-white/40 uppercase tracking-wider">Navigation</span>
                 </div>
@@ -77,9 +77,9 @@ export function AdminLayout() {
                                 <Icon className={`h-5 w-5 flex-shrink-0 transition-transform duration-300 ${
                                     isActive ? 'scale-110' : 'group-hover:scale-110'
                                 }`} />
-                                <span className="flex-1 text-left">{item.name}</span>
+                                <span className="flex-1 text-left truncate">{item.name}</span>
                                 {isActive && (
-                                    <ChevronRight className="h-4 w-4" />
+                                    <ChevronRight className="h-4 w-4 flex-shrink-0" />
                                 )}
                             </button>
                         );
@@ -88,10 +88,10 @@ export function AdminLayout() {
             </div>
 
             {/* User Section */}
-            <div className="border-t border-white/10 p-4">
+            <div className="border-t border-white/10 p-4 flex-shrink-0">
                 {/* User Card */}
                 <div className="flex items-center gap-3 p-3 rounded-xl bg-white/10 border border-white/10 mb-3">
-                    <div className="relative">
+                    <div className="relative flex-shrink-0">
                         <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg" style={{ background: 'linear-gradient(to bottom right, #a855f7, #3b82f6)' }}>
                             {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                         </div>
@@ -101,7 +101,7 @@ export function AdminLayout() {
                         <p className="text-sm font-semibold text-white truncate">{user.name || 'Admin'}</p>
                         <p className="text-xs text-white/50 truncate">{user.email}</p>
                     </div>
-                    <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                    <button className="p-2 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0">
                         <Settings className="h-4 w-4 text-white/60 hover:text-white transition-colors" />
                     </button>
                 </div>
@@ -124,13 +124,13 @@ export function AdminLayout() {
                     </button>
                 </div>
             </div>
-        </>
+        </div>
     );
 
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Mobile Header - fixed at top with gradient */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 z-[9999] h-16 flex items-center justify-between px-4 shadow-xl border-b border-white/10" style={{ background: 'linear-gradient(to right, #0f172a, #581c87, #0f172a)' }}>
+            <header className="lg:hidden fixed top-0 left-0 right-0 z-[9999] h-16 flex items-center justify-between px-4 shadow-xl border-b border-white/10 bg-slate-900">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #a855f7, #3b82f6)' }}>
                         <Zap className="h-5 w-5 text-white" />
@@ -154,19 +154,19 @@ export function AdminLayout() {
                         onClick={() => setIsSidebarOpen(false)}
                     />
                     {/* Sidebar with slide-in animation */}
-                    <aside className="lg:hidden fixed top-0 left-0 bottom-0 w-72 flex flex-col z-[9999] shadow-2xl" style={{ background: 'linear-gradient(to bottom right, #0f172a, #581c87, #0f172a)' }}>
+                    <aside className="lg:hidden fixed top-0 left-0 bottom-0 w-72 flex flex-col z-[9999] shadow-2xl overflow-hidden bg-[#1e1b4b]">
                         <SidebarContent />
                     </aside>
                 </>
             )}
 
-            {/* Desktop Sidebar - static positioning in flex container */}
-            <aside className="hidden lg:flex w-72 flex-col flex-shrink-0 fixed top-0 left-0 h-screen shadow-2xl z-[100]" style={{ background: 'linear-gradient(to bottom right, #0f172a, #581c87, #0f172a)' }}>
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:flex w-72 flex-col flex-shrink-0 fixed top-0 left-0 h-screen shadow-2xl z-[100] overflow-hidden bg-[#1e1b4b]">
                 <SidebarContent />
             </aside>
 
             {/* Main Content Area */}
-            <main className="min-h-screen pt-16 lg:pt-0 lg:ml-72 bg-gray-100">
+            <main className="min-h-screen pt-16 lg:pt-0 lg:ml-72 bg-gray-100 relative">
                 <div className="p-4 lg:p-8">
                     <Outlet />
                 </div>
