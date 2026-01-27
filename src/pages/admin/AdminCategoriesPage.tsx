@@ -439,13 +439,24 @@ export function AdminCategoriesPage() {
                                     </div>
                                 )}
                                 <div className="flex-1 w-full space-y-3">
-                                    <Input
+                                    <input
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageUpload}
                                         disabled={saving}
-                                        className="rounded-xl w-full"
+                                        className="hidden"
+                                        id="category-image-upload"
                                     />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => document.getElementById('category-image-upload')?.click()}
+                                        disabled={saving}
+                                        className="w-full rounded-lg"
+                                    >
+                                        {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ImageIcon className="h-4 w-4 mr-2" />}
+                                        Choose File
+                                    </Button>
                                     <p className="text-xs text-slate-400">Or paste an image URL:</p>
                                     <Input
                                         id="image"

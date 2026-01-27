@@ -55,10 +55,18 @@ module.exports = async (req, res) => {
 
             // Otherwise return flat list or filtered by parentId
             if (parentId) {
-                return res.json(rows.filter(c => c.parentId === parentId));
+                const filtered = rows.filter(c => c.parentId === parentId);
+                return res.json(filtered.map(c => ({
+                    ...c,
+                    _count: { products: c.product_count }
+                })));
             }
 
-            return res.json(rows);
+            // Return flat list with _count for consistency
+            return res.json(rows.map(c => ({
+                ...c,
+                _count: { products: c.product_count }
+            })));
         }
 
         if (req.method === 'POST') {

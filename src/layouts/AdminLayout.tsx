@@ -134,7 +134,7 @@ export function AdminLayout() {
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Mobile Header - fixed at top */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-[#4A5568] h-14 flex items-center justify-between px-4">
+            <header className="lg:hidden fixed top-0 left-0 right-0 z-[100] bg-[#4A5568] h-14 flex items-center justify-between px-4 shadow-md">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-[#718096] flex items-center justify-center">
                         <Zap className="h-4 w-4 text-white" />
@@ -248,7 +248,7 @@ export function AdminLayout() {
             </div>
 
             {/* Mobile Main Content */}
-            <main className="lg:hidden min-h-screen pt-24">
+            <main className="lg:hidden min-h-screen pt-[72px]">
                 <div className="p-4">
                     <Outlet />
                 </div>
