@@ -20,21 +20,25 @@ interface HomePageProps {
 export function HomePage({ onNavigate }: HomePageProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [catsRes, prodsRes] = await Promise.all([
+        const [catsRes, prodsRes, settingsRes] = await Promise.all([
           fetch('/api/categories'),
-          fetch('/api/products')
+          fetch('/api/products'),
+          fetch('/api/settings?type=homepage')
         ]);
 
         const catsData = await catsRes.json();
         const prodsData = await prodsRes.json();
+        const settingsData = await settingsRes.json();
 
         setCategories(catsData);
         setProducts(prodsData);
+        setSettings(settingsData);
       } catch (error) {
         console.error('Failed to fetch home page data:', error);
       } finally {
@@ -44,6 +48,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
     fetchData();
   }, []);
+
+  const isVisible = (id: string) => {
+    if (!settings || !settings.sections) return true;
+    const section = settings.sections.find((s: any) => s.id === id);
+    return section ? section.isEnabled : true;
+  };
 
   // Filter products for different sections
   const dealsOfTheDay = products.filter(p => p.originalPrice && p.originalPrice > p.price).slice(0, 5);
@@ -99,7 +109,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
         )}
 
         {/* Deals of the Day */}
-        {dealsOfTheDay.length > 0 && (
+        {dealsOfTheDay.length > 0 && isVisible('deals-of-the-day') && (
           <section style={{ marginBottom: 32 }}>
             <div style={{
               backgroundColor: '#ffffff',
@@ -209,7 +219,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
         )}
 
         {/* Product Carousels */}
-        {recommendedProducts.length > 0 && (
+        {recommendedProducts.length > 0 && isVisible('inspired-browsing') && (
           <ProductCarousel
             title="Inspired by your browsing history"
             products={recommendedProducts}
@@ -217,7 +227,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           />
         )}
 
-        {trendingProducts.length > 0 && (
+        {trendingProducts.length > 0 && isVisible('trending') && (
           <ProductCarousel
             title="Trending in Electronics"
             products={trendingProducts}
@@ -226,38 +236,40 @@ export function HomePage({ onNavigate }: HomePageProps) {
         )}
 
         {/* Sign Up Banner */}
-        <section style={{
-          background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-          borderRadius: 16,
-          padding: '48px 32px',
-          marginBottom: 32,
-          color: '#ffffff',
-          textAlign: 'center'
-        }}>
-          <h2 style={{ fontSize: 32, fontWeight: 700, margin: '0 0 16px' }}>Sign up and save</h2>
-          <p style={{ fontSize: 18, margin: '0 0 24px', maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', opacity: 0.9 }}>
-            Get exclusive deals, personalized recommendations, and early access to sales
-          </p>
-          <button
-            onClick={() => onNavigate('account')}
-            style={{
-              backgroundColor: '#ffffff',
-              color: '#0F1111',
-              padding: '14px 32px',
-              borderRadius: 8,
-              border: 'none',
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-            }}
-          >
-            Create your account
-          </button>
-        </section>
+        {isVisible('signup-banner') && (
+          <section style={{
+            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+            borderRadius: 16,
+            padding: '48px 32px',
+            marginBottom: 32,
+            color: '#ffffff',
+            textAlign: 'center'
+          }}>
+            <h2 style={{ fontSize: 32, fontWeight: 700, margin: '0 0 16px' }}>Sign up and save</h2>
+            <p style={{ fontSize: 18, margin: '0 0 24px', maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', opacity: 0.9 }}>
+              Get exclusive deals, personalized recommendations, and early access to sales
+            </p>
+            <button
+              onClick={() => onNavigate('account')}
+              style={{
+                backgroundColor: '#ffffff',
+                color: '#0F1111',
+                padding: '14px 32px',
+                borderRadius: 8,
+                border: 'none',
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+              }}
+            >
+              Create your account
+            </button>
+          </section>
+        )}
 
-        {peripherals.length > 0 && (
+        {peripherals.length > 0 && isVisible('pc-peripherals') && (
           <ProductCarousel
             title="PC Accessories & Peripherals"
             products={peripherals}
