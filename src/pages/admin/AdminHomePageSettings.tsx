@@ -90,15 +90,32 @@ export function AdminHomePageSettings() {
     };
 
     const toggleSection = (id: string) => {
-        setSections(prev => prev.map(section => 
+        const newSections = sections.map(section => 
             section.id === id ? { ...section, isEnabled: !section.isEnabled } : section
-        ));
+        );
+        setSections(newSections);
+        autoSave(newSections);
     };
 
     const updateSection = (id: string, field: keyof Section, value: any) => {
-        setSections(prev => prev.map(section => 
+        const newSections = sections.map(section => 
             section.id === id ? { ...section, [field]: value } : section
-        ));
+        );
+        setSections(newSections);
+        // We don't auto-save for every keystroke in text fields
+    };
+
+    const autoSave = async (newSections: Section[]) => {
+        try {
+            await fetch('/api/settings?type=homepage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sections: newSections })
+            });
+            console.log('Auto-saved settings');
+        } catch (error) {
+            console.error('Auto-save failed:', error);
+        }
     };
 
     const handleSave = async () => {

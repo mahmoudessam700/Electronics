@@ -29,14 +29,23 @@ export function HomePage({ onNavigate }: HomePageProps) {
         const [catsRes, prodsRes, settingsRes] = await Promise.all([
           fetch('/api/categories'),
           fetch('/api/products'),
-          fetch(`/api/settings?type=homepage&t=${Date.now()}`)
+          fetch(`/api/settings?type=homepage&t=${Date.now()}`, {
+            headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+          })
         ]);
 
         const catsData = await catsRes.json();
         const prodsData = await prodsRes.json();
         const settingsData = await settingsRes.json();
 
-        console.log('Home Settings Loaded:', settingsData);
+        console.log('--- Home Layout Debug ---');
+        console.log('Settings Payload:', settingsData);
+        if (settingsData && settingsData.sections) {
+          settingsData.sections.forEach((s: any) => {
+            console.log(`Section [${s.id}]: Visible = ${s.isEnabled}`);
+          });
+        }
+        console.log('-------------------------');
 
         setCategories(catsData);
         setProducts(prodsData);
