@@ -25,7 +25,7 @@ export function AdminLayout() {
     }
 
     const navItems = [
-        { name: 'Overview', path: '/admin', icon: LayoutDashboard },
+        { name: 'Admin Overview', path: '/admin', icon: LayoutDashboard },
         { name: 'Management Financial', path: '/admin/financial', icon: DollarSign },
         { name: 'Categories', path: '/admin/categories', icon: Folder },
         { name: 'Products', path: '/admin/products', icon: Package },
@@ -49,8 +49,8 @@ export function AdminLayout() {
                         <Zap className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h1 className="font-bold text-slate-900 text-base leading-tight">Adsolutions</h1>
-                        <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase">Admin Area</p>
+                        <h1 className="font-bold text-slate-900 text-base leading-tight italic">Adsolutions v2.0</h1>
+                        <p className="text-[10px] text-emerald-600 font-bold tracking-wider uppercase">Live Update Applied</p>
                     </div>
                 </div>
             )}
