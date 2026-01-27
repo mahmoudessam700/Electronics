@@ -248,8 +248,8 @@ export function AdminLayout() {
             </div>
 
             {/* Mobile Main Content */}
-            <main className="lg:hidden min-h-screen pt-[72px]">
-                <div className="p-4">
+            <main className="lg:hidden min-h-screen mt-14">
+                <div className="p-4 pt-6">
                     <Outlet />
                 </div>
             </main>
