@@ -238,9 +238,7 @@ export function AdminLayout() {
             </aside>
 
             {/* Main Content Area */}
-            <main className="min-h-screen lg:ml-64">
-                {/* Mobile spacer for fixed header */}
-                <div className="h-14 lg:hidden" />
+            <main className="min-h-screen pt-14 lg:pt-0 lg:ml-64 bg-gray-100">
                 <div className="p-4 lg:p-8">
                     <Outlet />
                 </div>
