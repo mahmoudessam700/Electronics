@@ -1,4 +1,5 @@
-import { Package, ShoppingCart, DollarSign, Users, TrendingUp, TrendingDown, ArrowUpRight, Clock } from 'lucide-react';
+import { Package, ShoppingCart, DollarSign, Users, TrendingUp, TrendingDown, ArrowUpRight, Clock, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function AdminDashboard() {
     const stats = [
@@ -64,10 +65,20 @@ export function AdminDashboard() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="bg-[#4A5568] rounded-xl p-6 text-white">
-                <p className="text-sm text-white/70 mb-1">Dashboard</p>
-                <h1 className="text-2xl font-bold">Welcome back, Admin!</h1>
-                <p className="text-white/80 text-sm mt-1">Here's what's happening with your store today.</p>
+            <div className="bg-[#4A5568] rounded-xl p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <p className="text-sm text-white/70 mb-1">Dashboard Overview</p>
+                    <h1 className="text-2xl font-bold">Welcome back, Admin!</h1>
+                    <p className="text-white/80 text-sm mt-1">Here's what's happening with your store today.</p>
+                </div>
+                <Link 
+                    to="/admin/financial" 
+                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 transition-all font-medium text-sm self-start md:self-center"
+                >
+                    <DollarSign className="h-4 w-4" />
+                    Financial Report
+                    <ChevronRight className="h-4 w-4 opacity-50" />
+                </Link>
             </div>
 
             {/* Stats Grid */}
