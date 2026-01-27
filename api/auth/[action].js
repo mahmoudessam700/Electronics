@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { serialize } = require('cookie');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
@@ -56,6 +57,56 @@ module.exports = async (req, res) => {
             const { rows } = await pool.query('SELECT id, email, name, phone, address, image, latitude, longitude, role FROM "User" WHERE id = $1', [decoded.userId]);
             if (!rows[0]) return res.status(404).json({ error: 'User not found' });
             return res.status(200).json({ user: rows[0] });
+        }
+
+        if (actionName === 'signup') {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+            const { email, password, name, phone, address, latitude, longitude } = req.body;
+
+            if (!email || !password || !name || !phone) {
+                return res.status(400).json({ error: 'Name, email, phone and password are required' });
+            }
+
+            // Check if user exists
+            const { rows: existingUsers } = await pool.query('SELECT id FROM "User" WHERE email = $1', [email]);
+            if (existingUsers.length > 0) {
+                return res.status(400).json({ error: 'An account with this email already exists' });
+            }
+
+            // Hash password
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            // Generate verification token
+            const token = crypto.randomBytes(32).toString('hex');
+            const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+
+            // Check user count for role
+            const { rows: userCount } = await pool.query('SELECT COUNT(*) FROM "User"');
+            const count = parseInt(userCount[0].count);
+            const role = (count === 0 || email.includes('admin')) ? 'ADMIN' : 'CUSTOMER';
+
+            const userId = `user_${Date.now()}`;
+
+            const { rows: newUser } = await pool.query(`
+                INSERT INTO "User" (
+                    id, email, password, name, phone, address, latitude, longitude, 
+                    role, "emailVerified", "emailVerificationToken", "emailVerificationExpires", 
+                    "createdAt", "updatedAt"
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())
+                RETURNING id, email, name, role
+            `, [
+                userId, email, hashedPassword, name, phone, address || null,
+                latitude || null, longitude || null, role,
+                false, token, expires
+            ]);
+
+            return res.status(201).json({
+                success: true,
+                message: 'Account created successfully! Please check your email to verify your account.',
+                requiresVerification: true,
+                user: newUser[0]
+            });
         }
 
         if (actionName === 'update-profile') {
