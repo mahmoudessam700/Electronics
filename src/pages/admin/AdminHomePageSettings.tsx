@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
     Layout, 
     Eye, 
@@ -22,11 +22,13 @@ import {
     Trash2,
     ChevronDown,
     ChevronUp,
-    Sparkles
+    Sparkles,
+    Upload
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { toast } from 'sonner';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { uploadFile } from '../../lib/api';
 
 interface Product {
     id: string;
@@ -173,6 +175,9 @@ export function AdminHomePageSettings() {
         }
     ]);
 
+    const [uploadingSlideId, setUploadingSlideId] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     useEffect(() => {
         fetchSettings();
         fetchProducts();
@@ -314,6 +319,29 @@ export function AdminHomePageSettings() {
             const newSlides = [...heroSlides];
             [newSlides[index], newSlides[index + 1]] = [newSlides[index + 1], newSlides[index]];
             setHeroSlides(newSlides);
+        }
+    };
+
+    const handleImageUpload = async (slideId: string, file: File) => {
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please select an image file');
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error('Image must be less than 10MB');
+            return;
+        }
+
+        setUploadingSlideId(slideId);
+        try {
+            const result = await uploadFile(file);
+            updateHeroSlide(slideId, 'image', result.url);
+            toast.success('Image uploaded successfully');
+        } catch (error) {
+            console.error('Upload failed:', error);
+            toast.error('Failed to upload image');
+        } finally {
+            setUploadingSlideId(null);
         }
     };
 
@@ -481,15 +509,53 @@ export function AdminHomePageSettings() {
                                     <div>
                                         <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">
                                             <Image className="inline h-3.5 w-3.5 mr-1" />
-                                            Image URL
+                                            Image
                                         </label>
-                                        <input
-                                            type="text"
-                                            value={slide.image}
-                                            onChange={(e) => updateHeroSlide(slide.id, 'image', e.target.value)}
-                                            className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none"
-                                            placeholder="https://..."
-                                        />
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={slide.image}
+                                                onChange={(e) => updateHeroSlide(slide.id, 'image', e.target.value)}
+                                                className="flex-1 text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                placeholder="https://..."
+                                            />
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                id={`hero-image-upload-${slide.id}`}
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        handleImageUpload(slide.id, file);
+                                                    }
+                                                    e.target.value = '';
+                                                }}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                disabled={uploadingSlideId === slide.id}
+                                                onClick={() => document.getElementById(`hero-image-upload-${slide.id}`)?.click()}
+                                                className="shrink-0 h-[34px] px-3"
+                                            >
+                                                {uploadingSlideId === slide.id ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                ) : (
+                                                    <Upload className="h-4 w-4" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                        {slide.image && (
+                                            <div className="mt-2">
+                                                <img 
+                                                    src={slide.image}
+                                                    alt="Preview"
+                                                    className="h-20 object-cover rounded-lg border border-slate-200"
+                                                />
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Title EN/AR */}
