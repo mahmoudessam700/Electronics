@@ -136,15 +136,39 @@ export function HomePage({ onNavigate }: HomePageProps) {
     return products.filter(p => p.price > 50).slice(0, 10);
   };
 
+  // Get PC Accessories & Peripherals section settings for manual product selection
+  const getPeripheralsProducts = () => {
+    if (!settings || !settings.sections) {
+      return products.filter(p =>
+        p.category?.toLowerCase().includes('mouse') ||
+        p.category?.toLowerCase().includes('keyboard') ||
+        p.category?.toLowerCase().includes('headphone')
+      ).slice(0, 10);
+    }
+    
+    const peripheralsSection = settings.sections.find((s: any) => s.id === 'pc-peripherals');
+    
+    // If manual selection is enabled and products are selected
+    if (peripheralsSection?.useManualSelection && peripheralsSection?.selectedProducts?.length > 0) {
+      // Return products in the order they were selected
+      return peripheralsSection.selectedProducts
+        .map((id: string) => products.find(p => p.id === id))
+        .filter(Boolean);
+    }
+    
+    // Default: automatic selection - products with mouse, keyboard, or headphone category
+    return products.filter(p =>
+      p.category?.toLowerCase().includes('mouse') ||
+      p.category?.toLowerCase().includes('keyboard') ||
+      p.category?.toLowerCase().includes('headphone')
+    ).slice(0, 10);
+  };
+
   // Filter products for different sections
   const dealsOfTheDay = getDealsProducts();
   const recommendedProducts = getInspiredProducts();
   const trendingProducts = getTrendingProducts();
-  const peripherals = products.filter(p =>
-    p.category?.toLowerCase().includes('mouse') ||
-    p.category?.toLowerCase().includes('keyboard') ||
-    p.category?.toLowerCase().includes('headphone')
-  ).slice(0, 10);
+  const peripherals = getPeripheralsProducts();
 
   if (loading) {
     return (

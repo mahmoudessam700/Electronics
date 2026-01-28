@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
                                 { id: 'inspired-browsing', isEnabled: true, name: 'Inspired by your browsing history', description: 'Shows a carousel of recommended products for the user.', selectedProducts: [], useManualSelection: false },
                                 { id: 'trending', isEnabled: true, name: 'Trending in Electronics', description: 'Shows high-value products (over E£50).', selectedProducts: [], useManualSelection: false },
                                 { id: 'signup-banner', isEnabled: true, name: 'Sign Up Banner', description: 'The purple gradient banner encouraging users to create an account.' },
-                                { id: 'pc-peripherals', isEnabled: true, name: 'PC Accessories & Peripherals', description: 'Shows mice, keyboards, and headphones.' }
+                                { id: 'pc-peripherals', isEnabled: true, name: 'PC Accessories & Peripherals', description: 'Shows mice, keyboards, and headphones.', selectedProducts: [], useManualSelection: false }
                             ]
                         });
                     }
