@@ -32,6 +32,7 @@ import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -47,6 +48,7 @@ function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, cartItems, addToCart, updateCartQuantity, removeFromCart, clearCart } = useAuth();
+  const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -219,27 +221,27 @@ function AppContent() {
                     <CheckCircle className="h-12 w-12 text-white" />
                   </div>
                 </div>
-                <h1 className="text-3xl mb-4">Order Placed Successfully!</h1>
+                <h1 className="text-3xl mb-4">{t('confirmation.orderPlaced')}</h1>
                 <p className="text-lg text-[#565959] mb-2">
-                  Thank you for your order!
+                  {t('confirmation.thankYou')}
                 </p>
                 <p className="text-[#565959] mb-8">
-                  You will receive an email confirmation shortly.
+                  {t('confirmation.emailConfirmation')}
                 </p>
 
                 <div className="bg-[#F7F8F8] rounded-lg p-6 mb-8 text-left">
-                  <h2 className="text-xl mb-4">Order Details</h2>
+                  <h2 className="text-xl mb-4">{t('confirmation.orderDetails')}</h2>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-[#565959]">Order Number:</span>
+                      <span className="text-[#565959]">{t('confirmation.orderNumber')}:</span>
                       <span className="font-medium">#{Math.floor(Math.random() * 1000000)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#565959]">Order Date:</span>
+                      <span className="text-[#565959]">{t('confirmation.orderDate')}:</span>
                       <span className="font-medium">January 25, 2026</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#565959]">Estimated Delivery:</span>
+                      <span className="text-[#565959]">{t('confirmation.estimatedDelivery')}:</span>
                       <span className="font-medium">January 28 - 30, 2026</span>
                     </div>
                   </div>
@@ -250,13 +252,13 @@ function AppContent() {
                     onClick={() => navigate('/')}
                     className="px-6 py-3 bg-[#A0AEC0] hover:bg-[#718096] text-[#0F1111] rounded-lg transition-colors"
                   >
-                    Continue Shopping
+                    {t('cart.continueShopping')}
                   </button>
                   <button
                     onClick={() => navigate('/orders')}
                     className="px-6 py-3 border border-[#D5D9D9] hover:bg-[#EAEDED] text-[#0F1111] rounded-lg transition-colors"
                   >
-                    View Orders
+                    {t('confirmation.viewOrders')}
                   </button>
                 </div>
               </div>
@@ -271,35 +273,35 @@ function AppContent() {
           <div className="max-w-[1500px] mx-auto px-4 py-12">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
               <div>
-                <h3 className="mb-4">Get to Know Us</h3>
+                <h3 className="mb-4">{t('footer.getToKnowUs')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><a href="#" className="hover:underline">About Us</a></li>
-                  <li><a href="#" className="hover:underline">Careers</a></li>
-                  <li><a href="#" className="hover:underline">Press Releases</a></li>
+                  <li><a href="#" className="hover:underline">{t('footer.aboutUs')}</a></li>
+                  <li><a href="#" className="hover:underline">{t('footer.careers')}</a></li>
+                  <li><a href="#" className="hover:underline">{t('footer.pressReleases')}</a></li>
                 </ul>
               </div>
               <div>
-                <h3 className="mb-4">Make Money with Us</h3>
+                <h3 className="mb-4">{t('footer.makeMoneyWithUs')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><a href="#" className="hover:underline">Sell on Shop</a></li>
-                  <li><a href="#" className="hover:underline">Become an Affiliate</a></li>
-                  <li><a href="#" className="hover:underline">Advertise Your Products</a></li>
+                  <li><a href="#" className="hover:underline">{t('footer.sellOnShop')}</a></li>
+                  <li><a href="#" className="hover:underline">{t('footer.becomeAffiliate')}</a></li>
+                  <li><a href="#" className="hover:underline">{t('footer.advertiseProducts')}</a></li>
                 </ul>
               </div>
               <div>
-                <h3 className="mb-4">Payment Products</h3>
+                <h3 className="mb-4">{t('footer.paymentProducts')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><a href="#" className="hover:underline">Shop Card</a></li>
-                  <li><a href="#" className="hover:underline">Shop Currency Converter</a></li>
-                  <li><a href="#" className="hover:underline">Gift Cards</a></li>
+                  <li><a href="#" className="hover:underline">{t('footer.shopCard')}</a></li>
+                  <li><a href="#" className="hover:underline">{t('footer.currencyConverter')}</a></li>
+                  <li><a href="#" className="hover:underline">{t('header.giftCards')}</a></li>
                 </ul>
               </div>
               <div>
-                <h3 className="mb-4">Let Us Help You</h3>
+                <h3 className="mb-4">{t('footer.letUsHelpYou')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><button onClick={() => handleNavigate('account')} className="hover:underline">Your Account</button></li>
-                  <li><button onClick={() => handleNavigate('orders')} className="hover:underline">Returns Center</button></li>
-                  <li><button onClick={() => handleNavigate('customer-service')} className="hover:underline">Help</button></li>
+                  <li><button onClick={() => handleNavigate('account')} className="hover:underline">{t('header.yourAccount')}</button></li>
+                  <li><button onClick={() => handleNavigate('orders')} className="hover:underline">{t('footer.returnsCenter')}</button></li>
+                  <li><button onClick={() => handleNavigate('customer-service')} className="hover:underline">{t('footer.help')}</button></li>
                 </ul>
               </div>
             </div>
@@ -312,7 +314,7 @@ function AppContent() {
                 </div>
               </div>
               <p className="text-sm text-gray-400">
-                © 2026 Shop.com, Inc. or its affiliates
+                {t('footer.copyright')}
               </p>
             </div>
           </div>
@@ -326,8 +328,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </LanguageProvider>
   );
 }

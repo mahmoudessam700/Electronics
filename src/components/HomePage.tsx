@@ -4,6 +4,7 @@ import { ProductCarousel } from './ProductCarousel';
 import { Product } from './ProductCard';
 import { Clock, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Category {
   id: string;
@@ -18,6 +19,7 @@ interface HomePageProps {
 }
 
 export function HomePage({ onNavigate }: HomePageProps) {
+  const { t } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [settings, setSettings] = useState<any>(null);
@@ -198,7 +200,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
         {/* Categories Grid - 4 columns */}
         {categories.length > 0 && (
           <section style={{ marginBottom: 32 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0F1111', marginBottom: 16 }}>Shop by Category</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0F1111', marginBottom: 16 }}>{t('home.shopByCategory')}</h2>
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -18,6 +19,7 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
     const [loading, setLoading] = useState(false);
     const [verified, setVerified] = useState(false);
     const { login } = useAuth();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -74,10 +76,10 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
         <div className="w-full">
             <div className="text-center mb-6">
                 <h2 className="text-xl font-bold text-[#0F1111]">
-                    Welcome Back
+                    {t('auth.welcomeBack')}
                 </h2>
                 <p className="mt-1 text-sm text-[#565959]">
-                    Sign in to your account
+                    {t('auth.signInToAccount')}
                 </p>
             </div>
 
@@ -85,7 +87,7 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
                 <div className="rounded-lg bg-green-50 p-3 border border-green-200 mb-4">
                     <div className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                        <p className="text-sm text-green-800">Email verified! You can now sign in.</p>
+                        <p className="text-sm text-green-800">{t('auth.emailVerified')}</p>
                     </div>
                 </div>
             )}
@@ -107,7 +109,7 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
                 <div className="space-y-3">
                     <div>
                         <Label htmlFor="email" className="text-sm font-medium text-[#0F1111]">
-                            Email <span className="text-red-500">*</span>
+                            {t('auth.email')} <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             id="email"
@@ -122,10 +124,10 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
                     <div>
                         <div className="flex items-center justify-between">
                             <Label htmlFor="password" className="text-sm font-medium text-[#0F1111]">
-                                Password <span className="text-red-500">*</span>
+                                {t('auth.password')} <span className="text-red-500">*</span>
                             </Label>
                             <Link to="/forgot-password" onClick={onSuccess} className="text-xs font-medium text-[#007185] hover:text-[#C7511F] hover:underline">
-                                Forgot password?
+                                {t('auth.forgotPassword')}
                             </Link>
                         </div>
                         <Input
@@ -151,22 +153,22 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
                     {loading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Signing in...
+                            {t('auth.signingIn')}
                         </>
                     ) : (
-                        'Sign in'
+                        t('header.signIn')
                     )}
                 </Button>
 
                 <div className="text-center pt-2">
                     <p className="text-sm text-[#565959]">
-                        New customer?{' '}
+                        {t('auth.newCustomer')}{' '}
                         <button
                             type="button"
                             onClick={onSwitchToSignUp}
                             className="font-medium text-[#007185] hover:text-[#C7511F] bg-transparent border-none p-0 hover:underline cursor-pointer"
                         >
-                            Create account
+                            {t('auth.createAccount')}
                         </button>
                     </p>
                 </div>

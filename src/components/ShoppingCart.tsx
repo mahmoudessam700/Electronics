@@ -2,6 +2,7 @@ import { Trash2, Plus, Minus, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
 import { Product } from './ProductCard';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export interface CartItem {
   product: Product;
@@ -23,6 +24,7 @@ export function ShoppingCart({
   onProceedToCheckout,
   onContinueShopping
 }: ShoppingCartProps) {
+  const { t } = useLanguage();
   const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -31,15 +33,15 @@ export function ShoppingCart({
       <div className="min-h-screen bg-white">
         <div className="max-w-[1200px] mx-auto px-4 py-12">
           <div className="text-center">
-            <h1 className="text-3xl mb-4">Your Shopping Cart is empty</h1>
+            <h1 className="text-3xl mb-4">{t('cart.empty')}</h1>
             <p className="text-[#565959] mb-6">
-              You have no items in your cart. Start adding some!
+              {t('cart.empty')}
             </p>
             <Button
               onClick={onContinueShopping}
               className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111]"
             >
-              Continue Shopping
+              {t('cart.continueShopping')}
             </Button>
           </div>
         </div>
@@ -50,7 +52,7 @@ export function ShoppingCart({
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-[1500px] mx-auto px-4 py-6">
-        <h1 className="text-3xl mb-6">Shopping Cart</h1>
+        <h1 className="text-3xl mb-6">{t('cart.shoppingCart')}</h1>
 
         <div className="grid lg:grid-cols-12 gap-6">
           {/* Cart Items */}
@@ -176,7 +178,7 @@ export function ShoppingCart({
             <div className="lg:hidden mt-6 p-4 bg-[#F7F8F8] rounded">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-lg">
-                  Subtotal ({itemCount} items):
+                  {t('cart.subtotal')} ({itemCount} {t('cart.items')}):
                 </span>
                 <span className="text-2xl">
                   E£{subtotal.toFixed(2)}
@@ -186,7 +188,7 @@ export function ShoppingCart({
                 onClick={onProceedToCheckout}
                 className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111]"
               >
-                Proceed to checkout
+                {t('cart.proceedToCheckout')}
               </Button>
             </div>
           </div>
@@ -197,13 +199,13 @@ export function ShoppingCart({
               <div className="flex items-center gap-2 text-sm text-[#007600] mb-4">
                 <ShieldCheck className="h-5 w-5" />
                 <span>
-                  Your order qualifies for FREE Delivery.
+                  {t('product.freeDelivery')}
                 </span>
               </div>
 
               <div className="flex items-baseline justify-between mb-4">
                 <span className="text-lg">
-                  Subtotal ({itemCount} items):
+                  {t('cart.subtotal')} ({itemCount} {t('cart.items')}):
                 </span>
                 <div className="flex items-baseline gap-1">
                   <span className="text-sm">E£</span>
@@ -225,7 +227,7 @@ export function ShoppingCart({
                 onClick={onProceedToCheckout}
                 className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] mb-2"
               >
-                Proceed to checkout
+                {t('cart.proceedToCheckout')}
               </Button>
 
               <div className="pt-4 border-t border-[#D5D9D9] mt-4">

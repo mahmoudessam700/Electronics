@@ -192,3 +192,92 @@
 html {
   font-size: var(--font-size);
 }
+
+/* RTL Support for Arabic */
+html[dir="rtl"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] body {
+  font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* Flip specific elements for RTL */
+html[dir="rtl"] .space-x-2 > :not(:last-child),
+html[dir="rtl"] .space-x-3 > :not(:last-child),
+html[dir="rtl"] .space-x-4 > :not(:last-child) {
+  margin-inline-start: calc(var(--spacing) * 2);
+  margin-inline-end: 0;
+}
+
+html[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: calc(var(--spacing) * 2);
+}
+
+html[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: calc(var(--spacing) * 2);
+}
+
+html[dir="rtl"] .pl-6 {
+  padding-left: 0;
+  padding-right: calc(var(--spacing) * 6);
+}
+
+html[dir="rtl"] .pr-2 {
+  padding-right: 0;
+  padding-left: calc(var(--spacing) * 2);
+}
+
+html[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+html[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+html[dir="rtl"] .rounded-l-md {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: calc(var(--radius) - 2px);
+  border-bottom-right-radius: calc(var(--radius) - 2px);
+}
+
+html[dir="rtl"] .rounded-r-md {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: calc(var(--radius) - 2px);
+  border-bottom-left-radius: calc(var(--radius) - 2px);
+}
+
+html[dir="rtl"] .rounded-l-none {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+html[dir="rtl"] .-right-1 {
+  right: auto;
+  left: calc(var(--spacing) * -1);
+}
+
+html[dir="rtl"] .right-4 {
+  right: auto;
+  left: calc(var(--spacing) * 4);
+}
+
+html[dir="rtl"] .left-4 {
+  left: auto;
+  right: calc(var(--spacing) * 4);
+}
+
+/* Carousel arrows flip for RTL */
+html[dir="rtl"] .rotate-180 {
+  transform: rotate(0deg);
+}
+
+html[dir="rtl"] :not(.rotate-180) svg[class*="lucide-chevron-left"],
+html[dir="rtl"] :not(.rotate-180) svg[class*="lucide-chevron-right"] {
+  transform: scaleX(-1);
+}

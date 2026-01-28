@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, Bell, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse, Headphones, Keyboard, Cable, Grid3x3, HardDrive, LogIn, UserPlus, User, Package, List, Settings } from 'lucide-react';
+import { Search, ShoppingCart, Bell, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse, Headphones, Keyboard, Cable, Grid3x3, HardDrive, LogIn, UserPlus, User, Package, List, Settings, Globe } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -9,6 +9,7 @@ import {
   HoverCardTrigger,
 } from './ui/hover-card';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { AuthModal } from './auth/AuthModal';
 
@@ -19,11 +20,16 @@ interface HeaderProps {
 
 export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   const { user, logout } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const [isHoverCardOpen, setIsHoverCardOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'ar' : 'en');
+  };
 
   const handleSignInClick = () => {
     setAuthView('signin');
@@ -63,7 +69,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                   <div className="flex flex-col gap-4 mt-8">
                     {user ? (
                       <div className="px-4 py-2 bg-gray-100 rounded mb-2">
-                        <p className="font-bold">Hello, {user.name || user.email}</p>
+                        <p className="font-bold">{t('header.hello')}, {user.name || user.email}</p>
                         <Button
                           variant="ghost"
                           className="text-sm p-0 h-auto text-red-600 mt-1"
@@ -72,7 +78,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                             setIsMobileMenuOpen(false);
                           }}
                         >
-                          Sign Out
+                          {t('header.signOut')}
                         </Button>
                       </div>
                     ) : (
@@ -81,24 +87,35 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] w-full font-bold"
                           onClick={handleSignInClick}
                         >
-                          Sign In
+                          {t('header.signIn')}
                         </Button>
                         <Button
                           variant="outline"
                           className="w-full"
                           onClick={handleSignUpClick}
                         >
-                          Create Account
+                          {t('header.createAccount')}
                         </Button>
                       </div>
                     )}
+                    {/* Mobile Language Toggle */}
+                    <div className="px-4 py-2 border-b mb-2">
+                      <Button
+                        variant="outline"
+                        className="w-full flex items-center justify-center gap-2"
+                        onClick={toggleLanguage}
+                      >
+                        <Globe className="h-4 w-4" />
+                        {language === 'en' ? 'العربية' : 'English'}
+                      </Button>
+                    </div>
                     <SheetClose asChild>
                       <Button
                         variant="ghost"
                         className="justify-start"
                         onClick={() => navigate('/')}
                       >
-                        Home
+                        {t('header.home')}
                       </Button>
                     </SheetClose>
                     <SheetClose asChild>
@@ -107,11 +124,11 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                         className="justify-start"
                         onClick={() => navigate('/search')}
                       >
-                        Browse Products
+                        {t('header.browseProducts')}
                       </Button>
                     </SheetClose>
                     <Button variant="ghost" className="justify-start">
-                      Account & Lists
+                      {t('header.accountAndLists')}
                     </Button>
                     <SheetClose asChild>
                       <Button
@@ -119,7 +136,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                         className="justify-start"
                         onClick={() => navigate('/cart')}
                       >
-                        Cart {cartItemCount > 0 && `(${cartItemCount})`}
+                        {t('header.cart')} {cartItemCount > 0 && `(${cartItemCount})`}
                       </Button>
                     </SheetClose>
                     {user?.role === 'ADMIN' && (
@@ -129,7 +146,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           className="justify-start text-blue-600 font-bold"
                           onClick={() => navigate('/admin')}
                         >
-                          Admin Dashboard
+                          {t('header.adminDashboard')}
                         </Button>
                       </SheetClose>
                     )}
@@ -150,10 +167,10 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
 
             {/* Deliver to */}
             <div className="hidden lg:flex flex-col items-start px-2 py-1">
-              <span className="text-xs text-gray-300">Deliver to</span>
+              <span className="text-xs text-gray-300">{t('header.deliverTo')}</span>
               <div className="flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm font-bold">Cairo & Giza</span>
+                <span className="text-sm font-bold">{t('header.location')}</span>
               </div>
             </div>
 
@@ -178,14 +195,14 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
             <div className="flex-1 w-full lg:w-auto lg:max-w-[800px] order-last lg:order-none mx-0 lg:mx-4">
               <div className="flex items-center">
                 <select className="hidden sm:block h-10 px-2 bg-[#F3F3F3] border-none rounded-l-md text-[#0F1111] text-sm focus:outline-none focus:ring-2 focus:ring-[#718096]">
-                  <option>All</option>
-                  <option>Books</option>
-                  <option>Fashion</option>
-                  <option>Home & Kitchen</option>
+                  <option>{t('header.all')}</option>
+                  <option>{t('category.books')}</option>
+                  <option>{t('category.fashion')}</option>
+                  <option>{t('category.homeKitchen')}</option>
                 </select>
                 <Input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder={t('header.searchPlaceholder')}
                   className="h-10 flex-1 rounded-md sm:rounded-none sm:rounded-r-none border-none focus-visible:ring-0"
                 />
                 <Button
@@ -206,17 +223,17 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                       className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1"
                       onClick={() => navigate('/account')}
                     >
-                      <span className="text-xs">Hello, {user.name || user.email}</span>
+                      <span className="text-xs">{t('header.hello')}, {user.name || user.email}</span>
                       <div className="flex items-center gap-1">
-                        <span className="text-sm font-bold">Account & Lists</span>
+                        <span className="text-sm font-bold">{t('header.accountAndLists')}</span>
                         <ChevronDown className="h-3 w-3" />
                       </div>
                     </button>
                   ) : (
                     <button className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1 text-left">
-                      <span className="text-xs">Hello, sign in</span>
+                      <span className="text-xs">{t('header.hello')}, {t('header.signIn')}</span>
                       <div className="flex items-center gap-1">
-                        <span className="text-sm font-bold">Account & Lists</span>
+                        <span className="text-sm font-bold">{t('header.accountAndLists')}</span>
                         <ChevronDown className="h-3 w-3" />
                       </div>
                     </button>
@@ -243,17 +260,17 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                             onClick={handleSignInClick}
                           >
                             <LogIn className="h-4 w-4" />
-                            Sign in
+                            {t('header.signIn')}
                           </Button>
                           <div className="text-center">
-                            <p className="text-xs text-gray-500 mb-2">New customer?</p>
+                            <p className="text-xs text-gray-500 mb-2">{t('header.newCustomer')}</p>
                             <Button
                               variant="outline"
                               className="w-full h-10 border-gray-300 hover:bg-gray-50 text-[#0F1111] font-bold flex items-center justify-center gap-2 transition-all"
                               onClick={handleSignUpClick}
                             >
                               <UserPlus className="h-4 w-4" />
-                              Create new account
+                              {t('header.createNewAccount')}
                             </Button>
                           </div>
                         </div>
@@ -271,21 +288,21 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           }}
                         >
                           <Settings className="h-4 w-4" />
-                          Admin Dashboard
+                          {t('header.adminDashboard')}
                         </button>
                       )}
 
                       <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 py-2">
-                        Your Account
+                        {t('header.yourAccount')}
                       </div>
 
                       {[
-                        { label: 'Your Account', icon: User, path: '/account' },
-                        { label: 'Your Orders', icon: Package, path: '/orders' },
-                        { label: 'Your Lists', icon: List, path: '/lists' }
+                        { label: t('header.yourAccount'), icon: User, path: '/account' },
+                        { label: t('header.yourOrders'), icon: Package, path: '/orders' },
+                        { label: t('header.yourLists'), icon: List, path: '/lists' }
                       ].map((item) => (
                         <button
-                          key={item.label}
+                          key={item.path}
                           className="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors group"
                           onClick={() => {
                             navigate(item.path);
@@ -309,7 +326,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           }}
                         >
                           <LogIn className="h-4 w-4 rotate-180" />
-                          Sign Out
+                          {t('header.signOut')}
                         </button>
                       </div>
                     )}
@@ -328,7 +345,17 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                     3
                   </span>
                 </div>
-                <span className="text-xs font-bold">Alerts</span>
+                <span className="text-xs font-bold">{t('header.alerts')}</span>
+              </button>
+
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="flex flex-col items-center hover:outline hover:outline-1 hover:outline-white px-2 py-1"
+                title={language === 'en' ? 'Switch to Arabic' : 'التبديل إلى الإنجليزية'}
+              >
+                <Globe className="h-6 w-6" />
+                <span className="text-xs font-bold">{language === 'en' ? 'عربي' : 'EN'}</span>
               </button>
 
               {/* Auth Modal - controlled separately */}
@@ -350,7 +377,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                     </span>
                   )}
                 </div>
-                <span className="text-sm font-bold">Cart</span>
+                <span className="text-sm font-bold">{t('header.cart')}</span>
               </button>
             </div>
           </div>
@@ -365,25 +392,25 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
               <SheetTrigger asChild>
                 <button className="flex items-center gap-2 hover:outline hover:outline-1 hover:outline-white px-2 py-1 whitespace-nowrap">
                   <Menu className="h-4 w-4" />
-                  <span className="text-sm font-bold">All</span>
+                  <span className="text-sm font-bold">{t('header.all')}</span>
                 </button>
               </SheetTrigger>
               <SheetContent side="left" className="bg-white w-[350px]">
                 <SheetTitle className="sr-only">Department Menu</SheetTitle>
                 <SheetDescription className="sr-only">Browse all departments and categories</SheetDescription>
                 <div className="flex flex-col gap-2 mt-8">
-                  <h3 className="font-bold mb-2">Departments</h3>
+                  <h3 className="font-bold mb-2">{t('header.departments')}</h3>
 
                   {/* Electronics Subcategories */}
                   {[
-                    { name: 'PCs', icon: Monitor },
-                    { name: 'Laptops', icon: Laptop },
-                    { name: 'Mice', icon: Mouse },
-                    { name: 'Keyboards', icon: Keyboard },
-                    { name: 'Headphones', icon: Headphones },
-                    { name: 'Cables', icon: Cable },
-                    { name: 'Mouse Pads', icon: Grid3x3 },
-                    { name: 'Hard Drives', icon: HardDrive }
+                    { name: 'PCs', translationKey: 'category.pcs', icon: Monitor },
+                    { name: 'Laptops', translationKey: 'category.laptops', icon: Laptop },
+                    { name: 'Mice', translationKey: 'category.mice', icon: Mouse },
+                    { name: 'Keyboards', translationKey: 'category.keyboards', icon: Keyboard },
+                    { name: 'Headphones', translationKey: 'category.headphones', icon: Headphones },
+                    { name: 'Cables', translationKey: 'category.cables', icon: Cable },
+                    { name: 'Mouse Pads', translationKey: 'category.mousePads', icon: Grid3x3 },
+                    { name: 'Hard Drives', translationKey: 'category.hardDrives', icon: HardDrive }
                   ].map((category) => (
                     <SheetClose asChild key={category.name}>
                       <button
@@ -393,7 +420,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                         className="text-left pl-6 pr-2 py-2 hover:bg-[#EAEDED] rounded text-[#0F1111] flex items-center gap-3"
                       >
                         <category.icon className="h-5 w-5 text-[#565959]" />
-                        {category.name}
+                        {t(category.translationKey)}
                       </button>
                     </SheetClose>
                   ))}
@@ -405,31 +432,31 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
               onClick={() => navigate('/search')}
               className="text-sm hover:outline hover:outline-1 hover:outline-white px-2 py-1 whitespace-nowrap"
             >
-              Today's Deals
+              {t('header.todaysDeals')}
             </button>
             <button
               onClick={() => navigate('/customer-service')}
               className="text-sm hover:outline hover:outline-1 hover:outline-white px-2 py-1 whitespace-nowrap"
             >
-              Customer Service
+              {t('header.customerService')}
             </button>
             <button
               onClick={() => navigate('/registry')}
               className="text-sm hover:outline hover:outline-1 hover:outline-white px-2 py-1 whitespace-nowrap"
             >
-              Registry
+              {t('header.registry')}
             </button>
             <button
               onClick={() => navigate('/gift-cards')}
               className="text-sm hover:outline hover:outline-1 hover:outline-white px-2 py-1 whitespace-nowrap"
             >
-              Gift Cards
+              {t('header.giftCards')}
             </button>
             <button
               onClick={() => navigate('/sell')}
               className="text-sm hover:outline hover:outline-1 hover:outline-white px-2 py-1 whitespace-nowrap"
             >
-              Sell
+              {t('header.sell')}
             </button>
           </div>
         </div>
