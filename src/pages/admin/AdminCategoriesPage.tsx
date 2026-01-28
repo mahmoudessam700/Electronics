@@ -27,6 +27,8 @@ import { useLanguage } from '../../contexts/LanguageContext';
 interface Category {
     id: string;
     name: string;
+    nameEn?: string;
+    nameAr?: string;
     slug: string;
     description?: string;
     image?: string;
@@ -69,10 +71,23 @@ const CATEGORY_TRANSLATION_KEYS: Record<string, string> = {
 export function AdminCategoriesPage() {
     const { t, isRTL, language } = useLanguage();
     
-    // Helper to get translated category name
-    const getCategoryName = (name: string): string => {
-        const key = CATEGORY_TRANSLATION_KEYS[name] || CATEGORY_TRANSLATION_KEYS[name.toLowerCase()];
-        return key ? t(key) : name;
+    // Helper to get translated category name - uses database values if available, falls back to translation keys
+    const getCategoryName = (category: Category | string): string => {
+        if (typeof category === 'string') {
+            // Fallback for string input (e.g., ALLOWED_CATEGORIES)
+            const key = CATEGORY_TRANSLATION_KEYS[category] || CATEGORY_TRANSLATION_KEYS[category.toLowerCase()];
+            return key ? t(key) : category;
+        }
+        // Use database values if available
+        if (language === 'ar' && category.nameAr) {
+            return category.nameAr;
+        }
+        if (category.nameEn) {
+            return category.nameEn;
+        }
+        // Fallback to translation keys
+        const key = CATEGORY_TRANSLATION_KEYS[category.name] || CATEGORY_TRANSLATION_KEYS[category.name.toLowerCase()];
+        return key ? t(key) : category.name;
     };
     
     const [categories, setCategories] = useState<Category[]>([]);
@@ -87,6 +102,8 @@ export function AdminCategoriesPage() {
     // Form state
     const [formData, setFormData] = useState({
         name: '',
+        nameEn: '',
+        nameAr: '',
         description: '',
         image: ''
     });
@@ -119,6 +136,8 @@ export function AdminCategoriesPage() {
         setEditingCategory(null);
         setFormData({
             name: '',
+            nameEn: '',
+            nameAr: '',
             description: '',
             image: ''
         });
@@ -129,6 +148,8 @@ export function AdminCategoriesPage() {
         setEditingCategory(category);
         setFormData({
             name: category.name,
+            nameEn: category.nameEn || category.name,
+            nameAr: category.nameAr || '',
             description: category.description || '',
             image: category.image || ''
         });
@@ -336,7 +357,7 @@ export function AdminCategoriesPage() {
                                                 {category.image ? (
                                                     <img 
                                                         src={category.image} 
-                                                        alt={getCategoryName(category.name)} 
+                                                        alt={getCategoryName(category)} 
                                                         className="h-10 w-10 md:h-12 md:w-12 object-cover rounded-lg border border-gray-200" 
                                                     />
                                                 ) : (
@@ -346,7 +367,7 @@ export function AdminCategoriesPage() {
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-gray-900">{getCategoryName(category.name)}</p>
+                                                <p className="font-semibold text-gray-900">{getCategoryName(category)}</p>
                                                 <p className="text-xs text-gray-400 font-mono">/{category.slug}</p>
                                             </div>
                                         </div>
@@ -445,6 +466,30 @@ export function AdminCategoriesPage() {
                                     ))}
                                 </select>
                             )}
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="nameEn" className="text-sm font-medium">{t('admin.nameInEnglish')}</Label>
+                            <Input
+                                id="nameEn"
+                                value={formData.nameEn}
+                                onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
+                                placeholder="English name"
+                                className="rounded-xl"
+                                dir="ltr"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="nameAr" className="text-sm font-medium">{t('admin.nameInArabic')}</Label>
+                            <Input
+                                id="nameAr"
+                                value={formData.nameAr}
+                                onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
+                                placeholder="الاسم بالعربية"
+                                className="rounded-xl"
+                                dir="rtl"
+                            />
                         </div>
 
                         <div className="space-y-2">

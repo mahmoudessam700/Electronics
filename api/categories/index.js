@@ -70,24 +70,24 @@ module.exports = async (req, res) => {
         }
 
         if (req.method === 'POST') {
-            const { name, description, image, parentId, sortOrder } = req.body;
+            const { name, nameEn, nameAr, description, image, parentId, sortOrder } = req.body;
             if (!name) return res.status(400).json({ error: 'Name is required' });
 
             const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             const id = `cat_${Date.now()}`;
 
             const { rows } = await pool.query(`
-                INSERT INTO "Category" (id, name, slug, description, image, "parentId", "sortOrder", "updatedAt")
-                VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+                INSERT INTO "Category" (id, name, "nameEn", "nameAr", slug, description, image, "parentId", "sortOrder", "updatedAt")
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
                 RETURNING *
-            `, [id, name, slug, description || null, image || null, parentId || null, sortOrder || 0]);
+            `, [id, name, nameEn || name, nameAr || null, slug, description || null, image || null, parentId || null, sortOrder || 0]);
 
             return res.status(201).json(rows[0]);
         }
 
         if (req.method === 'PUT') {
             const { id } = req.query;
-            const { name, description, image, parentId, sortOrder, categories: batchUpdates } = req.body;
+            const { name, nameEn, nameAr, description, image, parentId, sortOrder, categories: batchUpdates } = req.body;
 
             // Batch update for reordering
             if (batchUpdates && Array.isArray(batchUpdates)) {
@@ -115,14 +115,16 @@ module.exports = async (req, res) => {
             const { rows } = await pool.query(`
                 UPDATE "Category"
                 SET name = COALESCE($2, name),
-                    description = COALESCE($3, description),
-                    image = COALESCE($4, image),
-                    "parentId" = COALESCE($5, "parentId"),
-                    "sortOrder" = COALESCE($6, "sortOrder"),
+                    "nameEn" = COALESCE($3, "nameEn"),
+                    "nameAr" = COALESCE($4, "nameAr"),
+                    description = COALESCE($5, description),
+                    image = COALESCE($6, image),
+                    "parentId" = COALESCE($7, "parentId"),
+                    "sortOrder" = COALESCE($8, "sortOrder"),
                     "updatedAt" = NOW()
                 WHERE id = $1
                 RETURNING *
-            `, [id, name, description, image, parentId, sortOrder]);
+            `, [id, name, nameEn, nameAr, description, image, parentId, sortOrder]);
 
             return res.json(rows[0]);
         }

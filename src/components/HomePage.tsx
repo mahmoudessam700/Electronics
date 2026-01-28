@@ -6,7 +6,7 @@ import { Clock, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-// Mapping from English category names to translation keys
+// Mapping from English category names to translation keys (fallback for categories without nameEn/nameAr)
 const CATEGORY_TRANSLATION_KEYS: Record<string, string> = {
   'PCs': 'category.pcs',
   'Laptops': 'category.laptops',
@@ -30,6 +30,8 @@ const CATEGORY_TRANSLATION_KEYS: Record<string, string> = {
 interface Category {
   id: string;
   name: string;
+  nameEn?: string;
+  nameAr?: string;
   image: string;
   slug: string;
   children?: Category[];
@@ -40,16 +42,24 @@ interface HomePageProps {
 }
 
 export function HomePage({ onNavigate }: HomePageProps) {
-  const { t, formatCurrency } = useLanguage();
+  const { t, formatCurrency, language } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Helper function to get translated category name
-  const getCategoryName = (name: string): string => {
-    const key = CATEGORY_TRANSLATION_KEYS[name] || CATEGORY_TRANSLATION_KEYS[name.toLowerCase()];
-    return key ? t(key) : name;
+  // Helper function to get translated category name - uses database values if available
+  const getCategoryName = (category: Category): string => {
+    // Use database values if available
+    if (language === 'ar' && category.nameAr) {
+      return category.nameAr;
+    }
+    if (category.nameEn) {
+      return category.nameEn;
+    }
+    // Fallback to translation keys
+    const key = CATEGORY_TRANSLATION_KEYS[category.name] || CATEGORY_TRANSLATION_KEYS[category.name.toLowerCase()];
+    return key ? t(key) : category.name;
   };
 
   useEffect(() => {
@@ -239,7 +249,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 .map((category) => (
                   <CategoryCard
                     key={category.id}
-                    title={getCategoryName(category.name)}
+                    title={getCategoryName(category)}
                     image={category.image}
                     onClick={() => onNavigate('search', undefined, category.name)}
                   />
