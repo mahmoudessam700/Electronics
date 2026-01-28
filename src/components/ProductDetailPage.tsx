@@ -19,9 +19,28 @@ interface ProductDetailPageProps {
 }
 
 export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDetailPageProps) {
-  const { t, formatCurrency } = useLanguage();
+  const { t, formatCurrency, language } = useLanguage();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+
+  // Get translated product name
+  const getProductName = () => {
+    if (language === 'ar' && product.nameAr) {
+      return product.nameAr;
+    }
+    if (product.nameEn) {
+      return product.nameEn;
+    }
+    return product.name;
+  };
+
+  // Get translated product description
+  const getProductDescription = () => {
+    if (language === 'ar' && product.descriptionAr) {
+      return product.descriptionAr;
+    }
+    return product.description || '';
+  };
 
   // Mock additional images
   const images = [
@@ -113,7 +132,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
           <span className="mx-2">/</span>
           <span className="hover:text-[#C7511F] cursor-pointer">Headphones</span>
           <span className="mx-2">/</span>
-          <span className="text-[#0F1111]">{product.name}</span>
+          <span className="text-[#0F1111]">{getProductName()}</span>
         </div>
 
         {/* Main Content Grid */}
@@ -141,7 +160,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
                   <div className="aspect-square flex items-center justify-center relative">
                     <img
                       src={images[selectedImage]}
-                      alt={product.name}
+                      alt={getProductName()}
                       className="max-w-full max-h-full object-contain"
                     />
                   </div>
@@ -164,7 +183,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
 
           {/* Middle: Product Info */}
           <div className="lg:col-span-4">
-            <h1 className="text-xl md:text-2xl mb-2">{product.name}</h1>
+            <h1 className="text-xl md:text-2xl mb-2">{getProductName()}</h1>
 
             {/* Brand */}
             <p className="text-sm text-[#007185] hover:text-[#C7511F] cursor-pointer mb-2">
@@ -370,7 +389,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
           <div className="bg-white border border-[#D5D9D9] rounded-lg p-6">
             <div className="flex flex-wrap items-center gap-4 mb-6">
               <div className="w-24 h-24 border border-[#D5D9D9] rounded flex items-center justify-center">
-                <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain" />
+                <img src={product.image} alt={getProductName()} className="max-w-full max-h-full object-contain" />
               </div>
               <span className="text-2xl text-[#565959]">+</span>
               {frequentlyBoughtTogether.map((item) => (

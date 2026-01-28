@@ -68,23 +68,26 @@ module.exports = async (req, res) => {
         }
 
         if (req.method === 'POST') {
-            const { name, price, costPrice, originalPrice, description, category, categoryId, supplierId, image, inStock } = req.body;
+            const { name, nameEn, nameAr, price, costPrice, originalPrice, description, descriptionAr, category, categoryId, supplierId, image, inStock } = req.body;
 
             if (!name || price === undefined || !image) {
                 return res.status(400).json({ error: 'Name, price, and image are required' });
             }
 
             const { rows } = await pool.query(`
-                INSERT INTO "Product" (id, name, price, "costPrice", "originalPrice", description, category, "categoryId", "supplierId", image, "inStock", "updatedAt")
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+                INSERT INTO "Product" (id, name, "nameEn", "nameAr", price, "costPrice", "originalPrice", description, "descriptionAr", category, "categoryId", "supplierId", image, "inStock", "updatedAt")
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
                 RETURNING *
             `, [
                 `prod_${Date.now()}`,
                 name,
+                nameEn || name,
+                nameAr || null,
                 price,
                 costPrice || 0,
                 originalPrice || null,
                 description || null,
+                descriptionAr || null,
                 category || null,
                 categoryId || null,
                 supplierId || null,
@@ -97,26 +100,29 @@ module.exports = async (req, res) => {
 
         if (req.method === 'PUT') {
             const { id } = req.query;
-            const { name, price, costPrice, originalPrice, description, category, categoryId, supplierId, image, inStock } = req.body;
+            const { name, nameEn, nameAr, price, costPrice, originalPrice, description, descriptionAr, category, categoryId, supplierId, image, inStock } = req.body;
 
             if (!id) return res.status(400).json({ error: 'Product ID is required' });
 
             const { rows } = await pool.query(`
                 UPDATE "Product" 
                 SET name = COALESCE($2, name),
-                    price = COALESCE($3, price),
-                    "costPrice" = COALESCE($4, "costPrice"),
-                    "originalPrice" = COALESCE($5, "originalPrice"),
-                    description = COALESCE($6, description),
-                    category = COALESCE($7, category),
-                    "categoryId" = COALESCE($8, "categoryId"),
-                    "supplierId" = COALESCE($9, "supplierId"),
-                    image = COALESCE($10, image),
-                    "inStock" = COALESCE($11, "inStock"),
+                    "nameEn" = COALESCE($3, "nameEn"),
+                    "nameAr" = COALESCE($4, "nameAr"),
+                    price = COALESCE($5, price),
+                    "costPrice" = COALESCE($6, "costPrice"),
+                    "originalPrice" = COALESCE($7, "originalPrice"),
+                    description = COALESCE($8, description),
+                    "descriptionAr" = COALESCE($9, "descriptionAr"),
+                    category = COALESCE($10, category),
+                    "categoryId" = COALESCE($11, "categoryId"),
+                    "supplierId" = COALESCE($12, "supplierId"),
+                    image = COALESCE($13, image),
+                    "inStock" = COALESCE($14, "inStock"),
                     "updatedAt" = NOW()
                 WHERE id = $1
                 RETURNING *
-            `, [id, name, price, costPrice, originalPrice, description, category, categoryId, supplierId, image, inStock]);
+            `, [id, name, nameEn, nameAr, price, costPrice, originalPrice, description, descriptionAr, category, categoryId, supplierId, image, inStock]);
 
             if (rows.length === 0) return res.status(404).json({ error: 'Product not found' });
             return res.json(rows[0]);

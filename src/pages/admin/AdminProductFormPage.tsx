@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Loader2, ArrowLeft, Package, DollarSign, Tag, Building2, ImageIcon, CheckSquare, FileText, Upload, Camera } from 'lucide-react';
+import { Loader2, ArrowLeft, Package, DollarSign, Tag, Building2, ImageIcon, CheckSquare, FileText, Upload, Camera, Languages } from 'lucide-react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CameraCapture } from '../../components/CameraCapture';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface Category {
     id: string;
@@ -23,6 +24,7 @@ export function AdminProductFormPage() {
     const { id } = useParams();
     const isEditing = !!id;
     const navigate = useNavigate();
+    const { t, isRTL } = useLanguage();
 
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -31,10 +33,13 @@ export function AdminProductFormPage() {
 
     // Form fields
     const [name, setName] = useState('');
+    const [nameEn, setNameEn] = useState('');
+    const [nameAr, setNameAr] = useState('');
     const [price, setPrice] = useState('');
     const [costPrice, setCostPrice] = useState('');
     const [originalPrice, setOriginalPrice] = useState('');
     const [description, setDescription] = useState('');
+    const [descriptionAr, setDescriptionAr] = useState('');
     const [category, setCategory] = useState('');
     const [categoryId, setCategoryId] = useState('');
     const [supplierId, setSupplierId] = useState('');
@@ -77,10 +82,13 @@ export function AdminProductFormPage() {
             const data = await res.json();
             if (res.ok && data) {
                 setName(data.name);
+                setNameEn(data.nameEn || data.name);
+                setNameAr(data.nameAr || '');
                 setPrice(data.price.toString());
                 setCostPrice(data.costPrice?.toString() || '');
                 setOriginalPrice(data.originalPrice?.toString() || '');
                 setDescription(data.description || '');
+                setDescriptionAr(data.descriptionAr || '');
                 setCategory(data.category || '');
                 setCategoryId(data.categoryId || '');
                 setSupplierId(data.supplierId || '');
@@ -140,10 +148,13 @@ export function AdminProductFormPage() {
 
         const productData = {
             name,
+            nameEn: nameEn || name,
+            nameAr: nameAr || null,
             price: parseFloat(price),
             costPrice: costPrice ? parseFloat(costPrice) : 0,
             originalPrice: originalPrice ? parseFloat(originalPrice) : null,
             description,
+            descriptionAr: descriptionAr || null,
             category,
             categoryId: categoryId || null,
             supplierId: supplierId || null,
@@ -219,12 +230,12 @@ export function AdminProductFormPage() {
                     <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
                         <div className="flex items-center gap-2">
                             <Package className="h-5 w-5 text-indigo-600" />
-                            <h2 className="font-semibold text-slate-900">Basic Information</h2>
+                            <h2 className="font-semibold text-slate-900">{t('admin.basicInformation')}</h2>
                         </div>
                     </div>
                     <div className="p-6 space-y-5">
                         <div className="space-y-2">
-                            <Label htmlFor="name" className="text-sm font-medium">Product Name *</Label>
+                            <Label htmlFor="name" className="text-sm font-medium">{t('admin.productName')} *</Label>
                             <Input
                                 id="name"
                                 required
@@ -236,13 +247,61 @@ export function AdminProductFormPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+                            <Label htmlFor="description" className="text-sm font-medium">{t('admin.description')}</Label>
                             <textarea
                                 id="description"
                                 className="w-full min-h-[120px] p-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors resize-none"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 placeholder="Describe your product..."
+                                dir="ltr"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Translations Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                        <div className="flex items-center gap-2">
+                            <Languages className="h-5 w-5 text-blue-600" />
+                            <h2 className="font-semibold text-slate-900">{t('admin.translations')}</h2>
+                        </div>
+                    </div>
+                    <div className="p-6 space-y-5">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="nameEn" className="text-sm font-medium">{t('admin.nameInEnglish')}</Label>
+                                <Input
+                                    id="nameEn"
+                                    value={nameEn}
+                                    onChange={(e) => setNameEn(e.target.value)}
+                                    placeholder="English name"
+                                    className="rounded-xl h-11"
+                                    dir="ltr"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="nameAr" className="text-sm font-medium">{t('admin.nameInArabic')}</Label>
+                                <Input
+                                    id="nameAr"
+                                    value={nameAr}
+                                    onChange={(e) => setNameAr(e.target.value)}
+                                    placeholder="الاسم بالعربية"
+                                    className="rounded-xl h-11"
+                                    dir="rtl"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="descriptionAr" className="text-sm font-medium">{t('admin.descriptionInArabic')}</Label>
+                            <textarea
+                                id="descriptionAr"
+                                className="w-full min-h-[120px] p-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors resize-none"
+                                value={descriptionAr}
+                                onChange={(e) => setDescriptionAr(e.target.value)}
+                                placeholder="وصف المنتج بالعربية..."
+                                dir="rtl"
                             />
                         </div>
                     </div>

@@ -30,6 +30,8 @@ model Category {
 model Product {
   id            String      @id @default(cuid())
   name          String
+  nameEn        String?
+  nameAr        String?
   price         Float
   originalPrice Float?
   rating        Float       @default(4.5)
@@ -43,6 +45,7 @@ model Product {
   supplierId    String?
   supplier      Supplier?    @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   description   String?
+  descriptionAr String?
   costPrice     Float       @default(0)
   inStock       Boolean     @default(true)
   createdAt     DateTime    @default(now())
