@@ -101,17 +101,35 @@ export function HeroSlider({ onNavigate }: HeroSliderProps) {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
-  // Helper functions to get localized text
+  // Helper functions to get localized text with fallback to defaults
   const getTitle = (slide: Slide) => {
-    return language === 'ar' && slide.titleAr ? slide.titleAr : slide.title;
+    if (language === 'ar') {
+      if (slide.titleAr) return slide.titleAr;
+      // Try to find Arabic from defaults
+      const defaultSlide = defaultSlides.find(d => d.id === slide.id);
+      return defaultSlide?.titleAr || slide.title;
+    }
+    return slide.title;
   };
 
   const getSubtitle = (slide: Slide) => {
-    return language === 'ar' && slide.subtitleAr ? slide.subtitleAr : slide.subtitle;
+    if (language === 'ar') {
+      if (slide.subtitleAr) return slide.subtitleAr;
+      // Try to find Arabic from defaults
+      const defaultSlide = defaultSlides.find(d => d.id === slide.id);
+      return defaultSlide?.subtitleAr || slide.subtitle;
+    }
+    return slide.subtitle;
   };
 
   const getCtaText = (slide: Slide) => {
-    return language === 'ar' && slide.ctaTextAr ? slide.ctaTextAr : slide.ctaText;
+    if (language === 'ar') {
+      if (slide.ctaTextAr) return slide.ctaTextAr;
+      // Try to find Arabic from defaults
+      const defaultSlide = defaultSlides.find(d => d.id === slide.id);
+      return defaultSlide?.ctaTextAr || slide.ctaText;
+    }
+    return slide.ctaText;
   };
 
   return (

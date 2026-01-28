@@ -103,32 +103,41 @@ export function HomePage({ onNavigate }: HomePageProps) {
     if (!settings || !settings.sections) return defaultName;
     const section = settings.sections.find((s: any) => s.id === id);
     if (!section) return defaultName;
-    // Use Arabic name if language is Arabic and nameAr exists
-    if (language === 'ar' && section.nameAr) return section.nameAr;
+    // Use Arabic name if language is Arabic
+    if (language === 'ar') {
+      return section.nameAr || defaultName;
+    }
     return section.name || defaultName;
   };
 
   const getSectionBadge = (id: string) => {
-    if (!settings || !settings.sections) return { show: true, text: 'Ends in 12:34:56' };
+    const defaultText = language === 'ar' ? 'ينتهي في 12:34:56' : 'Ends in 12:34:56';
+    if (!settings || !settings.sections) return { show: true, text: defaultText };
     const section = settings.sections.find((s: any) => s.id === id);
-    if (!section) return { show: true, text: 'Ends in 12:34:56' };
-    // Use Arabic badge text if language is Arabic and badgeTextAr exists
-    const badgeText = (language === 'ar' && section.badgeTextAr) 
-      ? section.badgeTextAr 
-      : (section.badgeText || 'Ends in 12:34:56');
+    if (!section) return { show: true, text: defaultText };
+    // Use Arabic badge text if language is Arabic
+    const badgeText = (language === 'ar') 
+      ? (section.badgeTextAr || defaultText)
+      : (section.badgeText || defaultText);
     return {
       show: section.showBadge !== undefined ? section.showBadge : true,
       text: badgeText
     };
   };
 
-  const getSectionField = (id: string, field: string, defaultValue: string) => {
-    if (!settings || !settings.sections) return defaultValue;
+  const getSectionField = (id: string, field: string, defaultValue: string, defaultValueAr?: string) => {
+    if (!settings || !settings.sections) {
+      return language === 'ar' && defaultValueAr ? defaultValueAr : defaultValue;
+    }
     const section = settings.sections.find((s: any) => s.id === id);
-    if (!section) return defaultValue;
+    if (!section) {
+      return language === 'ar' && defaultValueAr ? defaultValueAr : defaultValue;
+    }
     // Check for Arabic version of the field
     const arField = field + 'Ar';
-    if (language === 'ar' && section[arField]) return section[arField];
+    if (language === 'ar') {
+      return section[arField] || defaultValueAr || defaultValue;
+    }
     return section[field] || defaultValue;
   };
 
@@ -418,7 +427,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
               {getSectionName('signup-banner', t('home.signUpForBestExperience'))}
             </h2>
             <p style={{ fontSize: 18, margin: '0 0 24px', maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', opacity: 0.9 }}>
-              {getSectionField('signup-banner', 'subtitleText', 'Get exclusive deals, personalized recommendations, and early access to sales')}
+              {getSectionField('signup-banner', 'subtitleText', 'Get exclusive deals, personalized recommendations, and early access to sales', 'احصل على عروض حصرية وتوصيات مخصصة ووصول مبكر للتخفيضات')}
             </p>
             <button
               onClick={() => onNavigate('account')}
@@ -435,7 +444,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
               }}
             >
-              {getSectionField('signup-banner', 'buttonText', 'Create your account')}
+              {getSectionField('signup-banner', 'buttonText', 'Create your account', 'أنشئ حسابك')}
             </button>
           </section>
         )}
