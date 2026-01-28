@@ -1,10 +1,12 @@
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, Users, Zap, ChevronRight, Menu, X, Settings, Bell, DollarSign, Layout } from 'lucide-react';
 import { useState } from 'react';
 
 export function AdminLayout() {
     const { user, loading, logout } = useAuth();
+    const { t, isRTL } = useLanguage();
     const location = useLocation();
     const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -14,7 +16,7 @@ export function AdminLayout() {
             <div className="min-h-screen flex items-center justify-center bg-slate-900">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                    <span className="text-white/70 text-sm font-medium">Loading admin panel...</span>
+                    <span className="text-white/70 text-sm font-medium">{t('admin.loading')}</span>
                 </div>
             </div>
         );
@@ -25,24 +27,24 @@ export function AdminLayout() {
     }
 
     const navItems = [
-        { name: 'Admin Overview', path: '/admin', icon: LayoutDashboard },
-        { name: 'Categories', path: '/admin/categories', icon: Folder },
-        { name: 'Products', path: '/admin/products', icon: Package },
-        { name: 'Suppliers', path: '/admin/suppliers', icon: Building2 },
-        { name: 'Customers', path: '/admin/users', icon: Users },
-        { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
-        { name: 'Management Financial', path: '/admin/financial', icon: DollarSign },
-        { name: 'Home Layout', path: '/admin/homepage', icon: Layout },
-        { name: 'Files', path: '/admin/files', icon: FolderOpen },
+        { name: t('admin.overview'), path: '/admin', icon: LayoutDashboard },
+        { name: t('admin.categories'), path: '/admin/categories', icon: Folder },
+        { name: t('admin.products'), path: '/admin/products', icon: Package },
+        { name: t('admin.suppliers'), path: '/admin/suppliers', icon: Building2 },
+        { name: t('admin.customers'), path: '/admin/users', icon: Users },
+        { name: t('admin.orders'), path: '/admin/orders', icon: ShoppingCart },
+        { name: t('admin.financial'), path: '/admin/financial', icon: DollarSign },
+        { name: t('admin.homeLayout'), path: '/admin/homepage', icon: Layout },
+        { name: t('admin.files'), path: '/admin/files', icon: FolderOpen },
     ];
 
     console.log('Admin Nav Items:', navItems);
 
     const renderSidebarContent = (isMobile = false) => (
-        <div className="flex flex-col h-full w-full bg-white border-r border-slate-200">
+        <div className={`flex flex-col h-full w-full bg-white border-slate-200 ${isRTL ? 'border-l' : 'border-r'}`}>
             {/* Logo Section - Hidden on Mobile Drawer to avoid duplication */}
             {!isMobile && (
-                <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-100 flex-shrink-0">
+                <div className={`h-20 flex items-center gap-3 border-b border-slate-100 flex-shrink-0 ${isRTL ? 'pr-6' : 'px-6'}`}>
                     <div 
                         className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
                         style={{ backgroundColor: '#0F172A' }}
@@ -51,22 +53,22 @@ export function AdminLayout() {
                     </div>
                     <div className="flex-1 min-w-0">
                         <h1 className="font-bold text-slate-900 text-base leading-tight italic">Adsolutions v2.0</h1>
-                        <p className="text-[10px] text-emerald-600 font-bold tracking-wider uppercase">Live Update Applied</p>
+                        <p className="text-[10px] text-emerald-600 font-bold tracking-wider uppercase">{t('admin.liveUpdate')}</p>
                     </div>
                 </div>
             )}
 
             {/* Mobile Header indicator */}
             {isMobile && (
-                <div className="h-16 flex items-center px-6 border-b border-slate-100 bg-slate-50/50">
-                    <span className="text-sm font-bold text-slate-900 uppercase tracking-widest">Navigation Menu</span>
+                <div className={`h-16 flex items-center border-b border-slate-100 bg-slate-50/50 ${isRTL ? 'pr-6' : 'px-6'}`}>
+                    <span className="text-sm font-bold text-slate-900 uppercase tracking-widest">{t('admin.navMenu')}</span>
                 </div>
             )}
 
             {/* Navigation */}
             <div className="flex-1 py-6 px-4 overflow-y-auto">
                 <div className="mb-4">
-                    <span className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Dashboard</span>
+                    <span className={`text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ${isRTL ? 'pr-3' : 'px-3'}`}>{t('admin.dashboard')}</span>
                 </div>
                 <nav className="space-y-1">
                     {navItems.map((item) => {
@@ -121,14 +123,14 @@ export function AdminLayout() {
                         className="flex items-center justify-center gap-2 py-2 px-3 text-[11px] font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 transition-all shadow-sm active:scale-95"
                     >
                         <Home className="h-4 w-4" />
-                        <span>Store</span>
+                        <span>{t('admin.store')}</span>
                     </button>
                     <button
                         onClick={logout}
                         className="flex items-center justify-center gap-2 py-2 px-3 text-[11px] font-bold text-red-600 hover:text-red-700 bg-white hover:bg-red-50 rounded-xl border border-red-100 transition-all shadow-sm active:scale-95"
                     >
                         <LogOut className="h-4 w-4" />
-                        <span>Exit</span>
+                        <span>{t('admin.exit')}</span>
                     </button>
                 </div>
             </div>
@@ -146,13 +148,13 @@ export function AdminLayout() {
                         background-color: white !important;
                     }
                     .admin-main-content {
-                        margin-left: 18rem !important;
+                        ${isRTL ? 'margin-right: 18rem !important;' : 'margin-left: 18rem !important;'}
                     }
                 }
             `}</style>
 
             {/* Desktop Static Sidebar */}
-            <aside className="admin-desktop-sidebar hidden fixed inset-y-0 left-0 bg-white flex-col z-[40]">
+            <aside className={`admin-desktop-sidebar hidden fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} bg-white flex-col z-[40]`}>
                 {renderSidebarContent()}
             </aside>
 
@@ -202,12 +204,12 @@ export function AdminLayout() {
                     />
                     {/* Drawer */}
                     <aside 
-                        className="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-300"
+                        className={`fixed inset-y-0 ${isRTL ? 'right-0 animate-in slide-in-from-right' : 'left-0 animate-in slide-in-from-left'} w-80 bg-white shadow-2xl flex flex-col duration-300`}
                         style={{ zIndex: 100000000 }}
                     >
                         <button
                             onClick={() => setIsSidebarOpen(false)}
-                            className="absolute top-4 right-4 p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all"
+                            className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all`}
                             style={{ zIndex: 100000001 }}
                         >
                             <X className="h-6 w-6" />

@@ -1,6 +1,7 @@
 import { Star } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export interface Product {
   id: string;
@@ -23,6 +24,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onClick }: ProductCardProps) {
+  const { formatCurrency, t, isRTL } = useLanguage();
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
@@ -69,18 +71,12 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
 
           {/* Price */}
           <div className="flex items-baseline gap-2">
-            <div className="flex items-baseline gap-1">
-              <span className="text-xs text-[#0F1111]">E£</span>
-              <span className="text-2xl text-[#0F1111]">
-                {Math.floor(product.price)}
-              </span>
-              <span className="text-xs text-[#0F1111]">
-                {(product.price % 1).toFixed(2).substring(1)}
-              </span>
-            </div>
+            <span className="text-lg font-bold text-[#0F1111]">
+              {formatCurrency(product.price)}
+            </span>
             {product.originalPrice && (
               <span className="text-sm text-[#565959] line-through">
-                E£{product.originalPrice.toFixed(2)}
+                {formatCurrency(product.originalPrice)}
               </span>
             )}
             {discount > 0 && (
@@ -102,7 +98,7 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
           {/* Delivery Date */}
           {product.deliveryDate && (
             <p className="text-xs text-[#565959]">
-              Get it by <span className="font-bold text-[#0F1111]">{product.deliveryDate}</span>
+              {t('product.freeDelivery')} <span className="font-bold text-[#0F1111]">{product.deliveryDate}</span>
             </p>
           )}
         </div>

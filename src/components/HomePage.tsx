@@ -19,7 +19,7 @@ interface HomePageProps {
 }
 
 export function HomePage({ onNavigate }: HomePageProps) {
-  const { t } = useLanguage();
+  const { t, formatCurrency } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [settings, setSettings] = useState<any>(null);
@@ -233,7 +233,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
                 <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0F1111', margin: 0 }}>
-                  {getSectionName('deals-of-the-day', 'Deals of the Day')}
+                  {getSectionName('deals-of-the-day', t('home.dealsOfTheDay'))}
                 </h2>
                 {getSectionBadge('deals-of-the-day').show && (
                   <div style={{
@@ -316,7 +316,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                           </span>
                         )}
                         <span style={{ fontSize: 18, fontWeight: 700, color: '#0F1111' }}>
-                          E£{product.price.toLocaleString()}
+                          {formatCurrency(product.price)}
                         </span>
                       </div>
                       <p style={{
@@ -342,7 +342,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
         {/* Product Carousels */}
         {recommendedProducts.length > 0 && isVisible('inspired-browsing') && (
           <ProductCarousel
-            title={getSectionName('inspired-browsing', 'Inspired by your browsing history')}
+            title={getSectionName('inspired-browsing', t('home.inspiredByHistory'))}
             products={recommendedProducts}
             onProductClick={(product) => onNavigate('product', product)}
           />
@@ -350,7 +350,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
         {trendingProducts.length > 0 && isVisible('trending') && (
           <ProductCarousel
-            title={getSectionName('trending', 'Trending in Electronics')}
+            title={getSectionName('trending', t('home.trendingInElectronics'))}
             products={trendingProducts}
             onProductClick={(product) => onNavigate('product', product)}
           />
@@ -367,7 +367,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             textAlign: 'center'
           }}>
             <h2 style={{ fontSize: 32, fontWeight: 700, margin: '0 0 16px' }}>
-              {getSectionName('signup-banner', 'Sign up and save')}
+              {getSectionName('signup-banner', t('home.signUpForBestExperience'))}
             </h2>
             <p style={{ fontSize: 18, margin: '0 0 24px', maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', opacity: 0.9 }}>
               {getSectionField('signup-banner', 'subtitleText', 'Get exclusive deals, personalized recommendations, and early access to sales')}
@@ -394,7 +394,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
         {peripherals.length > 0 && isVisible('pc-peripherals') && (
           <ProductCarousel
-            title={getSectionName('pc-peripherals', 'PC Accessories & Peripherals')}
+            title={getSectionName('pc-peripherals', t('home.pcAccessories'))}
             products={peripherals}
             onProductClick={(product) => onNavigate('product', product)}
           />

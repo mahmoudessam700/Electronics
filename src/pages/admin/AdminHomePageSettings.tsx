@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { toast } from 'sonner';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface Product {
     id: string;
@@ -43,6 +44,8 @@ interface Section {
 }
 
 export function AdminHomePageSettings() {
+    const { t, isRTL, formatCurrency } = useLanguage();
+
     const [sections, setSections] = useState<Section[]>([
         { 
             id: 'deals-of-the-day', 
@@ -228,7 +231,7 @@ export function AdminHomePageSettings() {
         return (
             <div className="flex flex-col items-center justify-center py-20">
                 <Loader2 className="h-10 w-10 animate-spin text-indigo-600 mb-4" />
-                <p className="text-slate-500 font-medium">Loading settings...</p>
+                <p className="text-slate-500 font-medium">{t('common.loading')}</p>
             </div>
         );
     }
@@ -242,8 +245,8 @@ export function AdminHomePageSettings() {
                         <Layout className="h-6 w-6 text-indigo-600" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Home Page Content</h1>
-                        <p className="text-sm text-slate-500">Control which sections are visible on the storefront</p>
+                        <h1 className="text-2xl font-bold text-slate-900">{t('admin.homeLayoutTitle')}</h1>
+                        <p className="text-sm text-slate-500">{t('admin.homeLayout')}</p>
                     </div>
                 </div>
                 <Button 
@@ -251,8 +254,8 @@ export function AdminHomePageSettings() {
                     disabled={saving}
                     className="h-11 px-8 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white font-semibold transition-all shadow-lg active:scale-95"
                 >
-                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                    Save Changes
+                    {saving ? <Loader2 className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4 animate-spin`} /> : <Save className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4`} />}
+                    {t('admin.saveChanges')}
                 </Button>
             </div>
 

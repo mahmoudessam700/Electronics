@@ -24,7 +24,7 @@ export function ShoppingCart({
   onProceedToCheckout,
   onContinueShopping
 }: ShoppingCartProps) {
-  const { t } = useLanguage();
+  const { t, formatCurrency } = useLanguage();
   const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -154,18 +154,12 @@ export function ShoppingCart({
 
                     {/* Price */}
                     <div className="flex-shrink-0 text-right">
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-sm">E£</span>
-                        <span className="text-2xl">
-                          {Math.floor(item.product.price)}
-                        </span>
-                        <span className="text-sm">
-                          {(item.product.price % 1).toFixed(2).substring(1)}
-                        </span>
-                      </div>
+                      <span className="text-lg font-bold">
+                        {formatCurrency(item.product.price)}
+                      </span>
                       {item.product.originalPrice && (
                         <p className="text-sm text-[#565959] line-through">
-                          E£{item.product.originalPrice.toFixed(2)}
+                          {formatCurrency(item.product.originalPrice)}
                         </p>
                       )}
                     </div>
@@ -181,7 +175,7 @@ export function ShoppingCart({
                   {t('cart.subtotal')} ({itemCount} {t('cart.items')}):
                 </span>
                 <span className="text-2xl">
-                  E£{subtotal.toFixed(2)}
+                  {formatCurrency(subtotal)}
                 </span>
               </div>
               <Button
@@ -207,15 +201,9 @@ export function ShoppingCart({
                 <span className="text-lg">
                   {t('cart.subtotal')} ({itemCount} {t('cart.items')}):
                 </span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-sm">E£</span>
-                  <span className="text-2xl">
-                    {Math.floor(subtotal)}
-                  </span>
-                  <span className="text-sm">
-                    {(subtotal % 1).toFixed(2).substring(1)}
-                  </span>
-                </div>
+                <span className="text-lg font-bold">
+                  {formatCurrency(subtotal)}
+                </span>
               </div>
 
               <label className="flex items-start gap-2 text-sm mb-4 cursor-pointer">

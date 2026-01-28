@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Loader2, ShoppingBag, Clock, TrendingUp, Package, Truck, CheckCircle2, XCircle, Search, Filter, Calendar } from 'lucide-react';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface Order {
     id: string;
@@ -12,15 +13,17 @@ interface Order {
     createdAt: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; icon: any; color: string; bg: string; border: string }> = {
-    PENDING: { label: 'Pending', icon: Clock, color: 'text-slate-700', bg: 'bg-slate-100', border: 'border-slate-200' },
-    PROCESSING: { label: 'Processing', icon: Package, color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200' },
-    SHIPPED: { label: 'Shipped', icon: Truck, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
-    DELIVERED: { label: 'Delivered', icon: CheckCircle2, color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200' },
-    CANCELLED: { label: 'Cancelled', icon: XCircle, color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
-};
-
 export function AdminOrdersPage() {
+    const { t, formatCurrency, isRTL } = useLanguage();
+
+    const STATUS_CONFIG: Record<string, { label: string; icon: any; color: string; bg: string; border: string }> = {
+        PENDING: { label: t('admin.pending'), icon: Clock, color: 'text-slate-700', bg: 'bg-slate-100', border: 'border-slate-200' },
+        PROCESSING: { label: t('admin.processing'), icon: Package, color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200' },
+        SHIPPED: { label: t('admin.shipped'), icon: Truck, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
+        DELIVERED: { label: t('admin.delivered'), icon: CheckCircle2, color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200' },
+        CANCELLED: { label: t('admin.cancelled'), icon: XCircle, color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
+    };
+
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -77,7 +80,7 @@ export function AdminOrdersPage() {
         return (
             <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
-                <span className="mt-4 text-slate-500">Loading orders...</span>
+                <span className="mt-4 text-slate-500">{t('common.loading')}</span>
             </div>
         );
     }
@@ -88,9 +91,9 @@ export function AdminOrdersPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        Orders
+                        {t('admin.orders')}
                     </h1>
-                    <p className="text-gray-500 mt-1 text-sm">Manage and track customer orders</p>
+                    <p className="text-gray-500 mt-1 text-sm">{t('admin.totalOrders')}: {orders.length}</p>
                 </div>
             </div>
 
@@ -102,7 +105,7 @@ export function AdminOrdersPage() {
                             <ShoppingBag className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Total Orders</p>
+                            <p className="text-sm text-gray-500">{t('admin.totalOrders')}</p>
                             <p className="text-xl font-bold text-gray-900">{stats.total}</p>
                         </div>
                     </div>
@@ -113,7 +116,7 @@ export function AdminOrdersPage() {
                             <Clock className="h-5 w-5 text-amber-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Pending</p>
+                            <p className="text-sm text-gray-500">{t('admin.pending')}</p>
                             <p className="text-xl font-bold text-amber-600">{stats.pending}</p>
                         </div>
                     </div>
@@ -124,7 +127,7 @@ export function AdminOrdersPage() {
                             <Package className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Processing</p>
+                            <p className="text-sm text-gray-500">{t('admin.processing')}</p>
                             <p className="text-xl font-bold text-blue-600">{stats.processing}</p>
                         </div>
                     </div>
@@ -135,7 +138,7 @@ export function AdminOrdersPage() {
                             <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Delivered</p>
+                            <p className="text-sm text-gray-500">{t('admin.delivered')}</p>
                             <p className="text-xl font-bold text-emerald-600">{stats.delivered}</p>
                         </div>
                     </div>
@@ -145,10 +148,10 @@ export function AdminOrdersPage() {
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400`} />
                     <Input
-                        placeholder="Search orders..."
-                        className="pl-10 bg-white border-gray-200 focus:border-[#4A5568] rounded-lg"
+                        placeholder={t('admin.searchPlaceholder')}
+                        className={`${isRTL ? 'pr-10' : 'pl-10'} bg-white border-gray-200 focus:border-[#4A5568] rounded-lg`}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -176,11 +179,11 @@ export function AdminOrdersPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-200">
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Order</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden sm:table-cell">Customer</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Date</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Total</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.orderId')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden sm:table-cell`}>{t('admin.customer')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell`}>{t('admin.date')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.amount')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.status')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -217,7 +220,7 @@ export function AdminOrdersPage() {
                                         </td>
                                         <td className="py-3 px-4">
                                             <span className="text-sm font-bold text-gray-900">
-                                                E£{order.totalAmount.toFixed(2)}
+                                                {formatCurrency(order.totalAmount)}
                                             </span>
                                         </td>
                                         <td className="py-3 px-4">
@@ -227,11 +230,11 @@ export function AdminOrdersPage() {
                                                     onChange={(e) => updateStatus(order.id, e.target.value)}
                                                     className={`appearance-none pl-3 pr-7 py-1.5 rounded-lg text-xs font-medium border cursor-pointer transition-colors ${config.bg} ${config.color} ${config.border} focus:outline-none focus:ring-2 focus:ring-[#4A5568]/20`}
                                                 >
-                                                    <option value="PENDING">Pending</option>
-                                                    <option value="PROCESSING">Processing</option>
-                                                    <option value="SHIPPED">Shipped</option>
-                                                    <option value="DELIVERED">Delivered</option>
-                                                    <option value="CANCELLED">Cancelled</option>
+                                                    <option value="PENDING">{t('admin.pending')}</option>
+                                                    <option value="PROCESSING">{t('admin.processing')}</option>
+                                                    <option value="SHIPPED">{t('admin.shipped')}</option>
+                                                    <option value="DELIVERED">{t('admin.delivered')}</option>
+                                                    <option value="CANCELLED">{t('admin.cancelled')}</option>
                                                 </select>
                                                 <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
                                                     <svg className={`w-3 h-3 ${config.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,11 +255,11 @@ export function AdminOrdersPage() {
                         <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gray-100 mb-4">
                             <ShoppingBag className="h-7 w-7 text-gray-400" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">No orders found</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('admin.noResults')}</h3>
                         <p className="text-gray-500">
                             {searchQuery || statusFilter !== 'ALL' 
-                                ? 'Try adjusting your filters' 
-                                : 'Orders will appear here when customers place them'}
+                                ? t('admin.noResults') 
+                                : t('admin.noRecentOrders')}
                         </p>
                     </div>
                 )}

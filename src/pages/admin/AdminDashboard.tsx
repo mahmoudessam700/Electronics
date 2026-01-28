@@ -1,18 +1,21 @@
 import { Package, ShoppingCart, DollarSign, Users, TrendingUp, TrendingDown, ArrowUpRight, Clock, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export function AdminDashboard() {
+    const { t, formatCurrency, isRTL } = useLanguage();
+
     const stats = [
         { 
-            title: 'Total Revenue', 
-            value: 'E£12,345', 
+            title: t('admin.totalRevenue'), 
+            value: formatCurrency(12345), 
             change: '+20.1%', 
             trend: 'up',
             icon: DollarSign, 
             iconBg: 'bg-[#4A5568]'
         },
         { 
-            title: 'Orders', 
+            title: t('admin.totalOrders'), 
             value: '125', 
             change: '+12.5%', 
             trend: 'up',
@@ -20,7 +23,7 @@ export function AdminDashboard() {
             iconBg: 'bg-[#718096]'
         },
         { 
-            title: 'Products', 
+            title: t('admin.totalProducts'), 
             value: '142', 
             change: '+3.2%', 
             trend: 'up',
@@ -28,7 +31,7 @@ export function AdminDashboard() {
             iconBg: 'bg-[#4A5568]'
         },
         { 
-            title: 'Active Users', 
+            title: t('admin.totalCustomers'), 
             value: '573', 
             change: '-2.4%', 
             trend: 'down',
@@ -67,16 +70,16 @@ export function AdminDashboard() {
             {/* Header */}
             <div className="bg-[#4A5568] rounded-xl p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <p className="text-sm text-white/70 mb-1">Dashboard Overview</p>
+                    <p className="text-sm text-white/70 mb-1">{t('admin.salesOverview')}</p>
                     <h1 className="text-2xl font-bold">Welcome back, Admin!</h1>
-                    <p className="text-white/80 text-sm mt-1">Here's what's happening with your store today.</p>
+                    <p className="text-white/80 text-sm mt-1">{t('admin.viewAll')}</p>
                 </div>
                 <Link 
                     to="/admin/financial" 
                     className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 transition-all font-medium text-sm self-start md:self-center"
                 >
                     <DollarSign className="h-4 w-4" />
-                    Financial Report
+                    {t('admin.financial')}
                     <ChevronRight className="h-4 w-4 opacity-50" />
                 </Link>
             </div>
@@ -146,11 +149,11 @@ export function AdminDashboard() {
                 <div className="lg:col-span-3 bg-white rounded-xl p-5 border border-gray-200">
                     <div className="flex items-center justify-between mb-5">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900">Recent Sales</h3>
-                            <p className="text-sm text-gray-500">Latest transactions</p>
+                            <h3 className="text-lg font-semibold text-gray-900">{t('admin.recentActivity')}</h3>
+                            <p className="text-sm text-gray-500">{t('admin.viewAll')}</p>
                         </div>
                         <button className="text-sm font-medium text-[#4A5568] hover:text-[#2D3748] flex items-center gap-1">
-                            View all
+                            {t('admin.viewAll')}
                             <ArrowUpRight className="h-4 w-4" />
                         </button>
                     </div>
@@ -166,7 +169,7 @@ export function AdminDashboard() {
                                     <p className="text-xs text-gray-500 truncate">{sale.email}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-sm font-bold text-gray-900">+E£{sale.amount.toLocaleString()}</p>
+                                    <p className="text-sm font-bold text-gray-900">+{formatCurrency(sale.amount)}</p>
                                 </div>
                             </div>
                         ))}
@@ -178,11 +181,11 @@ export function AdminDashboard() {
             <div className="bg-white rounded-xl p-5 border border-gray-200">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
-                        <p className="text-sm text-gray-500">Track and manage your latest orders</p>
+                        <h3 className="text-lg font-semibold text-gray-900">{t('admin.recentOrders')}</h3>
+                        <p className="text-sm text-gray-500">{t('admin.viewAll')}</p>
                     </div>
                     <button className="text-sm font-medium text-[#4A5568] hover:text-[#2D3748] flex items-center gap-1">
-                        View all orders
+                        {t('admin.viewAll')}
                         <ArrowUpRight className="h-4 w-4" />
                     </button>
                 </div>
@@ -191,11 +194,11 @@ export function AdminDashboard() {
                     <table className="w-full min-w-[500px]">
                         <thead>
                             <tr className="border-b border-gray-100">
-                                <th className="text-left py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Order ID</th>
-                                <th className="text-left py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Customer</th>
-                                <th className="text-left py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Date</th>
-                                <th className="text-left py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
-                                <th className="text-right py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Amount</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.orderId')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.customer')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.date')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.status')}</th>
+                                <th className={`${isRTL ? 'text-left' : 'text-right'} py-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.amount')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -219,7 +222,7 @@ export function AdminDashboard() {
                                         </span>
                                     </td>
                                     <td className="py-3 px-3 text-right">
-                                        <span className="text-sm font-bold text-gray-900">E£{order.amount.toLocaleString()}</span>
+                                        <span className="text-sm font-bold text-gray-900">{formatCurrency(order.amount)}</span>
                                     </td>
                                 </tr>
                             ))}

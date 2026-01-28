@@ -22,6 +22,7 @@ import {
 } from '../../components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { CameraCapture } from '../../components/CameraCapture';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface Category {
     id: string;
@@ -46,6 +47,7 @@ const ALLOWED_CATEGORIES = [
 ];
 
 export function AdminCategoriesPage() {
+    const { t, isRTL } = useLanguage();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -208,7 +210,7 @@ export function AdminCategoriesPage() {
         return (
             <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
-                <span className="mt-4 text-slate-500">Loading categories...</span>
+                <span className="mt-4 text-slate-500">{t('common.loading')}</span>
             </div>
         );
     }
@@ -219,26 +221,26 @@ export function AdminCategoriesPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        Categories
+                        {t('admin.categories')}
                     </h1>
-                    <p className="text-gray-500 mt-1 text-sm">Organize your products into categories</p>
+                    <p className="text-gray-500 mt-1 text-sm">{t('admin.totalProducts')}: {categories.length}</p>
                 </div>
                 <Button 
                     onClick={() => openAddForm()}
                     className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                 >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Category
+                    <Plus className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                    {t('admin.addCategory')}
                 </Button>
             </div>
 
             {/* Filters Bar */}
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400`} />
                     <Input
-                        placeholder="Search categories..."
-                        className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
+                        placeholder={t('admin.searchPlaceholder')}
+                        className={`${isRTL ? 'pr-10' : 'pl-10'} bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl`}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />

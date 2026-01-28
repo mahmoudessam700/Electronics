@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from './ui/select';
 import { Progress } from './ui/progress';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface ProductDetailPageProps {
   product: Product;
@@ -18,6 +19,7 @@ interface ProductDetailPageProps {
 }
 
 export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDetailPageProps) {
+  const { t, formatCurrency } = useLanguage();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
@@ -201,19 +203,15 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
                   <span className="text-sm text-[#C7511F] mr-2">-{discount}%</span>
                 )}
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-sm text-[#0F1111]">E£</span>
-                  <span className="text-3xl text-[#0F1111]">
-                    {Math.floor(product.price)}
-                  </span>
-                  <span className="text-sm text-[#0F1111]">
-                    {(product.price % 1).toFixed(2).substring(1)}
+                  <span className="text-2xl font-bold text-[#0F1111]">
+                    {formatCurrency(product.price)}
                   </span>
                 </div>
                 {product.originalPrice && (
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-[#565959]">List Price:</span>
+                    <span className="text-sm text-[#565959]">{t('product.originalPrice')}:</span>
                     <span className="text-sm text-[#565959] line-through">
-                      E£{product.originalPrice.toFixed(2)}
+                      {formatCurrency(product.originalPrice)}
                     </span>
                   </div>
                 )}
@@ -278,12 +276,8 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
             <div className="border border-[#D5D9D9] rounded-lg p-4 sticky top-4 lg:top-24 bg-white shadow-sm lg:shadow-none z-10">
               {/* Price */}
               <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-sm text-[#0F1111]">E£</span>
-                <span className="text-3xl text-[#0F1111]">
-                  {Math.floor(product.price)}
-                </span>
-                <span className="text-sm text-[#0F1111]">
-                  {(product.price % 1).toFixed(2).substring(1)}
+                <span className="text-2xl font-bold text-[#0F1111]">
+                  {formatCurrency(product.price)}
                 </span>
               </div>
 
@@ -389,8 +383,8 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
               ))}
             </div>
             <div className="flex items-center gap-4 mb-4">
-              <span className="text-sm">Total price:</span>
-              <span className="text-2xl text-[#0F1111]">E£{totalPrice.toFixed(2)}</span>
+              <span className="text-sm">{t('checkout.orderTotal')}:</span>
+              <span className="text-2xl text-[#0F1111]">{formatCurrency(totalPrice)}</span>
             </div>
             <Button className="bg-[#718096] hover:bg-[#4A5568] text-white">
               Add all to Cart

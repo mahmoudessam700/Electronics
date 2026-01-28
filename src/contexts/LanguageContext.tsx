@@ -7,6 +7,7 @@ interface LanguageContextType {
     setLanguage: (lang: Language) => void;
     t: (key: string) => string;
     isRTL: boolean;
+    formatCurrency: (amount: number) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -225,6 +226,135 @@ const en: Record<string, string> = {
     'lists.title': 'Your Lists',
     'lists.noLists': 'You have no lists yet',
     'lists.createList': 'Create a List',
+
+    // Admin Panel
+    'admin.overview': 'Admin Overview',
+    'admin.categories': 'Categories',
+    'admin.products': 'Products',
+    'admin.suppliers': 'Suppliers',
+    'admin.customers': 'Customers',
+    'admin.orders': 'Orders',
+    'admin.financial': 'Management Financial',
+    'admin.homeLayout': 'Home Layout',
+    'admin.files': 'Files',
+    'admin.dashboard': 'Dashboard',
+    'admin.navMenu': 'Navigation Menu',
+    'admin.store': 'Store',
+    'admin.exit': 'Exit',
+    'admin.loading': 'Loading admin panel...',
+    'admin.liveUpdate': 'Live Update Applied',
+    
+    // Admin Dashboard
+    'admin.totalOrders': 'Total Orders',
+    'admin.totalRevenue': 'Total Revenue',
+    'admin.totalProducts': 'Total Products',
+    'admin.totalCustomers': 'Total Customers',
+    'admin.recentOrders': 'Recent Orders',
+    'admin.recentActivity': 'Recent Activity',
+    'admin.salesOverview': 'Sales Overview',
+    'admin.viewAll': 'View All',
+    'admin.newOrder': 'New order',
+    'admin.noRecentOrders': 'No recent orders',
+    'admin.noRecentActivity': 'No recent activity',
+    
+    // Admin Products
+    'admin.addProduct': 'Add Product',
+    'admin.editProduct': 'Edit Product',
+    'admin.productName': 'Product Name',
+    'admin.productPrice': 'Price',
+    'admin.productStock': 'Stock',
+    'admin.productCategory': 'Category',
+    'admin.productSupplier': 'Supplier',
+    'admin.productDescription': 'Description',
+    'admin.productImage': 'Product Image',
+    'admin.originalPrice': 'Original Price',
+    'admin.costPrice': 'Cost Price',
+    'admin.deleteProduct': 'Delete Product',
+    'admin.confirmDelete': 'Are you sure you want to delete this?',
+    
+    // Admin Categories
+    'admin.addCategory': 'Add Category',
+    'admin.editCategory': 'Edit Category',
+    'admin.categoryName': 'Category Name',
+    'admin.categoryImage': 'Category Image',
+    'admin.parentCategory': 'Parent Category',
+    'admin.noParent': 'No Parent (Top Level)',
+    
+    // Admin Orders
+    'admin.orderId': 'Order ID',
+    'admin.customer': 'Customer',
+    'admin.status': 'Status',
+    'admin.date': 'Date',
+    'admin.amount': 'Amount',
+    'admin.pending': 'Pending',
+    'admin.processing': 'Processing',
+    'admin.shipped': 'Shipped',
+    'admin.delivered': 'Delivered',
+    'admin.cancelled': 'Cancelled',
+    'admin.orderDetails': 'Order Details',
+    'admin.updateStatus': 'Update Status',
+    
+    // Admin Suppliers
+    'admin.addSupplier': 'Add Supplier',
+    'admin.editSupplier': 'Edit Supplier',
+    'admin.supplierName': 'Supplier Name',
+    'admin.contactName': 'Contact Name',
+    'admin.phone': 'Phone',
+    'admin.addressLine': 'Address',
+    
+    // Admin Users/Customers
+    'admin.userId': 'User ID',
+    'admin.userName': 'Name',
+    'admin.userEmail': 'Email',
+    'admin.role': 'Role',
+    'admin.joinedDate': 'Joined',
+    
+    // Admin Financial
+    'admin.revenue': 'Revenue',
+    'admin.expenses': 'Expenses',
+    'admin.netProfit': 'Net Profit',
+    'admin.taxAmount': 'Tax Amount',
+    'admin.currentCycle': 'Current Cycle',
+    'admin.pastCycles': 'Past Cycles',
+    'admin.addExpense': 'Add Expense',
+    'admin.closeCycle': 'Close Cycle',
+    
+    // Admin Home Layout
+    'admin.homeLayoutTitle': 'Home Layout Settings',
+    'admin.sectionEnabled': 'Enabled',
+    'admin.sectionName': 'Section Name',
+    'admin.showBadge': 'Show Badge',
+    'admin.badgeText': 'Badge Text',
+    'admin.manualSelection': 'Manual Selection',
+    'admin.automaticSelection': 'Automatic Selection',
+    'admin.selectProducts': 'Select Products',
+    'admin.saveChanges': 'Save Changes',
+    'admin.resetToDefault': 'Reset to Default',
+    
+    // Admin Files
+    'admin.uploadFile': 'Upload File',
+    'admin.fileName': 'File Name',
+    'admin.fileSize': 'Size',
+    'admin.fileType': 'Type',
+    'admin.uploadDate': 'Upload Date',
+    'admin.copyUrl': 'Copy URL',
+    'admin.deleteFile': 'Delete',
+    
+    // Common Admin
+    'admin.actions': 'Actions',
+    'admin.noResults': 'No results found',
+    'admin.searchPlaceholder': 'Search...',
+    'admin.itemsPerPage': 'Items per page',
+    'admin.showing': 'Showing',
+    'admin.of': 'of',
+    'admin.save': 'Save',
+    'admin.cancel': 'Cancel',
+    'admin.create': 'Create',
+    'admin.update': 'Update',
+    'admin.delete': 'Delete',
+    'admin.edit': 'Edit',
+    'admin.view': 'View',
+    'admin.back': 'Back',
 };
 
 // Arabic translations
@@ -441,6 +571,135 @@ const ar: Record<string, string> = {
     'lists.title': 'قوائمك',
     'lists.noLists': 'لا توجد قوائم بعد',
     'lists.createList': 'إنشاء قائمة',
+
+    // Admin Panel
+    'admin.overview': 'نظرة عامة',
+    'admin.categories': 'الفئات',
+    'admin.products': 'المنتجات',
+    'admin.suppliers': 'الموردين',
+    'admin.customers': 'العملاء',
+    'admin.orders': 'الطلبات',
+    'admin.financial': 'الإدارة المالية',
+    'admin.homeLayout': 'تخطيط الصفحة الرئيسية',
+    'admin.files': 'الملفات',
+    'admin.dashboard': 'لوحة التحكم',
+    'admin.navMenu': 'قائمة التنقل',
+    'admin.store': 'المتجر',
+    'admin.exit': 'خروج',
+    'admin.loading': 'جاري تحميل لوحة التحكم...',
+    'admin.liveUpdate': 'التحديث فعال',
+    
+    // Admin Dashboard
+    'admin.totalOrders': 'إجمالي الطلبات',
+    'admin.totalRevenue': 'إجمالي الإيرادات',
+    'admin.totalProducts': 'إجمالي المنتجات',
+    'admin.totalCustomers': 'إجمالي العملاء',
+    'admin.recentOrders': 'الطلبات الأخيرة',
+    'admin.recentActivity': 'النشاط الأخير',
+    'admin.salesOverview': 'نظرة عامة على المبيعات',
+    'admin.viewAll': 'عرض الكل',
+    'admin.newOrder': 'طلب جديد',
+    'admin.noRecentOrders': 'لا توجد طلبات حديثة',
+    'admin.noRecentActivity': 'لا يوجد نشاط حديث',
+    
+    // Admin Products
+    'admin.addProduct': 'إضافة منتج',
+    'admin.editProduct': 'تعديل المنتج',
+    'admin.productName': 'اسم المنتج',
+    'admin.productPrice': 'السعر',
+    'admin.productStock': 'المخزون',
+    'admin.productCategory': 'الفئة',
+    'admin.productSupplier': 'المورد',
+    'admin.productDescription': 'الوصف',
+    'admin.productImage': 'صورة المنتج',
+    'admin.originalPrice': 'السعر الأصلي',
+    'admin.costPrice': 'سعر التكلفة',
+    'admin.deleteProduct': 'حذف المنتج',
+    'admin.confirmDelete': 'هل أنت متأكد من حذف هذا؟',
+    
+    // Admin Categories
+    'admin.addCategory': 'إضافة فئة',
+    'admin.editCategory': 'تعديل الفئة',
+    'admin.categoryName': 'اسم الفئة',
+    'admin.categoryImage': 'صورة الفئة',
+    'admin.parentCategory': 'الفئة الأم',
+    'admin.noParent': 'بدون أب (مستوى أعلى)',
+    
+    // Admin Orders
+    'admin.orderId': 'رقم الطلب',
+    'admin.customer': 'العميل',
+    'admin.status': 'الحالة',
+    'admin.date': 'التاريخ',
+    'admin.amount': 'المبلغ',
+    'admin.pending': 'قيد الانتظار',
+    'admin.processing': 'قيد المعالجة',
+    'admin.shipped': 'تم الشحن',
+    'admin.delivered': 'تم التوصيل',
+    'admin.cancelled': 'ملغي',
+    'admin.orderDetails': 'تفاصيل الطلب',
+    'admin.updateStatus': 'تحديث الحالة',
+    
+    // Admin Suppliers
+    'admin.addSupplier': 'إضافة مورد',
+    'admin.editSupplier': 'تعديل المورد',
+    'admin.supplierName': 'اسم المورد',
+    'admin.contactName': 'اسم جهة الاتصال',
+    'admin.phone': 'الهاتف',
+    'admin.addressLine': 'العنوان',
+    
+    // Admin Users/Customers
+    'admin.userId': 'رقم المستخدم',
+    'admin.userName': 'الاسم',
+    'admin.userEmail': 'البريد الإلكتروني',
+    'admin.role': 'الدور',
+    'admin.joinedDate': 'تاريخ الانضمام',
+    
+    // Admin Financial
+    'admin.revenue': 'الإيرادات',
+    'admin.expenses': 'المصروفات',
+    'admin.netProfit': 'صافي الربح',
+    'admin.taxAmount': 'مبلغ الضريبة',
+    'admin.currentCycle': 'الدورة الحالية',
+    'admin.pastCycles': 'الدورات السابقة',
+    'admin.addExpense': 'إضافة مصروف',
+    'admin.closeCycle': 'إغلاق الدورة',
+    
+    // Admin Home Layout
+    'admin.homeLayoutTitle': 'إعدادات تخطيط الصفحة الرئيسية',
+    'admin.sectionEnabled': 'مفعل',
+    'admin.sectionName': 'اسم القسم',
+    'admin.showBadge': 'إظهار الشارة',
+    'admin.badgeText': 'نص الشارة',
+    'admin.manualSelection': 'اختيار يدوي',
+    'admin.automaticSelection': 'اختيار تلقائي',
+    'admin.selectProducts': 'اختر المنتجات',
+    'admin.saveChanges': 'حفظ التغييرات',
+    'admin.resetToDefault': 'إعادة للافتراضي',
+    
+    // Admin Files
+    'admin.uploadFile': 'رفع ملف',
+    'admin.fileName': 'اسم الملف',
+    'admin.fileSize': 'الحجم',
+    'admin.fileType': 'النوع',
+    'admin.uploadDate': 'تاريخ الرفع',
+    'admin.copyUrl': 'نسخ الرابط',
+    'admin.deleteFile': 'حذف',
+    
+    // Common Admin
+    'admin.actions': 'الإجراءات',
+    'admin.noResults': 'لا توجد نتائج',
+    'admin.searchPlaceholder': 'بحث...',
+    'admin.itemsPerPage': 'عناصر في الصفحة',
+    'admin.showing': 'عرض',
+    'admin.of': 'من',
+    'admin.save': 'حفظ',
+    'admin.cancel': 'إلغاء',
+    'admin.create': 'إنشاء',
+    'admin.update': 'تحديث',
+    'admin.delete': 'حذف',
+    'admin.edit': 'تعديل',
+    'admin.view': 'عرض',
+    'admin.back': 'رجوع',
 };
 
 const translations: Record<Language, Record<string, string>> = { en, ar };
@@ -460,6 +719,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         return translations[language][key] || key;
     };
 
+    const formatCurrency = (amount: number): string => {
+        const formattedNumber = amount.toLocaleString(language === 'ar' ? 'ar-EG' : 'en-EG');
+        if (language === 'ar') {
+            return `${formattedNumber} ج.م`;
+        }
+        return `E£${formattedNumber}`;
+    };
+
     const isRTL = language === 'ar';
 
     // Apply RTL direction to document
@@ -469,7 +736,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }, [isRTL, language]);
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t, isRTL }}>
+        <LanguageContext.Provider value={{ language, setLanguage, t, isRTL, formatCurrency }}>
             {children}
         </LanguageContext.Provider>
     );
