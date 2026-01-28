@@ -15,7 +15,8 @@ import {
     Plus,
     X,
     Package,
-    GripVertical
+    GripVertical,
+    FileText
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { toast } from 'sonner';
@@ -37,6 +38,8 @@ interface Section {
     showBadge?: boolean;
     selectedProducts?: string[];
     useManualSelection?: boolean;
+    subtitleText?: string;
+    buttonText?: string;
 }
 
 export function AdminHomePageSettings() {
@@ -71,7 +74,9 @@ export function AdminHomePageSettings() {
             id: 'signup-banner', 
             name: 'Sign Up Banner', 
             description: 'The purple gradient banner encouraging users to create an account.', 
-            isEnabled: true 
+            isEnabled: true,
+            subtitleText: 'Get exclusive deals, personalized recommendations, and early access to sales',
+            buttonText: 'Create your account'
         },
         { 
             id: 'pc-peripherals', 
@@ -853,6 +858,41 @@ export function AdminHomePageSettings() {
                                                     Automatically shows products with category containing mouse, keyboard, or headphone.
                                                 </p>
                                             )}
+                                        </div>
+                                    )}
+
+                                    {/* Additional Settings for Sign Up Banner */}
+                                    {section.id === 'signup-banner' && (
+                                        <div className="flex flex-col gap-3 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            {/* Subtitle Text */}
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <FileText className="h-3.5 w-3.5 text-indigo-600" />
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Subtitle Text</span>
+                                                </div>
+                                                <textarea 
+                                                    value={section.subtitleText || ''}
+                                                    onChange={(e) => updateSection(section.id, 'subtitleText', e.target.value)}
+                                                    rows={2}
+                                                    className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all resize-none"
+                                                    placeholder="Enter subtitle text"
+                                                />
+                                            </div>
+
+                                            {/* Button Text */}
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Package className="h-3.5 w-3.5 text-indigo-600" />
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Button Text</span>
+                                                </div>
+                                                <input 
+                                                    type="text"
+                                                    value={section.buttonText || ''}
+                                                    onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)}
+                                                    className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                                                    placeholder="Enter button text"
+                                                />
+                                            </div>
                                         </div>
                                     )}
                                 </div>

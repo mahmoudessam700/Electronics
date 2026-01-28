@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
                                 { id: 'deals-of-the-day', isEnabled: true, name: 'Deals of the Day', description: 'Shows products that have an original price higher than their current price.', showBadge: true, badgeText: 'Ends in 12:34:56', selectedProducts: [], useManualSelection: false },
                                 { id: 'inspired-browsing', isEnabled: true, name: 'Inspired by your browsing history', description: 'Shows a carousel of recommended products for the user.', selectedProducts: [], useManualSelection: false },
                                 { id: 'trending', isEnabled: true, name: 'Trending in Electronics', description: 'Shows high-value products (over E£50).', selectedProducts: [], useManualSelection: false },
-                                { id: 'signup-banner', isEnabled: true, name: 'Sign Up Banner', description: 'The purple gradient banner encouraging users to create an account.' },
+                                { id: 'signup-banner', isEnabled: true, name: 'Sign Up Banner', description: 'The purple gradient banner encouraging users to create an account.', subtitleText: 'Get exclusive deals, personalized recommendations, and early access to sales', buttonText: 'Create your account' },
                                 { id: 'pc-peripherals', isEnabled: true, name: 'PC Accessories & Peripherals', description: 'Shows mice, keyboards, and headphones.', selectedProducts: [], useManualSelection: false }
                             ]
                         });

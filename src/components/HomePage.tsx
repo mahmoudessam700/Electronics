@@ -76,6 +76,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
     };
   };
 
+  const getSectionField = (id: string, field: string, defaultValue: string) => {
+    if (!settings || !settings.sections) return defaultValue;
+    const section = settings.sections.find((s: any) => s.id === id);
+    return section && section[field] ? section[field] : defaultValue;
+  };
+
   // Get deals section settings for manual product selection
   const getDealsProducts = () => {
     if (!settings || !settings.sections) {
@@ -362,7 +368,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
               {getSectionName('signup-banner', 'Sign up and save')}
             </h2>
             <p style={{ fontSize: 18, margin: '0 0 24px', maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', opacity: 0.9 }}>
-              Get exclusive deals, personalized recommendations, and early access to sales
+              {getSectionField('signup-banner', 'subtitleText', 'Get exclusive deals, personalized recommendations, and early access to sales')}
             </p>
             <button
               onClick={() => onNavigate('account')}
@@ -379,7 +385,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
               }}
             >
-              Create your account
+              {getSectionField('signup-banner', 'buttonText', 'Create your account')}
             </button>
           </section>
         )}
