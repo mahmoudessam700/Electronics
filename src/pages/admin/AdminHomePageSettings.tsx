@@ -265,9 +265,9 @@ export function AdminHomePageSettings() {
                     <Info className="h-4 w-4 text-blue-600" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-bold text-blue-900">Visibility Control</h3>
+                    <h3 className="text-sm font-bold text-blue-900">{t('admin.visibilityControl')}</h3>
                     <p className="text-xs text-blue-700 leading-relaxed mt-1">
-                        Use the toggles below to hide or show specific sections on your main page. This is useful for clearing space during specific sales or removing sections if they have no products yet.
+                        {t('admin.visibilityControlDesc')}
                     </p>
                 </div>
             </div>
@@ -298,14 +298,14 @@ export function AdminHomePageSettings() {
                                         className={`block w-full font-bold bg-transparent border-none p-0 focus:ring-0 transition-colors ${
                                             section.isEnabled ? 'text-slate-900' : 'text-slate-400'
                                         }`}
-                                        placeholder="Section Name"
+                                        placeholder={t('admin.sectionName')}
                                     />
                                     <textarea 
                                         value={section.description}
                                         onChange={(e) => updateSection(section.id, 'description', e.target.value)}
                                         rows={1}
                                         className="block w-full text-xs text-slate-500 bg-transparent border-none p-0 focus:ring-0 resize-none overflow-hidden"
-                                        placeholder="Section Description"
+                                        placeholder={t('admin.sectionDescription')}
                                         onInput={(e) => {
                                             const target = e.target as HTMLTextAreaElement;
                                             target.style.height = 'auto';
@@ -320,7 +320,7 @@ export function AdminHomePageSettings() {
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <Clock className="h-3.5 w-3.5 text-orange-600" />
-                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Countdown Badge</span>
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.countdownBadge')}</span>
                                                 </div>
                                                 <button
                                                     onClick={() => updateSection(section.id, 'showBadge', !section.showBadge)}
@@ -328,7 +328,7 @@ export function AdminHomePageSettings() {
                                                         section.showBadge ? 'bg-orange-100 text-orange-700' : 'bg-slate-200 text-slate-500'
                                                     }`}
                                                 >
-                                                    {section.showBadge ? 'ENABLED' : 'DISABLED'}
+                                                    {section.showBadge ? t('admin.enabled') : t('admin.disabled')}
                                                 </button>
                                             </div>
                                             {section.showBadge && (
@@ -337,7 +337,7 @@ export function AdminHomePageSettings() {
                                                     value={section.badgeText || ''}
                                                     onChange={(e) => updateSection(section.id, 'badgeText', e.target.value)}
                                                     className="w-full text-xs bg-white border border-slate-200 rounded-lg py-1.5 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                                                    placeholder="Enter badge text (e.g. Ends in 12:34:56)"
+                                                    placeholder={t('admin.enterBadgeText')}
                                                 />
                                             )}
 
@@ -346,7 +346,7 @@ export function AdminHomePageSettings() {
                                                 <div className="flex items-center justify-between mb-3">
                                                     <div className="flex items-center gap-2">
                                                         <Package className="h-3.5 w-3.5 text-indigo-600" />
-                                                        <span className="text-[10px] font-bold text-slate-600 uppercase">Manual Product Selection</span>
+                                                        <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.manualProductSelection')}</span>
                                                     </div>
                                                     <button
                                                         onClick={() => updateSection(section.id, 'useManualSelection', !section.useManualSelection)}
@@ -354,14 +354,14 @@ export function AdminHomePageSettings() {
                                                             section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
                                                         }`}
                                                     >
-                                                        {section.useManualSelection ? 'MANUAL' : 'AUTOMATIC'}
+                                                        {section.useManualSelection ? t('admin.manual') : t('admin.automatic')}
                                                     </button>
                                                 </div>
 
             {section.useManualSelection ? (
                                                     <div className="space-y-3">
                                                         <p className="text-[10px] text-slate-500">
-                                                            Select specific products to feature in this section.
+                                                            {t('admin.selectProductsToFeature')}
                                                         </p>
 
                                                         {/* Selected Products List */}
@@ -464,7 +464,7 @@ export function AdminHomePageSettings() {
                                                     </div>
                                                 ) : (
                                                     <p className="text-[10px] text-slate-500">
-                                                        Automatically shows all products with a discount (original price {'>'} current price).
+                                                        {t('admin.autoShowsDiscounted')}
                                                     </p>
                                                 )}
                                             </div>
@@ -912,12 +912,12 @@ export function AdminHomePageSettings() {
                                 {section.isEnabled ? (
                                     <>
                                         <Eye className="h-4 w-4" />
-                                        VISIBLE
+                                        {t('admin.visible')}
                                     </>
                                 ) : (
                                     <>
                                         <EyeOff className="h-4 w-4" />
-                                        HIDDEN
+                                        {t('admin.hidden')}
                                     </>
                                 )}
                             </button>
@@ -930,15 +930,15 @@ export function AdminHomePageSettings() {
             <div className="flex items-center justify-center gap-6 pt-4 text-slate-400">
                 <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    <span className="text-[10px] uppercase font-bold tracking-wider">Auto-Syncing Ready</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider">{t('admin.autoSyncingReady')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <RefreshCw className="h-4 w-4 text-indigo-500" />
-                    <span className="text-[10px] uppercase font-bold tracking-wider">Real-time Updates</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider">{t('admin.realTimeUpdates')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-slate-300" />
-                    <span className="text-[10px] uppercase font-bold tracking-wider">Versioning: v2.0</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider">{t('admin.versioning')}: v2.0</span>
                 </div>
             </div>
         </div>

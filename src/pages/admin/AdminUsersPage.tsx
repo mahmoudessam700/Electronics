@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { toast } from 'sonner';
 
 interface UserData {
@@ -21,6 +22,7 @@ interface UserData {
 
 export function AdminUsersPage() {
     const { token } = useAuth();
+    const { t } = useLanguage();
     const [users, setUsers] = useState<UserData[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -141,7 +143,7 @@ export function AdminUsersPage() {
         return (
             <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
-                <span className="mt-4 text-slate-500">Loading users...</span>
+                <span className="mt-4 text-slate-500">{t('admin.loadingUsers')}</span>
             </div>
         );
     }
@@ -152,9 +154,9 @@ export function AdminUsersPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        User Management
+                        {t('admin.userManagement')}
                     </h1>
-                    <p className="text-gray-500 mt-1 text-sm">Manage customers and administrators</p>
+                    <p className="text-gray-500 mt-1 text-sm">{t('admin.userManagementSubtitle')}</p>
                 </div>
             </div>
 
@@ -166,7 +168,7 @@ export function AdminUsersPage() {
                             <Users className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Total Users</p>
+                            <p className="text-sm text-gray-500">{t('admin.totalUsers')}</p>
                             <p className="text-xl font-bold text-gray-900">{stats.total}</p>
                         </div>
                     </div>
@@ -177,7 +179,7 @@ export function AdminUsersPage() {
                             <Crown className="h-5 w-5 text-purple-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Administrators</p>
+                            <p className="text-sm text-gray-500">{t('admin.administrators')}</p>
                             <p className="text-xl font-bold text-purple-600">{stats.admins}</p>
                         </div>
                     </div>
@@ -188,7 +190,7 @@ export function AdminUsersPage() {
                             <UserCheck className="h-5 w-5 text-emerald-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Customers</p>
+                            <p className="text-sm text-gray-500">{t('admin.customers')}</p>
                             <p className="text-xl font-bold text-emerald-600">{stats.customers}</p>
                         </div>
                     </div>
@@ -200,7 +202,7 @@ export function AdminUsersPage() {
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                        placeholder="Search users..."
+                        placeholder={t('admin.searchUsers')}
                         className="pl-10 bg-white border-gray-200 focus:border-[#4A5568] rounded-lg"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -217,7 +219,7 @@ export function AdminUsersPage() {
                                     : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                             }`}
                         >
-                            {role === 'ALL' ? 'All Users' : role === 'ADMIN' ? 'Admins' : 'Customers'}
+                            {role === 'ALL' ? t('admin.allUsers') : role === 'ADMIN' ? t('admin.admins') : t('admin.customers')}
                         </button>
                     ))}
                 </div>
@@ -229,11 +231,11 @@ export function AdminUsersPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-200">
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">User</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Role</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Contact</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">Location</th>
-                                <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{t('admin.user')}</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{t('admin.role')}</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">{t('admin.contact')}</th>
+                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{t('admin.location')}</th>
+                                <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{t('admin.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -249,7 +251,7 @@ export function AdminUsersPage() {
                                                 {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-gray-900 text-sm">{user.name || 'Unnamed User'}</p>
+                                                <p className="font-semibold text-gray-900 text-sm">{user.name || t('admin.unnamedUser')}</p>
                                                 <div className="flex items-center gap-1 text-xs text-gray-500">
                                                     <Mail className="h-3 w-3" />
                                                     <span className="truncate max-w-[150px]">{user.email}</span>
@@ -320,8 +322,8 @@ export function AdminUsersPage() {
                         <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gray-100 mb-4">
                             <Users className="h-7 w-7 text-gray-400" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">No users found</h3>
-                        <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('admin.noUsersFound')}</h3>
+                        <p className="text-gray-500">{t('admin.tryAdjustFilters')}</p>
                     </div>
                 )}
             </div>
@@ -330,11 +332,11 @@ export function AdminUsersPage() {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
-                        <DialogTitle className="text-xl">Edit User Profile</DialogTitle>
+                        <DialogTitle className="text-xl">{t('admin.editUserProfile')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSave} className="space-y-5 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+                            <Label htmlFor="name" className="text-sm font-medium">{t('admin.fullName')}</Label>
                             <Input
                                 id="name"
                                 value={formData.name}
@@ -343,7 +345,7 @@ export function AdminUsersPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+                            <Label htmlFor="phone" className="text-sm font-medium">{t('admin.phoneNumber')}</Label>
                             <Input
                                 id="phone"
                                 value={formData.phone}
@@ -352,7 +354,7 @@ export function AdminUsersPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="address" className="text-sm font-medium">Address</Label>
+                            <Label htmlFor="address" className="text-sm font-medium">{t('admin.address')}</Label>
                             <Input
                                 id="address"
                                 value={formData.address}
@@ -361,20 +363,20 @@ export function AdminUsersPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="role" className="text-sm font-medium">User Role</Label>
+                            <Label htmlFor="role" className="text-sm font-medium">{t('admin.userRole')}</Label>
                             <select
                                 id="role"
                                 className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814]"
                                 value={formData.role}
                                 onChange={(e) => setFormData({ ...formData, role: e.target.value as 'ADMIN' | 'CUSTOMER' })}
                             >
-                                <option value="CUSTOMER">Customer</option>
-                                <option value="ADMIN">Administrator</option>
+                                <option value="CUSTOMER">{t('admin.customer')}</option>
+                                <option value="ADMIN">{t('admin.administrator')}</option>
                             </select>
                         </div>
                         <DialogFooter className="pt-4 gap-2">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-lg">
-                                Cancel
+                                {t('admin.cancel')}
                             </Button>
                             <Button 
                                 type="submit" 
@@ -382,7 +384,7 @@ export function AdminUsersPage() {
                                 className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
                             >
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Save Changes
+                                {t('admin.saveChanges')}
                             </Button>
                         </DialogFooter>
                     </form>

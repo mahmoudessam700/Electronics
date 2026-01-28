@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { toast } from 'sonner';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface Supplier {
     id: string;
@@ -25,6 +26,7 @@ const SUPPLIER_COLORS = [
 ];
 
 export function AdminSuppliersPage() {
+    const { t } = useLanguage();
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [loading, setLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -144,7 +146,7 @@ export function AdminSuppliersPage() {
         return (
             <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-12 h-12 border-4 border-[#FFD814]/30 border-t-[#FFD814] rounded-full animate-spin" />
-                <span className="mt-4 text-slate-500">Loading suppliers...</span>
+                <span className="mt-4 text-slate-500">{t('admin.loadingSuppliers')}</span>
             </div>
         );
     }
@@ -155,15 +157,15 @@ export function AdminSuppliersPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        Suppliers
+                        {t('admin.suppliersTitle')}
                     </h1>
-                    <p className="text-gray-500 mt-1 text-sm">Manage your product suppliers and vendors</p>
+                    <p className="text-gray-500 mt-1 text-sm">{t('admin.suppliersSubtitle')}</p>
                 </div>
                 <Button 
                     onClick={() => handleOpenDialog()}
                     className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                 >
-                    <Plus className="mr-2 h-4 w-4" /> Add Supplier
+                    <Plus className="mr-2 h-4 w-4" /> {t('admin.addSupplier')}
                 </Button>
             </div>
 
@@ -174,7 +176,7 @@ export function AdminSuppliersPage() {
                         <Building2 className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500">Total Suppliers</p>
+                        <p className="text-sm text-gray-500">{t('admin.totalSuppliers')}</p>
                         <p className="text-xl font-bold text-gray-900">{suppliers.length}</p>
                     </div>
                 </div>
@@ -184,7 +186,7 @@ export function AdminSuppliersPage() {
             <div className="relative max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
-                    placeholder="Search suppliers..."
+                    placeholder={t('admin.searchSuppliers')}
                     className="pl-10 bg-white border-slate-200 focus:border-[#FFD814] focus:ring-[#FFD814]/20 rounded-xl"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -198,17 +200,17 @@ export function AdminSuppliersPage() {
                         <Building2 className="h-7 w-7 text-gray-400" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {searchQuery ? 'No suppliers found' : 'No suppliers yet'}
+                        {searchQuery ? t('admin.noSuppliersFound') : t('admin.noSuppliersYet')}
                     </h3>
                     <p className="text-gray-500 mb-6">
-                        {searchQuery ? 'Try adjusting your search' : 'Add your first supplier to get started'}
+                        {searchQuery ? t('admin.tryAdjustSearch') : t('admin.addFirstSupplier')}
                     </p>
                     {!searchQuery && (
                         <Button 
                             onClick={() => handleOpenDialog()}
                             className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                         >
-                            <Plus className="mr-2 h-4 w-4" /> Add First Supplier
+                            <Plus className="mr-2 h-4 w-4" /> {t('admin.addSupplier')}
                         </Button>
                     )}
                 </div>
@@ -277,7 +279,7 @@ export function AdminSuppliersPage() {
                                             </div>
                                         )}
                                         {!supplier.contact && !supplier.email && !supplier.phone && !supplier.address && (
-                                            <p className="text-sm text-gray-400 italic">No contact information</p>
+                                            <p className="text-sm text-gray-400 italic">{t('admin.noContactInfo')}</p>
                                         )}
                                     </div>
                                 </div>
@@ -292,12 +294,12 @@ export function AdminSuppliersPage() {
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-xl">
-                            {editingSupplier ? 'Edit Supplier' : 'Add Supplier'}
+                            {editingSupplier ? t('admin.editSupplier') : t('admin.addSupplier')}
                         </DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSave} className="space-y-5 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="name" className="text-sm font-medium">Supplier Name *</Label>
+                            <Label htmlFor="name" className="text-sm font-medium">{t('admin.supplierNameRequired')}</Label>
                             <Input
                                 id="name"
                                 value={formData.name}
@@ -309,7 +311,7 @@ export function AdminSuppliersPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="contact" className="text-sm font-medium">Contact Person</Label>
+                                <Label htmlFor="contact" className="text-sm font-medium">{t('admin.contactPerson')}</Label>
                                 <Input
                                     id="contact"
                                     value={formData.contact}
@@ -319,7 +321,7 @@ export function AdminSuppliersPage() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                                <Label htmlFor="email" className="text-sm font-medium">{t('admin.userEmail')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -331,7 +333,7 @@ export function AdminSuppliersPage() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+                            <Label htmlFor="phone" className="text-sm font-medium">{t('admin.phoneNumber')}</Label>
                             <Input
                                 id="phone"
                                 value={formData.phone}
@@ -341,7 +343,7 @@ export function AdminSuppliersPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="address" className="text-sm font-medium">Address</Label>
+                            <Label htmlFor="address" className="text-sm font-medium">{t('admin.address')}</Label>
                             <textarea
                                 id="address"
                                 className="w-full min-h-[80px] p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors"
@@ -352,7 +354,7 @@ export function AdminSuppliersPage() {
                         </div>
                         <DialogFooter className="pt-4 gap-2">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-lg">
-                                Cancel
+                                {t('admin.cancel')}
                             </Button>
                             <Button 
                                 type="submit" 
@@ -360,7 +362,7 @@ export function AdminSuppliersPage() {
                                 className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
                             >
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {editingSupplier ? 'Update Supplier' : 'Create Supplier'}
+                                {editingSupplier ? t('admin.updateSupplier') : t('admin.createSupplier')}
                             </Button>
                         </DialogFooter>
                     </form>
