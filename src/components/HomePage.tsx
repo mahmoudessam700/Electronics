@@ -6,6 +6,27 @@ import { Clock, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
+// Mapping from English category names to translation keys
+const CATEGORY_TRANSLATION_KEYS: Record<string, string> = {
+  'PCs': 'category.pcs',
+  'Laptops': 'category.laptops',
+  'Mice': 'category.mice',
+  'Keyboards': 'category.keyboards',
+  'Headphones': 'category.headphones',
+  'Cables': 'category.cables',
+  'Mouse Pads': 'category.mousePads',
+  'Hard Drives': 'category.hardDrives',
+  // lowercase variants
+  'pcs': 'category.pcs',
+  'laptops': 'category.laptops',
+  'mice': 'category.mice',
+  'keyboards': 'category.keyboards',
+  'headphones': 'category.headphones',
+  'cables': 'category.cables',
+  'mouse pads': 'category.mousePads',
+  'hard drives': 'category.hardDrives',
+};
+
 interface Category {
   id: string;
   name: string;
@@ -24,6 +45,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Helper function to get translated category name
+  const getCategoryName = (name: string): string => {
+    const key = CATEGORY_TRANSLATION_KEYS[name] || CATEGORY_TRANSLATION_KEYS[name.toLowerCase()];
+    return key ? t(key) : name;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -212,7 +239,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 .map((category) => (
                   <CategoryCard
                     key={category.id}
-                    title={category.name}
+                    title={getCategoryName(category.name)}
                     image={category.image}
                     onClick={() => onNavigate('search', undefined, category.name)}
                   />
