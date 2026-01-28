@@ -30,6 +30,12 @@ export function CameraCapture({ onCapture, trigger }: CameraCaptureProps) {
             setStream(mediaStream);
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
+                // Explicitly play the video after setting source
+                try {
+                    await videoRef.current.play();
+                } catch (playErr) {
+                    console.log("Autoplay handled by muted attribute");
+                }
             }
         } catch (err) {
             console.error("Camera access error:", err);
@@ -128,34 +134,42 @@ export function CameraCapture({ onCapture, trigger }: CameraCaptureProps) {
                                     <Loader2 className="h-10 w-10 animate-spin text-indigo-400" />
                                     <span className="text-sm font-medium animate-pulse">Initializing Camera...</span>
                                 </div>
-                            ) : (
+                            ) : stream ? (
                                 <video
                                     ref={videoRef}
                                     autoPlay
                                     playsInline
+                                    muted
                                     className="w-full h-full object-cover"
                                 />
+                            ) : (
+                                <div className="flex flex-col items-center gap-3 text-white">
+                                    <Video className="h-10 w-10 text-slate-500" />
+                                    <span className="text-sm font-medium text-slate-400">Camera not available</span>
+                                </div>
                             )}
                             
                             {/* Camera Overlay */}
-                            {!isStarting && (
+                            {!isStarting && stream && (
                                 <div className="absolute inset-0 pointer-events-none border-[40px] border-black/20" />
                             )}
 
                             {/* Controls */}
-                            <div className="absolute bottom-6 left-0 right-0 flex justify-center px-6">
-                                <div className="bg-slate-900/40 backdrop-blur-md p-3 rounded-full flex items-center gap-6 border border-white/10">
-                                    <Button 
-                                        type="button"
-                                        onClick={capturePhoto}
-                                        className="rounded-full w-16 h-16 p-0 bg-white border-4 border-slate-400 hover:bg-slate-100 shadow-2xl active:scale-95 transition-all"
-                                    >
-                                        <div className="w-12 h-12 rounded-full border-2 border-slate-900 flex items-center justify-center">
-                                            <div className="w-8 h-8 rounded-full bg-red-600 shadow-inner" />
-                                        </div>
-                                    </Button>
+                            {stream && (
+                                <div className="absolute bottom-6 left-0 right-0 flex justify-center px-6">
+                                    <div className="bg-slate-900/40 backdrop-blur-md p-3 rounded-full flex items-center gap-6 border border-white/10">
+                                        <Button 
+                                            type="button"
+                                            onClick={capturePhoto}
+                                            className="rounded-full w-16 h-16 p-0 bg-white border-4 border-slate-400 hover:bg-slate-100 shadow-2xl active:scale-95 transition-all"
+                                        >
+                                            <div className="w-12 h-12 rounded-full border-2 border-slate-900 flex items-center justify-center">
+                                                <div className="w-8 h-8 rounded-full bg-red-600 shadow-inner" />
+                                            </div>
+                                        </Button>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </>
                     ) : (
                         <>
@@ -192,7 +206,7 @@ export function CameraCapture({ onCapture, trigger }: CameraCaptureProps) {
                 </div>
                 
                 <div className="p-4 bg-slate-900 text-white/50 text-[10px] text-center uppercase tracking-widest font-bold">
-                    {capturedImage ? 'Photo Preview' : 'Live Camera Feed'}
+                    {capturedImage ? 'Photo Preview' : isStarting ? 'Starting Camera...' : stream ? 'Live Camera Feed' : 'Camera Unavailable'}
                 </div>
                 
                 <canvas ref={canvasRef} className="hidden" />
