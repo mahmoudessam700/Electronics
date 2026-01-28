@@ -36,8 +36,8 @@ module.exports = async (req, res) => {
                         // Return Defaults if row doesn't exist
                         return res.json({
                             sections: [
-                                { id: 'deals-of-the-day', isEnabled: true, name: 'Deals of the Day', description: 'Shows products that have an original price higher than their current price.', showBadge: true, badgeText: 'Ends in 12:34:56' },
-                                { id: 'inspired-browsing', isEnabled: true, name: 'Inspired by your browsing history', description: 'Shows a carousel of recommended products for the user.' },
+                                { id: 'deals-of-the-day', isEnabled: true, name: 'Deals of the Day', description: 'Shows products that have an original price higher than their current price.', showBadge: true, badgeText: 'Ends in 12:34:56', selectedProducts: [], useManualSelection: false },
+                                { id: 'inspired-browsing', isEnabled: true, name: 'Inspired by your browsing history', description: 'Shows a carousel of recommended products for the user.', selectedProducts: [], useManualSelection: false },
                                 { id: 'trending', isEnabled: true, name: 'Trending in Electronics', description: 'Shows high-value products (over E£1000).' },
                                 { id: 'signup-banner', isEnabled: true, name: 'Sign Up Banner', description: 'The purple gradient banner encouraging users to create an account.' },
                                 { id: 'pc-peripherals', isEnabled: true, name: 'PC Accessories & Peripherals', description: 'Shows mice, keyboards, and headphones.' }

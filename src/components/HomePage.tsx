@@ -96,9 +96,29 @@ export function HomePage({ onNavigate }: HomePageProps) {
     return products.filter(p => p.originalPrice && p.originalPrice > p.price).slice(0, 5);
   };
 
+  // Get inspired by browsing history section settings for manual product selection
+  const getInspiredProducts = () => {
+    if (!settings || !settings.sections) {
+      return products.slice(0, 10);
+    }
+    
+    const inspiredSection = settings.sections.find((s: any) => s.id === 'inspired-browsing');
+    
+    // If manual selection is enabled and products are selected
+    if (inspiredSection?.useManualSelection && inspiredSection?.selectedProducts?.length > 0) {
+      // Return products in the order they were selected
+      return inspiredSection.selectedProducts
+        .map((id: string) => products.find(p => p.id === id))
+        .filter(Boolean);
+    }
+    
+    // Default: automatic selection - first 10 products
+    return products.slice(0, 10);
+  };
+
   // Filter products for different sections
   const dealsOfTheDay = getDealsProducts();
-  const recommendedProducts = products.slice(0, 10);
+  const recommendedProducts = getInspiredProducts();
   const trendingProducts = products.filter(p => p.price > 1000).slice(0, 10);
   const peripherals = products.filter(p =>
     p.category?.toLowerCase().includes('mouse') ||
