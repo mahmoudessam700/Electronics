@@ -119,7 +119,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
   // Filter products for different sections
   const dealsOfTheDay = getDealsProducts();
   const recommendedProducts = getInspiredProducts();
-  const trendingProducts = products.filter(p => p.price > 1000).slice(0, 10);
+  const trendingProducts = products.filter(p => p.price > 50).slice(0, 10);
   const peripherals = products.filter(p =>
     p.category?.toLowerCase().includes('mouse') ||
     p.category?.toLowerCase().includes('keyboard') ||

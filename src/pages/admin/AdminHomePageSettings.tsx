@@ -62,7 +62,7 @@ export function AdminHomePageSettings() {
         { 
             id: 'trending', 
             name: 'Trending in Electronics', 
-            description: 'Shows high-value products (over E£1000).', 
+            description: 'Shows high-value products (over E£50).', 
             isEnabled: true 
         },
         { 
