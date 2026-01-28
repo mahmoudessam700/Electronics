@@ -107,7 +107,14 @@ export function HeroSlider({ onNavigate }: HeroSliderProps) {
       if (slide.titleAr) return slide.titleAr;
       // Try to find Arabic from defaults
       const defaultSlide = defaultSlides.find(d => d.id === slide.id);
-      return defaultSlide?.titleAr || slide.title;
+      if (defaultSlide?.titleAr) return defaultSlide.titleAr;
+      // Hardcoded fallbacks for common titles
+      const titleTranslations: Record<string, string> = {
+        'New Year Sale': 'تخفيضات السنة الجديدة',
+        'Latest Laptops': 'أحدث اللابتوبات',
+        'Gaming Accessories': 'إكسسوارات الألعاب'
+      };
+      return titleTranslations[slide.title] || slide.title;
     }
     return slide.title;
   };
@@ -117,7 +124,14 @@ export function HeroSlider({ onNavigate }: HeroSliderProps) {
       if (slide.subtitleAr) return slide.subtitleAr;
       // Try to find Arabic from defaults
       const defaultSlide = defaultSlides.find(d => d.id === slide.id);
-      return defaultSlide?.subtitleAr || slide.subtitle;
+      if (defaultSlide?.subtitleAr) return defaultSlide.subtitleAr;
+      // Hardcoded fallbacks for common subtitles
+      const subtitleTranslations: Record<string, string> = {
+        'Up to 50% off on premium tech': 'خصم يصل إلى 50% على التقنية المتميزة',
+        'Powerful performance for work and play': 'أداء قوي للعمل واللعب',
+        'Upgrade your gaming setup': 'طور معدات الألعاب الخاصة بك'
+      };
+      return subtitleTranslations[slide.subtitle] || slide.subtitle;
     }
     return slide.subtitle;
   };
@@ -127,7 +141,17 @@ export function HeroSlider({ onNavigate }: HeroSliderProps) {
       if (slide.ctaTextAr) return slide.ctaTextAr;
       // Try to find Arabic from defaults
       const defaultSlide = defaultSlides.find(d => d.id === slide.id);
-      return defaultSlide?.ctaTextAr || slide.ctaText;
+      if (defaultSlide?.ctaTextAr) return defaultSlide.ctaTextAr;
+      // Hardcoded fallbacks for common CTA texts
+      const ctaTranslations: Record<string, string> = {
+        'Shop Now': 'تسوق الآن',
+        'Explore Laptops': 'استكشف اللابتوبات',
+        'Discover More': 'اكتشف المزيد',
+        'Buy Now': 'اشتري الآن',
+        'Learn More': 'اعرف المزيد',
+        'View All': 'عرض الكل'
+      };
+      return ctaTranslations[slide.ctaText] || slide.ctaText;
     }
     return slide.ctaText;
   };
