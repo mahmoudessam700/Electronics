@@ -83,6 +83,7 @@ const en: Record<string, string> = {
     'home.signUp': 'Sign Up',
     'home.pcAccessories': 'PC Accessories & Peripherals',
     'home.topRatedProducts': 'Top Rated Products',
+    'home.shopNow': 'Shop now',
 
     // Product
     'product.addToCart': 'Add to Cart',
@@ -91,6 +92,7 @@ const en: Record<string, string> = {
     'product.outOfStock': 'Out of Stock',
     'product.prime': 'Prime',
     'product.freeDelivery': 'FREE Delivery',
+    'product.tomorrow': 'Tomorrow',
     'product.quantity': 'Quantity',
     'product.reviews': 'reviews',
     'product.rating': 'rating',
@@ -556,6 +558,7 @@ const ar: Record<string, string> = {
     'home.signUp': 'سجل الآن',
     'home.pcAccessories': 'إكسسوارات الكمبيوتر والملحقات',
     'home.topRatedProducts': 'المنتجات الأعلى تقييماً',
+    'home.shopNow': 'تسوق الآن',
 
     // Product
     'product.addToCart': 'أضف إلى السلة',
@@ -564,6 +567,7 @@ const ar: Record<string, string> = {
     'product.outOfStock': 'غير متوفر',
     'product.prime': 'برايم',
     'product.freeDelivery': 'توصيل مجاني',
+    'product.tomorrow': 'غداً',
     'product.quantity': 'الكمية',
     'product.reviews': 'تقييمات',
     'product.rating': 'تقييم',

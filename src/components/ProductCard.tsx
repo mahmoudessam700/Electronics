@@ -113,7 +113,7 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
           {/* Delivery Date */}
           {product.deliveryDate && (
             <p className="text-xs text-[#565959]">
-              {t('product.freeDelivery')} <span className="font-bold text-[#0F1111]">{product.deliveryDate}</span>
+              {t('product.freeDelivery')} <span className="font-bold text-[#0F1111]">{product.deliveryDate === 'Tomorrow' ? t('product.tomorrow') : product.deliveryDate}</span>
             </p>
           )}
         </div>

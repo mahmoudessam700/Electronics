@@ -1,3 +1,5 @@
+import { useLanguage } from '../contexts/LanguageContext';
+
 interface CategoryCardProps {
   title: string;
   image?: string;
@@ -5,6 +7,7 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ title, image, onClick }: CategoryCardProps) {
+  const { t } = useLanguage();
   return (
     <div
       onClick={onClick}
@@ -57,7 +60,7 @@ export function CategoryCard({ title, image, onClick }: CategoryCardProps) {
         color: '#007185',
         marginTop: 'auto'
       }}>
-        Shop now
+        {t('home.shopNow')}
       </span>
     </div>
   );
