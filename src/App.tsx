@@ -13,6 +13,13 @@ import { SellPage } from './components/SellPage';
 import { OrdersPage } from './components/OrdersPage';
 import { AccountPage } from './components/AccountPage';
 import { ListsPage } from './components/ListsPage';
+import { AboutUsPage } from './components/AboutUsPage';
+import { CareersPage } from './components/CareersPage';
+import { PressReleasesPage } from './components/PressReleasesPage';
+import { AffiliatePage } from './components/AffiliatePage';
+import { AdvertisePage } from './components/AdvertisePage';
+import { ShopCardPage } from './components/ShopCardPage';
+import { CurrencyConverterPage } from './components/CurrencyConverterPage';
 import { SignInPage } from './components/auth/SignInPage';
 import { SignUpPage } from './components/auth/SignUpPage';
 import { ForgotPasswordPage } from './components/auth/ForgotPasswordPage';
@@ -212,6 +219,13 @@ function AppContent() {
         <Route path="/orders" element={<OrdersPage onNavigate={handleNavigate} />} />
         <Route path="/account" element={<AccountPage onNavigate={handleNavigate} />} />
         <Route path="/lists" element={<ListsPage onNavigate={handleNavigate} onAddToCart={handleAddToCart} />} />
+        <Route path="/about-us" element={<AboutUsPage onNavigate={handleNavigate} />} />
+        <Route path="/careers" element={<CareersPage onNavigate={handleNavigate} />} />
+        <Route path="/press" element={<PressReleasesPage onNavigate={handleNavigate} />} />
+        <Route path="/affiliate" element={<AffiliatePage onNavigate={handleNavigate} />} />
+        <Route path="/advertise" element={<AdvertisePage onNavigate={handleNavigate} />} />
+        <Route path="/shop-card" element={<ShopCardPage onNavigate={handleNavigate} />} />
+        <Route path="/currency-converter" element={<CurrencyConverterPage onNavigate={handleNavigate} />} />
         <Route path="/confirmation" element={
           <div className="min-h-screen bg-white">
             <div className="max-w-[800px] mx-auto px-4 py-12">
@@ -275,25 +289,25 @@ function AppContent() {
               <div>
                 <h3 className="mb-4">{t('footer.getToKnowUs')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><a href="#" className="hover:underline">{t('footer.aboutUs')}</a></li>
-                  <li><a href="#" className="hover:underline">{t('footer.careers')}</a></li>
-                  <li><a href="#" className="hover:underline">{t('footer.pressReleases')}</a></li>
+                  <li><button onClick={() => handleNavigate('about-us')} className="hover:underline">{t('footer.aboutUs')}</button></li>
+                  <li><button onClick={() => handleNavigate('careers')} className="hover:underline">{t('footer.careers')}</button></li>
+                  <li><button onClick={() => handleNavigate('press')} className="hover:underline">{t('footer.pressReleases')}</button></li>
                 </ul>
               </div>
               <div>
                 <h3 className="mb-4">{t('footer.makeMoneyWithUs')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><a href="#" className="hover:underline">{t('footer.sellOnShop')}</a></li>
-                  <li><a href="#" className="hover:underline">{t('footer.becomeAffiliate')}</a></li>
-                  <li><a href="#" className="hover:underline">{t('footer.advertiseProducts')}</a></li>
+                  <li><button onClick={() => handleNavigate('sell')} className="hover:underline">{t('footer.sellOnShop')}</button></li>
+                  <li><button onClick={() => handleNavigate('affiliate')} className="hover:underline">{t('footer.becomeAffiliate')}</button></li>
+                  <li><button onClick={() => handleNavigate('advertise')} className="hover:underline">{t('footer.advertiseProducts')}</button></li>
                 </ul>
               </div>
               <div>
                 <h3 className="mb-4">{t('footer.paymentProducts')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><a href="#" className="hover:underline">{t('footer.shopCard')}</a></li>
-                  <li><a href="#" className="hover:underline">{t('footer.currencyConverter')}</a></li>
-                  <li><a href="#" className="hover:underline">{t('header.giftCards')}</a></li>
+                  <li><button onClick={() => handleNavigate('shop-card')} className="hover:underline">{t('footer.shopCard')}</button></li>
+                  <li><button onClick={() => handleNavigate('currency-converter')} className="hover:underline">{t('footer.currencyConverter')}</button></li>
+                  <li><button onClick={() => handleNavigate('gift-cards')} className="hover:underline">{t('header.giftCards')}</button></li>
                 </ul>
               </div>
               <div>
