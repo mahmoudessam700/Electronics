@@ -52,7 +52,12 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
             if (onSuccess) {
                 onSuccess();
             } else {
-                if (data.user.role === 'ADMIN') {
+                // Check if user was redirected from checkout
+                const checkoutRedirect = localStorage.getItem('checkout_redirect');
+                if (checkoutRedirect === 'true') {
+                    localStorage.removeItem('checkout_redirect');
+                    navigate('/checkout');
+                } else if (data.user.role === 'ADMIN') {
                     navigate('/admin');
                 } else {
                     navigate('/');

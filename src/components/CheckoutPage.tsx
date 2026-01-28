@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, CreditCard, Lock, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -6,6 +7,8 @@ import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { CartItem } from './ShoppingCart';
 import { Card, CardContent } from './ui/card';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface CheckoutPageProps {
   cartItems: CartItem[];
@@ -13,6 +16,17 @@ interface CheckoutPageProps {
 }
 
 export function CheckoutPage({ cartItems, onPlaceOrder }: CheckoutPageProps) {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  
+  // Require login to access checkout
+  useEffect(() => {
+    if (!loading && !user) {
+      localStorage.setItem('checkout_redirect', 'true');
+      toast.info('Please sign in to continue checkout', { duration: 3000 });
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',

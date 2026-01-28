@@ -4,7 +4,7 @@ import { Header } from './components/Header';
 import { HomePage } from './components/HomePage';
 import { ProductListingPage } from './components/ProductListingPage';
 import { ProductDetailPage } from './components/ProductDetailPage';
-import { ShoppingCart, CartItem } from './components/ShoppingCart';
+import { ShoppingCart } from './components/ShoppingCart';
 import { CheckoutPage } from './components/CheckoutPage';
 import { CustomerServicePage } from './components/CustomerServicePage';
 import { RegistryPage } from './components/RegistryPage';
@@ -31,7 +31,7 @@ import { AdminHomePageSettings } from './pages/admin/AdminHomePageSettings';
 import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -46,7 +46,7 @@ function ScrollToTop() {
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { user, cartItems, addToCart, updateCartQuantity, removeFromCart, clearCart } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -74,50 +74,45 @@ function AppContent() {
     }
   };
 
-  const handleAddToCart = (product: Product, quantity: number) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product.id === product.id);
-
-      if (existingItem) {
-        toast.success(`Updated ${product.name} quantity in cart`, {
-          duration: 3000,
-        });
-        return prevItems.map(item =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      } else {
-        toast.success(`Added ${product.name} to cart`, {
-          duration: 3000,
-          action: {
-            label: 'View Cart',
-            onClick: () => navigate('/cart'),
-          },
-        });
-        return [...prevItems, { product, quantity }];
-      }
-    });
+  const handleAddToCart = async (product: Product, quantity: number) => {
+    const existingItem = cartItems.find(item => item.product.id === product.id);
+    
+    await addToCart(product, quantity);
+    
+    if (existingItem) {
+      toast.success(`Updated ${product.name} quantity in cart`, {
+        duration: 3000,
+      });
+    } else {
+      toast.success(`Added ${product.name} to cart`, {
+        duration: 3000,
+        action: {
+          label: 'View Cart',
+          onClick: () => navigate('/cart'),
+        },
+      });
+    }
   };
 
-  const handleBuyNow = (product: Product, quantity: number) => {
-    handleAddToCart(product, quantity);
-    navigate('/checkout');
+  const handleBuyNow = async (product: Product, quantity: number) => {
+    await handleAddToCart(product, quantity);
+    // Require login for checkout
+    if (!user) {
+      localStorage.setItem('checkout_redirect', 'true');
+      toast.info('Please sign in to continue checkout', { duration: 3000 });
+      navigate('/login');
+    } else {
+      navigate('/checkout');
+    }
   };
 
-  const handleUpdateQuantity = (productId: string, newQuantity: number) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.product.id === productId
-          ? { ...item, quantity: newQuantity }
-          : item
-      )
-    );
+  const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
+    await updateCartQuantity(productId, newQuantity);
   };
 
-  const handleRemoveItem = (productId: string) => {
+  const handleRemoveItem = async (productId: string) => {
     const item = cartItems.find(i => i.product.id === productId);
-    setCartItems(prevItems => prevItems.filter(item => item.product.id !== productId));
+    await removeFromCart(productId);
     if (item) {
       toast.success(`Removed ${item.product.name} from cart`, {
         duration: 3000,
@@ -125,11 +120,21 @@ function AppContent() {
     }
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     navigate('/confirmation');
-    setTimeout(() => {
-      setCartItems([]);
+    setTimeout(async () => {
+      await clearCart();
     }, 2000);
+  };
+
+  const handleProceedToCheckout = () => {
+    if (!user) {
+      localStorage.setItem('checkout_redirect', 'true');
+      toast.info('Please sign in to continue checkout', { duration: 3000 });
+      navigate('/login');
+    } else {
+      navigate('/checkout');
+    }
   };
 
   const ProductDetailWrapper = () => {
@@ -173,7 +178,7 @@ function AppContent() {
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}
             onContinueShopping={() => handleNavigate('home')}
-            onProceedToCheckout={() => handleNavigate('checkout')}
+            onProceedToCheckout={handleProceedToCheckout}
           />
         } />
         <Route path="/checkout" element={
