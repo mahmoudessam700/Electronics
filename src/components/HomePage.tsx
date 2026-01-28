@@ -102,23 +102,34 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const getSectionName = (id: string, defaultName: string) => {
     if (!settings || !settings.sections) return defaultName;
     const section = settings.sections.find((s: any) => s.id === id);
-    return section && section.name ? section.name : defaultName;
+    if (!section) return defaultName;
+    // Use Arabic name if language is Arabic and nameAr exists
+    if (language === 'ar' && section.nameAr) return section.nameAr;
+    return section.name || defaultName;
   };
 
   const getSectionBadge = (id: string) => {
     if (!settings || !settings.sections) return { show: true, text: 'Ends in 12:34:56' };
     const section = settings.sections.find((s: any) => s.id === id);
     if (!section) return { show: true, text: 'Ends in 12:34:56' };
+    // Use Arabic badge text if language is Arabic and badgeTextAr exists
+    const badgeText = (language === 'ar' && section.badgeTextAr) 
+      ? section.badgeTextAr 
+      : (section.badgeText || 'Ends in 12:34:56');
     return {
       show: section.showBadge !== undefined ? section.showBadge : true,
-      text: section.badgeText || 'Ends in 12:34:56'
+      text: badgeText
     };
   };
 
   const getSectionField = (id: string, field: string, defaultValue: string) => {
     if (!settings || !settings.sections) return defaultValue;
     const section = settings.sections.find((s: any) => s.id === id);
-    return section && section[field] ? section[field] : defaultValue;
+    if (!section) return defaultValue;
+    // Check for Arabic version of the field
+    const arField = field + 'Ar';
+    if (language === 'ar' && section[arField]) return section[arField];
+    return section[field] || defaultValue;
   };
 
   // Get deals section settings for manual product selection
