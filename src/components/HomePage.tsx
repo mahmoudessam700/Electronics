@@ -116,10 +116,30 @@ export function HomePage({ onNavigate }: HomePageProps) {
     return products.slice(0, 10);
   };
 
+  // Get trending in electronics section settings for manual product selection
+  const getTrendingProducts = () => {
+    if (!settings || !settings.sections) {
+      return products.filter(p => p.price > 50).slice(0, 10);
+    }
+    
+    const trendingSection = settings.sections.find((s: any) => s.id === 'trending');
+    
+    // If manual selection is enabled and products are selected
+    if (trendingSection?.useManualSelection && trendingSection?.selectedProducts?.length > 0) {
+      // Return products in the order they were selected
+      return trendingSection.selectedProducts
+        .map((id: string) => products.find(p => p.id === id))
+        .filter(Boolean);
+    }
+    
+    // Default: automatic selection - products over E£50
+    return products.filter(p => p.price > 50).slice(0, 10);
+  };
+
   // Filter products for different sections
   const dealsOfTheDay = getDealsProducts();
   const recommendedProducts = getInspiredProducts();
-  const trendingProducts = products.filter(p => p.price > 50).slice(0, 10);
+  const trendingProducts = getTrendingProducts();
   const peripherals = products.filter(p =>
     p.category?.toLowerCase().includes('mouse') ||
     p.category?.toLowerCase().includes('keyboard') ||

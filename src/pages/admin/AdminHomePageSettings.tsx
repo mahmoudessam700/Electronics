@@ -63,7 +63,9 @@ export function AdminHomePageSettings() {
             id: 'trending', 
             name: 'Trending in Electronics', 
             description: 'Shows high-value products (over E£50).', 
-            isEnabled: true 
+            isEnabled: true,
+            selectedProducts: [],
+            useManualSelection: false
         },
         { 
             id: 'signup-banner', 
@@ -585,6 +587,137 @@ export function AdminHomePageSettings() {
                                             ) : (
                                                 <p className="text-[10px] text-slate-500">
                                                     Automatically shows the first 10 products as recommendations.
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Additional Settings for Trending in Electronics */}
+                                    {section.id === 'trending' && (
+                                        <div className="flex flex-col gap-3 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            {/* Manual Product Selection Toggle */}
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <Package className="h-3.5 w-3.5 text-indigo-600" />
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Manual Product Selection</span>
+                                                </div>
+                                                <button
+                                                    onClick={() => updateSection(section.id, 'useManualSelection', !section.useManualSelection)}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${
+                                                        section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
+                                                    }`}
+                                                >
+                                                    {section.useManualSelection ? 'MANUAL' : 'AUTOMATIC'}
+                                                </button>
+                                            </div>
+
+                                            {section.useManualSelection ? (
+                                                <div className="space-y-3">
+                                                    <p className="text-[10px] text-slate-500">
+                                                        Select specific products to show as trending.
+                                                    </p>
+
+                                                    {/* Selected Products List */}
+                                                    {getSelectedProducts(section.id).length > 0 && (
+                                                        <div className="space-y-2">
+                                                            {getSelectedProducts(section.id).map((productId) => {
+                                                                const product = allProducts.find(p => p.id === productId);
+                                                                if (!product) return null;
+                                                                return (
+                                                                    <div key={productId} className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2">
+                                                                        <GripVertical className="h-3.5 w-3.5 text-slate-300" />
+                                                                        <img 
+                                                                            src={product.image} 
+                                                                            alt={product.name}
+                                                                            className="w-8 h-8 object-contain rounded bg-slate-100"
+                                                                        />
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
+                                                                            <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                        </div>
+                                                                        <button
+                                                                            onClick={() => removeProductFromSection(section.id, productId)}
+                                                                            className="p-1 hover:bg-red-50 rounded-md text-slate-400 hover:text-red-500 transition-all"
+                                                                        >
+                                                                            <X className="h-3.5 w-3.5" />
+                                                                        </button>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Add Product Button / Search */}
+                                                    {!showProductPicker ? (
+                                                        <button
+                                                            onClick={() => setShowProductPicker(true)}
+                                                            className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-dashed border-slate-300 rounded-lg text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all"
+                                                        >
+                                                            <Plus className="h-3.5 w-3.5" />
+                                                            Add Product
+                                                        </button>
+                                                    ) : (
+                                                        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                                                            <div className="p-2 border-b border-slate-100 flex items-center gap-2">
+                                                                <Search className="h-3.5 w-3.5 text-slate-400" />
+                                                                <input
+                                                                    type="text"
+                                                                    value={productSearch}
+                                                                    onChange={(e) => setProductSearch(e.target.value)}
+                                                                    placeholder="Search products..."
+                                                                    className="flex-1 text-xs outline-none bg-transparent"
+                                                                    autoFocus
+                                                                />
+                                                                <button 
+                                                                    onClick={() => { setShowProductPicker(false); setProductSearch(''); }}
+                                                                    className="text-slate-400 hover:text-slate-600"
+                                                                >
+                                                                    <X className="h-3.5 w-3.5" />
+                                                                </button>
+                                                            </div>
+                                                            <div className="max-h-48 overflow-y-auto">
+                                                                {filteredProducts.slice(0, 10).map(product => {
+                                                                    const isSelected = getSelectedProducts(section.id).includes(product.id);
+                                                                    return (
+                                                                        <button
+                                                                            key={product.id}
+                                                                            onClick={() => {
+                                                                                if (!isSelected) {
+                                                                                    addProductToSection(section.id, product.id);
+                                                                                }
+                                                                            }}
+                                                                            disabled={isSelected}
+                                                                            className={`w-full flex items-center gap-2 p-2 text-left transition-all ${
+                                                                                isSelected 
+                                                                                    ? 'bg-indigo-50 opacity-50 cursor-not-allowed' 
+                                                                                    : 'hover:bg-slate-50'
+                                                                            }`}
+                                                                        >
+                                                                            <img 
+                                                                                src={product.image} 
+                                                                                alt={product.name}
+                                                                                className="w-8 h-8 object-contain rounded bg-slate-100"
+                                                                            />
+                                                                            <div className="flex-1 min-w-0">
+                                                                                <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
+                                                                                <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                            </div>
+                                                                            {isSelected && (
+                                                                                <CheckCircle2 className="h-4 w-4 text-indigo-500" />
+                                                                            )}
+                                                                        </button>
+                                                                    );
+                                                                })}
+                                                                {filteredProducts.length === 0 && (
+                                                                    <p className="p-3 text-xs text-slate-400 text-center">No products found</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <p className="text-[10px] text-slate-500">
+                                                    Automatically shows products priced over E£50.
                                                 </p>
                                             )}
                                         </div>
