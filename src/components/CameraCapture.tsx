@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Camera, X, RefreshCw, Check, Loader2, Video } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
@@ -13,11 +13,30 @@ export function CameraCapture({ onCapture, trigger }: CameraCaptureProps) {
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [isStarting, setIsStarting] = useState(false);
+    const [cameraError, setCameraError] = useState<string | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
+    // Start camera when dialog opens
+    useEffect(() => {
+        if (isOpen && !stream && !capturedImage && !isStarting) {
+            startCamera();
+        }
+    }, [isOpen]);
+
+    // Attach stream to video element when both are available
+    useEffect(() => {
+        if (stream && videoRef.current) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.play().catch(err => {
+                console.log("Video play error:", err);
+            });
+        }
+    }, [stream]);
+
     const startCamera = async () => {
         setIsStarting(true);
+        setCameraError(null);
         try {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
                 video: { 
@@ -28,19 +47,9 @@ export function CameraCapture({ onCapture, trigger }: CameraCaptureProps) {
                 audio: false
             });
             setStream(mediaStream);
-            if (videoRef.current) {
-                videoRef.current.srcObject = mediaStream;
-                // Explicitly play the video after setting source
-                try {
-                    await videoRef.current.play();
-                } catch (playErr) {
-                    console.log("Autoplay handled by muted attribute");
-                }
-            }
-        } catch (err) {
+        } catch (err: any) {
             console.error("Camera access error:", err);
-            alert("Could not access camera. Please ensure you have given permission and are using HTTPS.");
-            setIsOpen(false);
+            setCameraError(err.message || "Could not access camera");
         } finally {
             setIsStarting(false);
         }
@@ -53,15 +62,22 @@ export function CameraCapture({ onCapture, trigger }: CameraCaptureProps) {
         }
     }, [stream]);
 
+    // Cleanup stream when component unmounts
+    useEffect(() => {
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, [stream]);
+
     const handleOpenChange = (open: boolean) => {
         if (!open) {
             stopCamera();
             setCapturedImage(null);
+            setCameraError(null);
         }
         setIsOpen(open);
-        if (open) {
-            startCamera();
-        }
     };
 
     const capturePhoto = () => {
@@ -134,6 +150,19 @@ export function CameraCapture({ onCapture, trigger }: CameraCaptureProps) {
                                     <Loader2 className="h-10 w-10 animate-spin text-indigo-400" />
                                     <span className="text-sm font-medium animate-pulse">Initializing Camera...</span>
                                 </div>
+                            ) : cameraError ? (
+                                <div className="flex flex-col items-center gap-3 text-white p-6 text-center">
+                                    <Video className="h-10 w-10 text-red-400" />
+                                    <span className="text-sm font-medium text-red-400">Camera Error</span>
+                                    <span className="text-xs text-slate-400 max-w-xs">{cameraError}</span>
+                                    <Button 
+                                        onClick={startCamera}
+                                        variant="outline"
+                                        className="mt-2 text-white border-white/20 hover:bg-white/10"
+                                    >
+                                        Try Again
+                                    </Button>
+                                </div>
                             ) : stream ? (
                                 <video
                                     ref={videoRef}
@@ -144,8 +173,8 @@ export function CameraCapture({ onCapture, trigger }: CameraCaptureProps) {
                                 />
                             ) : (
                                 <div className="flex flex-col items-center gap-3 text-white">
-                                    <Video className="h-10 w-10 text-slate-500" />
-                                    <span className="text-sm font-medium text-slate-400">Camera not available</span>
+                                    <Loader2 className="h-10 w-10 animate-spin text-indigo-400" />
+                                    <span className="text-sm font-medium animate-pulse">Starting Camera...</span>
                                 </div>
                             )}
                             
@@ -206,7 +235,7 @@ export function CameraCapture({ onCapture, trigger }: CameraCaptureProps) {
                 </div>
                 
                 <div className="p-4 bg-slate-900 text-white/50 text-[10px] text-center uppercase tracking-widest font-bold">
-                    {capturedImage ? 'Photo Preview' : isStarting ? 'Starting Camera...' : stream ? 'Live Camera Feed' : 'Camera Unavailable'}
+                    {capturedImage ? 'Photo Preview' : isStarting ? 'Starting Camera...' : cameraError ? 'Camera Error' : stream ? 'Live Camera Feed' : 'Initializing...'}
                 </div>
                 
                 <canvas ref={canvasRef} className="hidden" />
