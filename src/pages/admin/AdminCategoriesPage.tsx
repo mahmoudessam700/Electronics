@@ -46,8 +46,35 @@ const ALLOWED_CATEGORIES = [
     'Hard Drives'
 ];
 
+// Map category names to translation keys
+const CATEGORY_TRANSLATION_KEYS: Record<string, string> = {
+    'PCs': 'category.pcs',
+    'pcs': 'category.pcs',
+    'Laptops': 'category.laptops',
+    'laptops': 'category.laptops',
+    'Mice': 'category.mice',
+    'mice': 'category.mice',
+    'Keyboards': 'category.keyboards',
+    'keyboards': 'category.keyboards',
+    'Headphones': 'category.headphones',
+    'headphones': 'category.headphones',
+    'Cables': 'category.cables',
+    'cables': 'category.cables',
+    'Mouse Pads': 'category.mousePads',
+    'mouse pads': 'category.mousePads',
+    'Hard Drives': 'category.hardDrives',
+    'hard drives': 'category.hardDrives',
+};
+
 export function AdminCategoriesPage() {
-    const { t, isRTL } = useLanguage();
+    const { t, isRTL, language } = useLanguage();
+    
+    // Helper to get translated category name
+    const getCategoryName = (name: string): string => {
+        const key = CATEGORY_TRANSLATION_KEYS[name] || CATEGORY_TRANSLATION_KEYS[name.toLowerCase()];
+        return key ? t(key) : name;
+    };
+    
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -254,9 +281,9 @@ export function AdminCategoriesPage() {
                         <Layers className="h-5 w-5 text-amber-600" />
                     </div>
                     <div>
-                        <p className="font-medium text-gray-900">Available Categories</p>
+                        <p className="font-medium text-gray-900">{t('admin.availableCategories')}</p>
                         <p className="text-sm text-gray-600 mt-1">
-                            {ALLOWED_CATEGORIES.join(' • ')}
+                            {ALLOWED_CATEGORIES.map(cat => getCategoryName(cat)).join(' • ')}
                         </p>
                     </div>
                 </div>
@@ -265,26 +292,26 @@ export function AdminCategoriesPage() {
             {/* Categories Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
-                    <p className="text-sm text-gray-500">Total Categories</p>
-                    <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
-                </div>
-                <div className="bg-white rounded-xl p-4 border border-gray-200">
-                    <p className="text-sm text-gray-500">With Products</p>
-                    <p className="text-2xl font-bold text-emerald-600">
-                        {categories.filter(c => (c._count?.products || 0) > 0).length}
+                    <p className="text-sm text-gray-500">{t('admin.totalProducts')}</p>
+                    <p className="text-2xl font-bold text-[#4A5568]">
+                        {categories.reduce((acc, c) => acc + (c._count?.products || 0), 0)}
                     </p>
                 </div>
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
-                    <p className="text-sm text-gray-500">Empty</p>
+                    <p className="text-sm text-gray-500">{t('admin.empty')}</p>
                     <p className="text-2xl font-bold text-amber-600">
                         {categories.filter(c => (c._count?.products || 0) === 0).length}
                     </p>
                 </div>
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
-                    <p className="text-sm text-gray-500">Total Products</p>
-                    <p className="text-2xl font-bold text-[#4A5568]">
-                        {categories.reduce((acc, c) => acc + (c._count?.products || 0), 0)}
+                    <p className="text-sm text-gray-500">{t('admin.withProducts')}</p>
+                    <p className="text-2xl font-bold text-emerald-600">
+                        {categories.filter(c => (c._count?.products || 0) > 0).length}
                     </p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <p className="text-sm text-gray-500">{t('admin.totalCategories')}</p>
+                    <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
                 </div>
             </div>
 
@@ -294,10 +321,10 @@ export function AdminCategoriesPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-200">
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Category</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Description</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Products</th>
-                                <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.category')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell`}>{t('admin.description')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.products')}</th>
+                                <th className={`${isRTL ? 'text-left' : 'text-right'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -309,7 +336,7 @@ export function AdminCategoriesPage() {
                                                 {category.image ? (
                                                     <img 
                                                         src={category.image} 
-                                                        alt={category.name} 
+                                                        alt={getCategoryName(category.name)} 
                                                         className="h-10 w-10 md:h-12 md:w-12 object-cover rounded-lg border border-gray-200" 
                                                     />
                                                 ) : (
@@ -319,14 +346,14 @@ export function AdminCategoriesPage() {
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-gray-900">{category.name}</p>
+                                                <p className="font-semibold text-gray-900">{getCategoryName(category.name)}</p>
                                                 <p className="text-xs text-gray-400 font-mono">/{category.slug}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="py-3 px-4 hidden md:table-cell">
                                         <span className="text-sm text-gray-600 line-clamp-2">
-                                            {category.description || <span className="text-gray-400 italic">No description</span>}
+                                            {category.description || <span className="text-gray-400 italic">{t('admin.noDescription')}</span>}
                                         </span>
                                     </td>
                                     <td className="py-3 px-4">
@@ -335,11 +362,11 @@ export function AdminCategoriesPage() {
                                                 ? 'bg-emerald-100 text-emerald-700'
                                                 : 'bg-gray-100 text-gray-500'
                                         }`}>
-                                            {category._count?.products || 0} products
+                                            {category._count?.products || 0} {t('admin.products')}
                                         </span>
                                     </td>
                                     <td className="py-3 px-4">
-                                        <div className="flex justify-end gap-1">
+                                        <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} gap-1`}>
                                             <Button 
                                                 variant="ghost" 
                                                 size="icon" 
@@ -369,16 +396,16 @@ export function AdminCategoriesPage() {
                         <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gray-100 mb-4">
                             <Folder className="h-7 w-7 text-gray-400" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">No categories found</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('admin.noCategoriesFound')}</h3>
                         <p className="text-gray-500 mb-6">
-                            {searchQuery ? 'Try adjusting your search terms' : 'Get started by adding your first category'}
+                            {searchQuery ? t('admin.tryAdjustingSearch') : t('admin.getStartedCategories')}
                         </p>
                         {!searchQuery && (
                             <Button 
                                 onClick={() => openAddForm()}
                                 className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                             >
-                                <Plus className="mr-2 h-4 w-4" /> Add First Category
+                                <Plus className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4`} /> {t('admin.addFirstCategory')}
                             </Button>
                         )}
                     </div>
@@ -390,19 +417,19 @@ export function AdminCategoriesPage() {
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-xl">
-                            {editingCategory ? 'Edit Category' : 'Add Category'}
+                            {editingCategory ? t('admin.editCategory') : t('admin.addCategory')}
                         </DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-5 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="name" className="text-sm font-medium">Name *</Label>
+                            <Label htmlFor="name" className="text-sm font-medium">{t('admin.categoryNameRequired')}</Label>
                             {editingCategory ? (
                                 <Input
                                     id="name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Category name"
+                                    placeholder={t('admin.category')}
                                     className="rounded-xl"
                                 />
                             ) : (
@@ -410,29 +437,29 @@ export function AdminCategoriesPage() {
                                     id="name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors"
+                                    className={`w-full h-11 px-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors ${isRTL ? 'text-right' : 'text-left'}`}
                                 >
-                                    <option value="">Select a category...</option>
+                                    <option value="">{t('admin.selectCategory')}</option>
                                     {ALLOWED_CATEGORIES.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
+                                        <option key={cat} value={cat}>{getCategoryName(cat)}</option>
                                     ))}
                                 </select>
                             )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+                            <Label htmlFor="description" className="text-sm font-medium">{t('admin.description')}</Label>
                             <Input
                                 id="description"
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                placeholder="Optional description"
+                                placeholder={t('admin.optionalDescription')}
                                 className="rounded-xl"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">Image</Label>
+                            <Label className="text-sm font-medium">{t('admin.categoryImage')}</Label>
                             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
                                 {formData.image ? (
                                     <img src={formData.image} alt="Preview" className="h-24 w-24 object-cover rounded-xl border shadow-sm flex-shrink-0" />
@@ -457,8 +484,8 @@ export function AdminCategoriesPage() {
                                         disabled={saving}
                                         className="w-full rounded-lg"
                                     >
-                                        {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ImageIcon className="h-4 w-4 mr-2" />}
-                                        Choose File
+                                        {saving ? <Loader2 className={`h-4 w-4 animate-spin ${isRTL ? 'ml-2' : 'mr-2'}`} /> : <ImageIcon className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />}
+                                        {t('admin.chooseFile')}
                                     </Button>
 
                                     <CameraCapture 
@@ -471,12 +498,12 @@ export function AdminCategoriesPage() {
                                                 disabled={saving}
                                             >
                                                 <Camera className="h-4 w-4" />
-                                                Take Photo
+                                                {t('admin.takePhoto')}
                                             </Button>
                                         }
                                     />
 
-                                    <p className="text-xs text-slate-400">Or paste an image URL:</p>
+                                    <p className="text-xs text-slate-400">{t('admin.pasteImageUrl')}</p>
                                     <div className="flex items-center">
                                         <div className="bg-slate-50 border border-slate-200 px-3 h-11 flex items-center justify-center rounded-l-xl text-slate-500 font-bold text-[10px] border-r-0 whitespace-nowrap">
                                             URL
@@ -496,15 +523,15 @@ export function AdminCategoriesPage() {
 
                     <DialogFooter className="gap-2">
                         <Button variant="outline" onClick={() => setIsFormOpen(false)} className="rounded-lg">
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button 
                             onClick={handleSave} 
                             disabled={saving}
                             className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
                         >
-                            {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                            {editingCategory ? 'Update' : 'Create'}
+                            {saving && <Loader2 className={`h-4 w-4 animate-spin ${isRTL ? 'ml-2' : 'mr-2'}`} />}
+                            {editingCategory ? t('common.update') : t('common.create')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -514,19 +541,18 @@ export function AdminCategoriesPage() {
             <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
                 <AlertDialogContent className="rounded-2xl">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Category</AlertDialogTitle>
+                        <AlertDialogTitle>{t('admin.deleteCategory')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete "{deletingCategory?.name}"?
-                            Products in this category will become uncategorized.
+                            {t('admin.deleteCategoryConfirm')}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-2">
-                        <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="rounded-xl">{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction 
                             onClick={handleDelete} 
                             className="bg-red-600 hover:bg-red-700 rounded-xl"
                         >
-                            Delete
+                            {t('common.delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

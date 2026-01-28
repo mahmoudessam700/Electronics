@@ -183,6 +183,8 @@ const en: Record<string, string> = {
     'common.save': 'Save',
     'common.cancel': 'Cancel',
     'common.delete': 'Delete',
+    'common.update': 'Update',
+    'common.create': 'Create',
     'common.edit': 'Edit',
     'common.search': 'Search',
     'common.filter': 'Filter',
@@ -427,8 +429,24 @@ const en: Record<string, string> = {
     'admin.loadingFinancial': 'Loading financial records...',
     'admin.margin': 'Margin',
     
-    // Category
-    'category.shopNow': 'Shop now',
+    // Admin Categories Page
+    'admin.availableCategories': 'Available Categories',
+    'admin.totalCategories': 'Total Categories',
+    'admin.withProducts': 'With Products',
+    'admin.empty': 'Empty',
+    'admin.noDescription': 'No description',
+    'admin.noCategoriesFound': 'No categories found',
+    'admin.tryAdjustingSearch': 'Try adjusting your search terms',
+    'admin.getStartedCategories': 'Get started by adding your first category',
+    'admin.addFirstCategory': 'Add First Category',
+    'admin.deleteCategory': 'Delete Category',
+    'admin.deleteCategoryConfirm': 'Are you sure you want to delete this category? Products in this category will become uncategorized.',
+    'admin.categoryNameRequired': 'Name *',
+    'admin.selectCategory': 'Select a category...',
+    'admin.optionalDescription': 'Optional description',
+    'admin.chooseFile': 'Choose File',
+    'admin.takePhoto': 'Take Photo',
+    'admin.pasteImageUrl': 'Or paste an image URL:',
     
     // Admin Home Layout (extended)
     'admin.visibilityControl': 'Visibility Control',
@@ -633,6 +651,8 @@ const ar: Record<string, string> = {
     'common.save': 'حفظ',
     'common.cancel': 'إلغاء',
     'common.delete': 'حذف',
+    'common.update': 'تحديث',
+    'common.create': 'إنشاء',
     'common.edit': 'تعديل',
     'common.search': 'بحث',
     'common.filter': 'تصفية',
@@ -877,8 +897,24 @@ const ar: Record<string, string> = {
     'admin.loadingFinancial': 'جاري تحميل السجلات المالية...',
     'admin.margin': 'الهامش',
     
-    // Category
-    'category.shopNow': 'تسوق الآن',
+    // Admin Categories Page
+    'admin.availableCategories': 'الفئات المتاحة',
+    'admin.totalCategories': 'إجمالي الفئات',
+    'admin.withProducts': 'تحتوي منتجات',
+    'admin.empty': 'فارغة',
+    'admin.noDescription': 'لا يوجد وصف',
+    'admin.noCategoriesFound': 'لم يتم العثور على فئات',
+    'admin.tryAdjustingSearch': 'حاول تعديل كلمات البحث',
+    'admin.getStartedCategories': 'ابدأ بإضافة فئتك الأولى',
+    'admin.addFirstCategory': 'إضافة أول فئة',
+    'admin.deleteCategory': 'حذف الفئة',
+    'admin.deleteCategoryConfirm': 'هل أنت متأكد من حذف هذه الفئة؟ المنتجات في هذه الفئة ستصبح بدون فئة.',
+    'admin.categoryNameRequired': 'الاسم *',
+    'admin.selectCategory': 'اختر فئة...',
+    'admin.optionalDescription': 'وصف اختياري',
+    'admin.chooseFile': 'اختر ملف',
+    'admin.takePhoto': 'التقط صورة',
+    'admin.pasteImageUrl': 'أو الصق رابط الصورة:',
     
     // Admin Home Layout (extended)
     'admin.visibilityControl': 'التحكم في الظهور',
