@@ -2,86 +2,89 @@ import { Search, MessageCircle, Package, CreditCard, TruckIcon, RefreshCw, Shiel
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface CustomerServicePageProps {
   onNavigate: (page: string) => void;
 }
 
 export function CustomerServicePage({ onNavigate }: CustomerServicePageProps) {
+  const { t } = useLanguage();
+
   const quickLinks = [
     {
       icon: Package,
-      title: 'Track Package',
-      description: 'Check the status of your orders',
+      title: t('customerService.trackPackage'),
+      description: t('customerService.trackPackageDesc'),
       color: 'text-blue-600'
     },
     {
       icon: RefreshCw,
-      title: 'Returns & Refunds',
-      description: 'Return or exchange items',
+      title: t('customerService.returnsRefunds'),
+      description: t('customerService.returnsRefundsDesc'),
       color: 'text-green-600'
     },
     {
       icon: CreditCard,
-      title: 'Payment Settings',
-      description: 'Manage payment methods',
+      title: t('customerService.paymentSettings'),
+      description: t('customerService.paymentSettingsDesc'),
       color: 'text-purple-600'
     },
     {
       icon: Shield,
-      title: 'Account Security',
-      description: 'Update password and settings',
+      title: t('customerService.accountSecurity'),
+      description: t('customerService.accountSecurityDesc'),
       color: 'text-orange-600'
     },
     {
       icon: TruckIcon,
-      title: 'Delivery Issues',
-      description: 'Report delivery problems',
+      title: t('customerService.deliveryIssues'),
+      description: t('customerService.deliveryIssuesDesc'),
       color: 'text-red-600'
     },
     {
       icon: MessageCircle,
-      title: 'Contact Us',
-      description: 'Chat with customer support',
+      title: t('customerService.contactUs'),
+      description: t('customerService.contactUsDesc'),
       color: 'text-indigo-600'
     }
   ];
 
   const faqs = [
     {
-      category: 'Orders & Shipping',
+      category: t('customerService.ordersShipping'),
       questions: [
-        'How do I track my order?',
-        'What are the shipping options?',
-        'Can I change my shipping address?',
-        'How long does delivery take?'
+        t('customerService.ordersShippingQ1'),
+        t('customerService.ordersShippingQ2'),
+        t('customerService.ordersShippingQ3'),
+        t('customerService.ordersShippingQ4')
       ]
     },
     {
-      category: 'Returns & Refunds',
+      category: t('customerService.returnsRefundsSection'),
       questions: [
-        'How do I return an item?',
-        'What is your return policy?',
-        'When will I get my refund?',
-        'Can I exchange an item?'
+        t('customerService.returnsRefundsQ1'),
+        t('customerService.returnsRefundsQ2'),
+        t('customerService.returnsRefundsQ3'),
+        t('customerService.returnsRefundsQ4')
       ]
     },
     {
-      category: 'Account & Security',
+      category: t('customerService.accountSecuritySection'),
       questions: [
-        'How do I reset my password?',
-        'How do I update my email?',
-        'Is my payment information secure?',
-        'How do I delete my account?'
+        t('customerService.accountSecurityQ1'),
+        t('customerService.accountSecurityQ2'),
+        t('customerService.accountSecurityQ3'),
+        t('customerService.accountSecurityQ4')
       ]
     },
     {
-      category: 'Payment & Pricing',
+      category: t('customerService.paymentPricing'),
       questions: [
-        'What payment methods do you accept?',
-        'Why was I charged sales tax?',
-        'Do you offer price matching?',
-        'How do I use a gift card?'
+        t('customerService.paymentPricingQ1'),
+        t('customerService.paymentPricingQ2'),
+        t('customerService.paymentPricingQ3'),
+        t('customerService.paymentPricingQ4')
       ]
     }
   ];
@@ -91,9 +94,9 @@ export function CustomerServicePage({ onNavigate }: CustomerServicePageProps) {
       <div className="max-w-[1200px] mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl mb-4">How can we help you?</h1>
+          <h1 className="text-4xl mb-4">{t('customerService.howCanWeHelp')}</h1>
           <p className="text-[#565959] mb-6">
-            Search our help library or browse by category
+            {t('customerService.searchHelp')}
           </p>
           
           {/* Search Bar */}
@@ -102,7 +105,7 @@ export function CustomerServicePage({ onNavigate }: CustomerServicePageProps) {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#565959]" />
               <Input
                 type="text"
-                placeholder="Describe your issue..."
+                placeholder={t('customerService.searchPlaceholder')}
                 className="pl-12 pr-4 py-6 text-lg"
               />
             </div>
@@ -111,7 +114,7 @@ export function CustomerServicePage({ onNavigate }: CustomerServicePageProps) {
 
         {/* Quick Links */}
         <section className="mb-12">
-          <h2 className="text-2xl mb-6">Quick Links</h2>
+          <h2 className="text-2xl mb-6">{t('customerService.quickLinks')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {quickLinks.map((link) => (
               <Card key={link.title} className="group cursor-pointer hover:shadow-lg transition-shadow">
@@ -134,7 +137,7 @@ export function CustomerServicePage({ onNavigate }: CustomerServicePageProps) {
 
         {/* Browse by Topic */}
         <section className="mb-12">
-          <h2 className="text-2xl mb-6">Browse by Topic</h2>
+          <h2 className="text-2xl mb-6">{t('customerService.browseByTopic')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {faqs.map((section) => (
               <Card key={section.category}>
@@ -157,19 +160,19 @@ export function CustomerServicePage({ onNavigate }: CustomerServicePageProps) {
 
         {/* Contact Options */}
         <section className="mb-12">
-          <h2 className="text-2xl mb-6">Still Need Help?</h2>
+          <h2 className="text-2xl mb-6">{t('customerService.stillNeedHelp')}</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <Card className="text-center">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-[#718096] rounded-full flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl mb-2">Live Chat</h3>
+                <h3 className="text-xl mb-2">{t('customerService.liveChat')}</h3>
                 <p className="text-sm text-[#565959] mb-4">
-                  Chat with our support team
+                  {t('customerService.liveChatDesc')}
                 </p>
                 <Button className="bg-[#718096] hover:bg-[#4A5568] text-white">
-                  Start Chat
+                  {t('customerService.startChat')}
                 </Button>
               </CardContent>
             </Card>
@@ -179,12 +182,12 @@ export function CustomerServicePage({ onNavigate }: CustomerServicePageProps) {
                 <div className="w-16 h-16 bg-[#007185] rounded-full flex items-center justify-center mx-auto mb-4">
                   <Headphones className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl mb-2">Phone Support</h3>
+                <h3 className="text-xl mb-2">{t('customerService.phoneSupport')}</h3>
                 <p className="text-sm text-[#565959] mb-4">
-                  Call us: 1-800-123-4567
+                  {t('customerService.phoneSupportDesc')}
                 </p>
                 <Button variant="outline">
-                  Request Callback
+                  {t('customerService.requestCallback')}
                 </Button>
               </CardContent>
             </Card>
@@ -194,12 +197,12 @@ export function CustomerServicePage({ onNavigate }: CustomerServicePageProps) {
                 <div className="w-16 h-16 bg-[#232F3E] rounded-full flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl mb-2">Email Support</h3>
+                <h3 className="text-xl mb-2">{t('customerService.emailSupport')}</h3>
                 <p className="text-sm text-[#565959] mb-4">
-                  Get help via email
+                  {t('customerService.emailSupportDesc')}
                 </p>
                 <Button variant="outline">
-                  Send Email
+                  {t('customerService.sendEmail')}
                 </Button>
               </CardContent>
             </Card>
@@ -212,16 +215,16 @@ export function CustomerServicePage({ onNavigate }: CustomerServicePageProps) {
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl mb-2">Looking for your orders?</h2>
+                  <h2 className="text-2xl mb-2">{t('customerService.lookingForOrders')}</h2>
                   <p className="text-[#565959]">
-                    View order status, tracking information, and more
+                    {t('customerService.lookingForOrdersDesc')}
                   </p>
                 </div>
                 <Button 
                   onClick={() => onNavigate('home')}
                   className="bg-[#718096] hover:bg-[#4A5568] text-white"
                 >
-                  View Orders
+                  {t('customerService.viewOrders')}
                 </Button>
               </div>
             </CardContent>

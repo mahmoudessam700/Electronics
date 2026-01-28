@@ -2,38 +2,41 @@ import { Gift, Heart, Baby, Home, GraduationCap, Users, Plus, Search, Share2 } f
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface RegistryPageProps {
   onNavigate: (page: string) => void;
 }
 
 export function RegistryPage({ onNavigate }: RegistryPageProps) {
+  const { t, formatCurrency } = useLanguage();
+
   const registryTypes = [
     {
       icon: Heart,
-      title: 'Wedding Registry',
-      description: 'Start your new life together with gifts you\'ll love',
+      title: t('registry.weddingRegistry'),
+      description: t('registry.weddingRegistryDesc'),
       color: 'bg-red-100',
       iconColor: 'text-red-600'
     },
     {
       icon: Baby,
-      title: 'Baby Registry',
-      description: 'Get ready for your little one with everything you need',
+      title: t('registry.babyRegistry'),
+      description: t('registry.babyRegistryDesc'),
       color: 'bg-blue-100',
       iconColor: 'text-blue-600'
     },
     {
       icon: GraduationCap,
-      title: 'Birthday & Graduation',
-      description: 'Celebrate milestones with the perfect gifts',
+      title: t('registry.birthdayGraduation'),
+      description: t('registry.birthdayGraduationDesc'),
       color: 'bg-purple-100',
       iconColor: 'text-purple-600'
     },
     {
       icon: Home,
-      title: 'Housewarming',
-      description: 'Make your new house feel like home',
+      title: t('registry.housewarming'),
+      description: t('registry.housewarmingDesc'),
       color: 'bg-green-100',
       iconColor: 'text-green-600'
     }
@@ -73,23 +76,23 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
   const benefits = [
     {
       icon: Gift,
-      title: 'Easy to Create',
-      description: 'Set up your registry in minutes'
+      title: t('registry.easyToCreate'),
+      description: t('registry.easyToCreateDesc')
     },
     {
       icon: Share2,
-      title: 'Easy to Share',
-      description: 'Share with family and friends instantly'
+      title: t('registry.easyToShare'),
+      description: t('registry.easyToShareDesc')
     },
     {
       icon: Users,
-      title: 'Group Gifting',
-      description: 'Let multiple people contribute to big items'
+      title: t('registry.groupGifting'),
+      description: t('registry.groupGiftingDesc')
     },
     {
       icon: Home,
-      title: 'Free Returns',
-      description: '90-day return policy on registry items'
+      title: t('registry.freeReturns'),
+      description: t('registry.freeReturnsDesc')
     }
   ];
 
@@ -98,18 +101,18 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-16">
         <div className="max-w-[1200px] mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl mb-4">Gift Registry</h1>
+          <h1 className="text-4xl md:text-5xl mb-4">{t('registry.title')}</h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Create your perfect registry and share it with loved ones
+            {t('registry.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="bg-white text-[#0F1111] hover:bg-gray-100 px-8 py-6 text-lg">
               <Plus className="h-5 w-5 mr-2" />
-              Create a Registry
+              {t('registry.createRegistry')}
             </Button>
             <Button variant="outline" className="border-2 border-white text-white hover:bg-white/20 px-8 py-6 text-lg">
               <Search className="h-5 w-5 mr-2" />
-              Find a Registry
+              {t('registry.findRegistry')}
             </Button>
           </div>
         </div>
@@ -118,7 +121,7 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
       <div className="max-w-[1200px] mx-auto px-4 py-12">
         {/* Registry Types */}
         <section className="mb-12">
-          <h2 className="text-3xl mb-6">Choose Your Registry Type</h2>
+          <h2 className="text-3xl mb-6">{t('registry.chooseType')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {registryTypes.map((type) => (
               <Card key={type.title} className="group cursor-pointer hover:shadow-xl transition-all">
@@ -131,7 +134,7 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
                       <h3 className="text-xl mb-2 group-hover:text-[#C7511F]">{type.title}</h3>
                       <p className="text-[#565959] mb-4">{type.description}</p>
                       <Button className="bg-[#718096] hover:bg-[#4A5568] text-white">
-                        Get Started
+                        {t('registry.getStarted')}
                       </Button>
                     </div>
                   </div>
@@ -145,15 +148,15 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
         <section className="mb-12">
           <Card>
             <CardContent className="p-8">
-              <h2 className="text-2xl mb-6">Find a Registry</h2>
+              <h2 className="text-2xl mb-6">{t('registry.findRegistry')}</h2>
               <div className="grid md:grid-cols-3 gap-4">
-                <Input id="registry-first-name" name="firstName" placeholder="First Name" autoComplete="off" />
-                <Input id="registry-last-name" name="lastName" placeholder="Last Name" autoComplete="off" />
-                <Input id="registry-event-date" name="eventDate" placeholder="Event Date (Optional)" type="date" autoComplete="off" />
+                <Input id="registry-first-name" name="firstName" placeholder={t('registry.firstName')} autoComplete="off" />
+                <Input id="registry-last-name" name="lastName" placeholder={t('registry.lastName')} autoComplete="off" />
+                <Input id="registry-event-date" name="eventDate" placeholder={t('registry.eventDate')} type="date" autoComplete="off" />
               </div>
               <Button className="mt-4 bg-[#718096] hover:bg-[#4A5568] text-white">
                 <Search className="h-4 w-4 mr-2" />
-                Search Registries
+                {t('registry.searchRegistries')}
               </Button>
             </CardContent>
           </Card>
@@ -161,7 +164,7 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
 
         {/* Popular Registry Items */}
         <section className="mb-12">
-          <h2 className="text-2xl mb-6">Most Popular Registry Items</h2>
+          <h2 className="text-2xl mb-6">{t('registry.popularItems')}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {popularRegistryItems.map((item) => (
               <Card key={item.id} className="group cursor-pointer hover:shadow-lg transition-shadow">
@@ -176,9 +179,9 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
                   <h3 className="text-sm mb-2 line-clamp-2 group-hover:text-[#C7511F]">
                     {item.name}
                   </h3>
-                  <p className="text-lg mb-1">E£{item.price}</p>
+                  <p className="text-lg mb-1">{formatCurrency(item.price)}</p>
                   <p className="text-xs text-[#565959]">
-                    On {item.registries.toLocaleString()} registries
+                    {t('registry.onRegistries').replace('{count}', item.registries.toLocaleString())}
                   </p>
                 </CardContent>
               </Card>
@@ -188,7 +191,7 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
 
         {/* Benefits */}
         <section className="mb-12">
-          <h2 className="text-2xl mb-6">Why Create a Registry?</h2>
+          <h2 className="text-2xl mb-6">{t('registry.whyCreate')}</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {benefits.map((benefit) => (
               <Card key={benefit.title} className="text-center">
@@ -208,20 +211,20 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
         <section>
           <Card className="bg-gradient-to-r from-[#4A5568] to-[#718096] border-none text-white">
             <CardContent className="p-12 text-center">
-              <h2 className="text-3xl mb-4">Ready to Create Your Registry?</h2>
+              <h2 className="text-3xl mb-4">{t('registry.readyToCreate')}</h2>
               <p className="text-lg mb-6 max-w-2xl mx-auto">
-                It only takes a few minutes to set up. Add items from millions of products and share with friends and family.
+                {t('registry.readyToCreateDesc')}
               </p>
               <div className="flex gap-4 justify-center">
                 <Button className="bg-white text-[#0F1111] hover:bg-gray-100 px-8 py-6 text-lg">
-                  Create Registry
+                  {t('registry.createRegistry')}
                 </Button>
                 <Button 
                   onClick={() => onNavigate('search')}
                   variant="outline" 
                   className="border-2 border-white text-white hover:bg-white/20 px-8 py-6 text-lg"
                 >
-                  Browse Products
+                  {t('registry.browseProducts')}
                 </Button>
               </div>
             </CardContent>
