@@ -58,6 +58,22 @@ function AppContent() {
   const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`/api/settings?type=homepage&t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          setSettings(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch settings in App:', error);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
