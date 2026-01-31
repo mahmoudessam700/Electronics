@@ -35,6 +35,7 @@ import { AdminSuppliersPage } from './pages/admin/AdminSuppliersPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 import { AdminFinancialPage } from './pages/admin/AdminFinancialPage';
 import { AdminHomePageSettings } from './pages/admin/AdminHomePageSettings';
+import { AdminPageContentSettings } from './pages/admin/AdminPageContentSettings';
 import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
@@ -231,6 +232,7 @@ function AppContent() {
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="financial" element={<AdminFinancialPage />} />
           <Route path="homepage" element={<AdminHomePageSettings />} />
+          <Route path="pages" element={<AdminPageContentSettings />} />
           <Route path="files" element={<AdminFilesPage />} />
         </Route>
 

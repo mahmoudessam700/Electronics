@@ -4,15 +4,74 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useState, useEffect } from 'react';
 
 interface AffiliatePageProps {
   onNavigate: (page: string) => void;
 }
 
-export function AffiliatePage({ onNavigate: _onNavigate }: AffiliatePageProps) {
-  const { t } = useLanguage();
+interface PageContent {
+  id: string;
+  heroTitle: string;
+  heroTitleAr: string;
+  heroSubtitle: string;
+  heroSubtitleAr: string;
+  sections: {
+    id: string;
+    type: string;
+    title: string;
+    titleAr: string;
+    content: string;
+    contentAr: string;
+    items?: {
+      id: string;
+      title: string;
+      titleAr: string;
+      description: string;
+      descriptionAr: string;
+    }[];
+  }[];
+}
 
-  const benefits = [
+export function AffiliatePage({ onNavigate: _onNavigate }: AffiliatePageProps) {
+  const { t, language } = useLanguage();
+  const [pageContent, setPageContent] = useState<PageContent | null>(null);
+
+  useEffect(() => {
+    const fetchPageContent = async () => {
+      try {
+        const res = await fetch(`/api/settings?type=page-content&t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          const affiliatePage = data?.pages?.find((p: PageContent) => p.id === 'affiliate');
+          if (affiliatePage) {
+            setPageContent(affiliatePage);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch page content:', error);
+      }
+    };
+    fetchPageContent();
+  }, []);
+
+  const getContent = (field: string, defaultValue: string) => {
+    if (!pageContent) return defaultValue;
+    const arField = field + 'Ar';
+    if (language === 'ar' && (pageContent as any)[arField]) return (pageContent as any)[arField];
+    return (pageContent as any)[field] || defaultValue;
+  };
+
+  const getSection = (sectionId: string) => {
+    return pageContent?.sections?.find(s => s.id === sectionId);
+  };
+
+  const getSectionItems = (sectionId: string) => {
+    const section = getSection(sectionId);
+    return section?.items || [];
+  };
+
+  const defaultBenefits = [
     {
       icon: DollarSign,
       title: t('affiliate.earnCommissions'),
@@ -34,6 +93,16 @@ export function AffiliatePage({ onNavigate: _onNavigate }: AffiliatePageProps) {
       description: t('affiliate.dedicatedSupportDesc')
     }
   ];
+
+  const benefitIcons = [DollarSign, BarChart3, Share2, Users];
+  const benefitItems = getSectionItems('benefits');
+  const benefits = benefitItems.length > 0 
+    ? benefitItems.map((item, index) => ({
+        icon: benefitIcons[index % benefitIcons.length],
+        title: language === 'ar' ? item.titleAr : item.title,
+        description: language === 'ar' ? item.descriptionAr : item.description
+      }))
+    : defaultBenefits;
 
   const steps = [
     {
@@ -81,9 +150,11 @@ export function AffiliatePage({ onNavigate: _onNavigate }: AffiliatePageProps) {
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl md:text-5xl mb-6">{t('affiliate.title')}</h1>
+              <h1 className="text-4xl md:text-5xl mb-6">
+                {getContent('heroTitle', t('affiliate.title'))}
+              </h1>
               <p className="text-xl mb-8">
-                {t('affiliate.subtitle')}
+                {getContent('heroSubtitle', t('affiliate.subtitle'))}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button className="bg-white text-orange-600 hover:bg-gray-100 px-8 py-6 text-lg">
@@ -126,8 +197,8 @@ export function AffiliatePage({ onNavigate: _onNavigate }: AffiliatePageProps) {
         <section className="mb-16">
           <h2 className="text-3xl mb-8 text-center">{t('affiliate.whyJoin')}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefits.map((benefit) => (
-              <Card key={benefit.title}>
+            {benefits.map((benefit, index) => (
+              <Card key={index}>
                 <CardContent className="p-6 text-center">
                   <div className="w-16 h-16 bg-[#059669]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <benefit.icon className="h-8 w-8 text-[#059669]" />

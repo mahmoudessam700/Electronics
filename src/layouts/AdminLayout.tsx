@@ -1,7 +1,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, Users, Zap, ChevronRight, Menu, X, Settings, Bell, DollarSign, Layout } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, Users, Zap, ChevronRight, Menu, X, Settings, Bell, DollarSign, Layout, FileText } from 'lucide-react';
 import { useState } from 'react';
 
 export function AdminLayout() {
@@ -35,6 +35,7 @@ export function AdminLayout() {
         { name: t('admin.orders'), path: '/admin/orders', icon: ShoppingCart },
         { name: t('admin.financial'), path: '/admin/financial', icon: DollarSign },
         { name: t('admin.homeLayout'), path: '/admin/homepage', icon: Layout },
+        { name: t('admin.pageContent') || 'Page Content', path: '/admin/pages', icon: FileText },
         { name: t('admin.files'), path: '/admin/files', icon: FolderOpen },
     ];
 

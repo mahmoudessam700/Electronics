@@ -1,15 +1,82 @@
 import { Building2, Globe, Award, Heart, Rocket, Shield } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useState, useEffect } from 'react';
 
 interface AboutUsPageProps {
   onNavigate: (page: string) => void;
 }
 
-export function AboutUsPage({ onNavigate: _onNavigate }: AboutUsPageProps) {
-  const { t } = useLanguage();
+interface PageContent {
+  id: string;
+  heroTitle: string;
+  heroTitleAr: string;
+  heroSubtitle: string;
+  heroSubtitleAr: string;
+  sections: {
+    id: string;
+    type: string;
+    title: string;
+    titleAr: string;
+    content: string;
+    contentAr: string;
+    items?: {
+      id: string;
+      title: string;
+      titleAr: string;
+      description: string;
+      descriptionAr: string;
+    }[];
+  }[];
+}
 
-  const values = [
+export function AboutUsPage({ onNavigate: _onNavigate }: AboutUsPageProps) {
+  const { t, language } = useLanguage();
+  const [pageContent, setPageContent] = useState<PageContent | null>(null);
+
+  useEffect(() => {
+    const fetchPageContent = async () => {
+      try {
+        const res = await fetch(`/api/settings?type=page-content&t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          const aboutPage = data?.pages?.find((p: PageContent) => p.id === 'about-us');
+          if (aboutPage) {
+            setPageContent(aboutPage);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch page content:', error);
+      }
+    };
+    fetchPageContent();
+  }, []);
+
+  const getContent = (field: string, defaultValue: string) => {
+    if (!pageContent) return defaultValue;
+    const arField = field + 'Ar';
+    if (language === 'ar' && (pageContent as any)[arField]) return (pageContent as any)[arField];
+    return (pageContent as any)[field] || defaultValue;
+  };
+
+  const getSection = (sectionId: string) => {
+    return pageContent?.sections?.find(s => s.id === sectionId);
+  };
+
+  const getSectionContent = (sectionId: string, field: string, defaultValue: string) => {
+    const section = getSection(sectionId);
+    if (!section) return defaultValue;
+    const arField = field + 'Ar';
+    if (language === 'ar' && (section as any)[arField]) return (section as any)[arField];
+    return (section as any)[field] || defaultValue;
+  };
+
+  const getSectionItems = (sectionId: string) => {
+    const section = getSection(sectionId);
+    return section?.items || [];
+  };
+
+  const defaultValues = [
     {
       icon: Heart,
       title: t('aboutUs.customerFirst'),
@@ -31,6 +98,16 @@ export function AboutUsPage({ onNavigate: _onNavigate }: AboutUsPageProps) {
       description: t('aboutUs.sustainabilityDesc')
     }
   ];
+
+  const valueIcons = [Heart, Rocket, Shield, Globe];
+  const valueItems = getSectionItems('values');
+  const values = valueItems.length > 0 
+    ? valueItems.map((item, index) => ({
+        icon: valueIcons[index % valueIcons.length],
+        title: language === 'ar' ? item.titleAr : item.title,
+        description: language === 'ar' ? item.descriptionAr : item.description
+      }))
+    : defaultValues;
 
   const stats = [
     { value: '10M+', label: t('aboutUs.statCustomers') },
@@ -79,9 +156,11 @@ export function AboutUsPage({ onNavigate: _onNavigate }: AboutUsPageProps) {
           <div className="bg-orange-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
             <Building2 className="h-10 w-10 text-orange-600" />
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">{t('aboutUs.title')}</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
+            {getContent('heroTitle', t('aboutUs.title'))}
+          </h1>
           <p className="text-xl max-w-2xl mx-auto text-gray-600 leading-relaxed">
-            {t('aboutUs.subtitle')}
+            {getContent('heroSubtitle', t('aboutUs.subtitle'))}
           </p>
         </div>
       </div>
@@ -92,9 +171,11 @@ export function AboutUsPage({ onNavigate: _onNavigate }: AboutUsPageProps) {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
               <span className="text-orange-600 font-semibold tracking-wider uppercase text-sm mb-4 block">Our Story</span>
-              <h2 className="text-4xl font-bold mb-8 text-[#2D3748]">{t('aboutUs.ourMission')}</h2>
+              <h2 className="text-4xl font-bold mb-8 text-[#2D3748]">
+                {getSectionContent('mission', 'title', t('aboutUs.ourMission'))}
+              </h2>
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                {t('aboutUs.missionText1')}
+                {getSectionContent('mission', 'content', t('aboutUs.missionText1'))}
               </p>
               <p className="text-lg text-gray-600 leading-relaxed">
                 {t('aboutUs.missionText2')}
@@ -115,10 +196,12 @@ export function AboutUsPage({ onNavigate: _onNavigate }: AboutUsPageProps) {
 
         {/* Values Section */}
         <section className="mb-24">
-          <h2 className="text-4xl font-bold mb-12 text-center text-[#2D3748]">{t('aboutUs.ourValues')}</h2>
+          <h2 className="text-4xl font-bold mb-12 text-center text-[#2D3748]">
+            {getSectionContent('values', 'title', t('aboutUs.ourValues'))}
+          </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value) => (
-              <Card key={value.title} className="border-none shadow-lg shadow-orange-50/50 rounded-[32px] overflow-hidden hover:scale-105 transition-transform duration-300">
+            {values.map((value, index) => (
+              <Card key={index} className="border-none shadow-lg shadow-orange-50/50 rounded-[32px] overflow-hidden hover:scale-105 transition-transform duration-300">
                 <CardContent className="p-8 text-center">
                   <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <value.icon className="h-8 w-8 text-orange-600" />

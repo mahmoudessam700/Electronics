@@ -3,42 +3,84 @@ import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface CareersPageProps {
   onNavigate: (page: string) => void;
+}
+
+interface PageContent {
+  id: string;
+  heroTitle: string;
+  heroTitleAr: string;
+  heroSubtitle: string;
+  heroSubtitleAr: string;
+  sections: {
+    id: string;
+    type: string;
+    title: string;
+    titleAr: string;
+    content: string;
+    contentAr: string;
+    items?: {
+      id: string;
+      title: string;
+      titleAr: string;
+      description: string;
+      descriptionAr: string;
+    }[];
+  }[];
 }
 
 export function CareersPage({ onNavigate: _onNavigate }: CareersPageProps) {
   const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
-  const [settings, setSettings] = useState<any>(null);
+  const [pageContent, setPageContent] = useState<PageContent | null>(null);
 
   useEffect(() => {
-    const fetchSettings = async () => {
+    const fetchPageContent = async () => {
       try {
-        const res = await fetch(`/api/settings?type=homepage&t=${Date.now()}`);
+        const res = await fetch(`/api/settings?type=page-content&t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
-          const careersSettings = data?.sections?.find((s: any) => s.id === 'footer-careers');
-          setSettings(careersSettings);
+          const careersPage = data?.pages?.find((p: PageContent) => p.id === 'careers');
+          if (careersPage) {
+            setPageContent(careersPage);
+          }
         }
       } catch (error) {
-        console.error('Failed to fetch careers settings:', error);
+        console.error('Failed to fetch page content:', error);
       }
     };
-    fetchSettings();
+    fetchPageContent();
   }, []);
 
-  const getPageContent = (field: string, defaultValue: string) => {
-    if (!settings) return defaultValue;
+  const getContent = (field: string, defaultValue: string) => {
+    if (!pageContent) return defaultValue;
     const arField = field + 'Ar';
-    if (language === 'ar' && settings[arField]) return settings[arField];
-    return settings[field] || defaultValue;
+    if (language === 'ar' && (pageContent as any)[arField]) return (pageContent as any)[arField];
+    return (pageContent as any)[field] || defaultValue;
   };
 
-  const benefits = [
+  const getSection = (sectionId: string) => {
+    return pageContent?.sections?.find(s => s.id === sectionId);
+  };
+
+  const getSectionContent = (sectionId: string, field: string, defaultValue: string) => {
+    const section = getSection(sectionId);
+    if (!section) return defaultValue;
+    const arField = field + 'Ar';
+    if (language === 'ar' && (section as any)[arField]) return (section as any)[arField];
+    return (section as any)[field] || defaultValue;
+  };
+
+  const getSectionItems = (sectionId: string) => {
+    const section = getSection(sectionId);
+    return section?.items || [];
+  };
+
+  const defaultBenefits = [
     {
       icon: Heart,
       title: t('careers.benefitHealth'),
@@ -60,6 +102,16 @@ export function CareersPage({ onNavigate: _onNavigate }: CareersPageProps) {
       description: t('careers.benefitGrowthDesc')
     }
   ];
+
+  const benefitIcons = [Heart, GraduationCap, Coffee, Rocket];
+  const benefitItems = getSectionItems('benefits');
+  const benefits = benefitItems.length > 0 
+    ? benefitItems.map((item, index) => ({
+        icon: benefitIcons[index % benefitIcons.length],
+        title: language === 'ar' ? item.titleAr : item.title,
+        description: language === 'ar' ? item.descriptionAr : item.description
+      }))
+    : defaultBenefits;
 
   const departments = [
     { id: 'all', name: t('careers.allDepartments') },
@@ -150,10 +202,10 @@ export function CareersPage({ onNavigate: _onNavigate }: CareersPageProps) {
         <div className="max-w-[1200px] mx-auto px-4 text-center">
           <Briefcase className="h-16 w-16 mx-auto mb-4" />
           <h1 className="text-4xl md:text-5xl mb-4">
-            {getPageContent('heroTitle', t('careers.title'))}
+            {getContent('heroTitle', t('careers.title'))}
           </h1>
           <p className="text-xl max-w-2xl mx-auto mb-8">
-            {getPageContent('heroSubtitle', t('careers.subtitle'))}
+            {getContent('heroSubtitle', t('careers.subtitle'))}
           </p>
           <div className="flex max-w-lg mx-auto gap-2">
             <div className="relative flex-1">
@@ -172,10 +224,12 @@ export function CareersPage({ onNavigate: _onNavigate }: CareersPageProps) {
       <div className="max-w-[1200px] mx-auto px-4 py-12">
         {/* Why Join Us */}
         <section className="mb-16">
-          <h2 className="text-3xl mb-8 text-center">{t('careers.whyJoinUs')}</h2>
+          <h2 className="text-3xl mb-8 text-center">
+            {getSectionContent('why-join', 'title', t('careers.whyJoinUs'))}
+          </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefits.map((benefit) => (
-              <Card key={benefit.title}>
+            {benefits.map((benefit, index) => (
+              <Card key={index}>
                 <CardContent className="p-6 text-center">
                   <div className="w-16 h-16 bg-[#718096]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <benefit.icon className="h-8 w-8 text-[#718096]" />
