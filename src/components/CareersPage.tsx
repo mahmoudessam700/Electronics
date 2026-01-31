@@ -122,7 +122,7 @@ export function CareersPage({ onNavigate: _onNavigate }: CareersPageProps) {
   return (
     <div className="min-h-screen bg-[#EAEDED]">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#2563eb] to-[#7c3aed] text-white py-20">
+      <div className="bg-gradient-to-r from-[#2563eb] to-[#7c3aed] text-orange-200 py-20">
         <div className="max-w-[1200px] mx-auto px-4 text-center">
           <Briefcase className="h-16 w-16 mx-auto mb-4" />
           <h1 className="text-4xl md:text-5xl mb-4">{t('careers.title')}</h1>
@@ -266,7 +266,7 @@ export function CareersPage({ onNavigate: _onNavigate }: CareersPageProps) {
 
         {/* CTA Section */}
         <section className="mt-16">
-          <Card className="bg-gradient-to-r from-[#718096] to-[#4A5568] text-white">
+          <Card className="bg-gradient-to-r from-[#718096] to-[#4A5568] text-orange-200">
             <CardContent className="p-8 text-center">
               <Users className="h-12 w-12 mx-auto mb-4" />
               <h2 className="text-2xl mb-4">{t('careers.dontSeeRole')}</h2>
