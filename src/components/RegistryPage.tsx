@@ -110,7 +110,7 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
               <Plus className="h-5 w-5 mr-2" />
               {t('registry.createRegistry')}
             </Button>
-            <Button variant="outline" className="border-2 border-white text-white hover:bg-white/20 px-8 py-6 text-lg">
+            <Button variant="outline" className="border-2 border-white text-black hover:bg-white/20 px-8 py-6 text-lg">
               <Search className="h-5 w-5 mr-2" />
               {t('registry.findRegistry')}
             </Button>
