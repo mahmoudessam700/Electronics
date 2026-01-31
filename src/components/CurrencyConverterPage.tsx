@@ -100,11 +100,11 @@ export function CurrencyConverterPage({ onNavigate: _onNavigate }: CurrencyConve
   return (
     <div className="min-h-screen bg-[#EAEDED]">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#0891b2] to-[#06b6d4] text-orange-200 py-16">
+      <div className="bg-gradient-to-r from-[#0891b2] to-[#06b6d4] text-orange-600 py-16">
         <div className="max-w-[1200px] mx-auto px-4 text-center">
           <RefreshCw className="h-16 w-16 mx-auto mb-4" />
-          <h1 className="text-4xl md:text-5xl mb-4 text-orange-200">{t('currency.title')}</h1>
-          <p className="text-xl max-w-2xl mx-auto text-orange-200">
+          <h1 className="text-4xl md:text-5xl mb-4 text-orange-600">{t('currency.title')}</h1>
+          <p className="text-xl max-w-2xl mx-auto text-orange-600">
             {t('currency.subtitle')}
           </p>
         </div>

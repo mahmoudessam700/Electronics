@@ -91,7 +91,7 @@ export function PressReleasesPage({ onNavigate: _onNavigate }: PressReleasesPage
   return (
     <div className="min-h-screen bg-[#EAEDED]">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#1f2937] to-[#374151] text-orange-200 py-20">
+      <div className="bg-gradient-to-r from-[#1f2937] to-[#374151] text-orange-600 py-20">
         <div className="max-w-[1200px] mx-auto px-4 text-center">
           <Newspaper className="h-16 w-16 mx-auto mb-4" />
           <h1 className="text-4xl md:text-5xl mb-4">{t('press.title')}</h1>
