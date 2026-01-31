@@ -303,7 +303,7 @@ function AppContent() {
               <div>
                 <h3 className="mb-4">{t('footer.makeMoneyWithUs')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><button onClick={() => handleNavigate('sell')} className="hover:underline">{t('footer.sellOnShop')}</button></li>
+                  {isFooterLinkVisible('footer-sell') && <li><button onClick={() => handleNavigate('sell')} className="hover:underline">{t('footer.sellOnShop')}</button></li>}
                   {isFooterLinkVisible('footer-affiliate') && <li><button onClick={() => handleNavigate('affiliate')} className="hover:underline">{t('footer.becomeAffiliate')}</button></li>}
                   {isFooterLinkVisible('footer-advertise') && <li><button onClick={() => handleNavigate('advertise')} className="hover:underline">{t('footer.advertiseProducts')}</button></li>}
                 </ul>
@@ -313,15 +313,15 @@ function AppContent() {
                 <ul className="space-y-2 text-sm text-gray-300">
                   {isFooterLinkVisible('footer-shop-card') && <li><button onClick={() => handleNavigate('shop-card')} className="hover:underline">{t('footer.shopCard')}</button></li>}
                   {isFooterLinkVisible('footer-currency') && <li><button onClick={() => handleNavigate('currency-converter')} className="hover:underline">{t('footer.currencyConverter')}</button></li>}
-                  <li><button onClick={() => handleNavigate('gift-cards')} className="hover:underline">{t('header.giftCards')}</button></li>
+                  {isFooterLinkVisible('footer-gift-cards') && <li><button onClick={() => handleNavigate('gift-cards')} className="hover:underline">{t('header.giftCards')}</button></li>}
                 </ul>
               </div>
               <div>
                 <h3 className="mb-4">{t('footer.letUsHelpYou')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><button onClick={() => handleNavigate('account')} className="hover:underline">{t('header.yourAccount')}</button></li>
-                  <li><button onClick={() => handleNavigate('orders')} className="hover:underline">{t('footer.returnsCenter')}</button></li>
-                  <li><button onClick={() => handleNavigate('customer-service')} className="hover:underline">{t('footer.help')}</button></li>
+                  {isFooterLinkVisible('footer-account') && <li><button onClick={() => handleNavigate('account')} className="hover:underline">{t('header.yourAccount')}</button></li>}
+                  {isFooterLinkVisible('footer-orders') && <li><button onClick={() => handleNavigate('orders')} className="hover:underline">{t('footer.returnsCenter')}</button></li>}
+                  {isFooterLinkVisible('footer-help') && <li><button onClick={() => handleNavigate('customer-service')} className="hover:underline">{t('footer.help')}</button></li>}
                 </ul>
               </div>
             </div>

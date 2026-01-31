@@ -10,9 +10,33 @@ interface CareersPageProps {
 }
 
 export function CareersPage({ onNavigate: _onNavigate }: CareersPageProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`/api/settings?type=homepage&t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          const careersSettings = data?.sections?.find((s: any) => s.id === 'footer-careers');
+          setSettings(careersSettings);
+        }
+      } catch (error) {
+        console.error('Failed to fetch careers settings:', error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const getPageContent = (field: string, defaultValue: string) => {
+    if (!settings) return defaultValue;
+    const arField = field + 'Ar';
+    if (language === 'ar' && settings[arField]) return settings[arField];
+    return settings[field] || defaultValue;
+  };
 
   const benefits = [
     {
@@ -125,9 +149,11 @@ export function CareersPage({ onNavigate: _onNavigate }: CareersPageProps) {
       <div className="bg-gradient-to-r from-[#2563eb] to-[#7c3aed] text-orange-600 py-20">
         <div className="max-w-[1200px] mx-auto px-4 text-center">
           <Briefcase className="h-16 w-16 mx-auto mb-4" />
-          <h1 className="text-4xl md:text-5xl mb-4">{t('careers.title')}</h1>
+          <h1 className="text-4xl md:text-5xl mb-4">
+            {getPageContent('heroTitle', t('careers.title'))}
+          </h1>
           <p className="text-xl max-w-2xl mx-auto mb-8">
-            {t('careers.subtitle')}
+            {getPageContent('heroSubtitle', t('careers.subtitle'))}
           </p>
           <div className="flex max-w-lg mx-auto gap-2">
             <div className="relative flex-1">

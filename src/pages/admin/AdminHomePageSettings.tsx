@@ -67,6 +67,29 @@ interface Section {
     subtitleTextAr?: string;
     buttonText?: string;
     buttonTextAr?: string;
+    // New content fields for footer pages
+    heroTitle?: string;
+    heroTitleAr?: string;
+    heroSubtitle?: string;
+    heroSubtitleAr?: string;
+    contentBody?: string;
+    contentBodyAr?: string;
+    benefit1Title?: string;
+    benefit1TitleAr?: string;
+    benefit1Desc?: string;
+    benefit1DescAr?: string;
+    benefit2Title?: string;
+    benefit2TitleAr?: string;
+    benefit2Desc?: string;
+    benefit2DescAr?: string;
+    benefit3Title?: string;
+    benefit3TitleAr?: string;
+    benefit3Desc?: string;
+    benefit3DescAr?: string;
+    benefit4Title?: string;
+    benefit4TitleAr?: string;
+    benefit4Desc?: string;
+    benefit4DescAr?: string;
 }
 
 export function AdminHomePageSettings() {
@@ -182,6 +205,46 @@ export function AdminHomePageSettings() {
             nameAr: 'التذييل: محول العملات',
             description: 'Control visibility of Currency Converter link in footer.', 
             descriptionAr: 'التحكم في ظهور رابط "محول العملات" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-sell', 
+            name: 'Footer: Sell on Shop', 
+            nameAr: 'التذييل: البيع على المتجر',
+            description: 'Control visibility of Sell on Shop link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "البيع على المتجر" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-gift-cards', 
+            name: 'Footer: Gift Cards', 
+            nameAr: 'التذييل: بطاقات الهدايا',
+            description: 'Control visibility of Gift Cards link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "بطاقات الهدايا" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-account', 
+            name: 'Footer: Your Account', 
+            nameAr: 'التذييل: حسابك',
+            description: 'Control visibility of Your Account link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "حسابك" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-orders', 
+            name: 'Footer: Returns Center', 
+            nameAr: 'التذييل: مركز الإرجاع',
+            description: 'Control visibility of Returns Center link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "مركز الإرجاع" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-help', 
+            name: 'Footer: Help/Customer Service', 
+            nameAr: 'التذييل: المساعدة/خدمة العملاء',
+            description: 'Control visibility of Help link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "المساعدة" في تذييل الصفحة.',
             isEnabled: true
         }
     ]);
@@ -1445,6 +1508,115 @@ export function AdminHomePageSettings() {
                                                     className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                                                     placeholder="أدخل نص الزر (عربي)"
                                                 />
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* Content Editor for Footer Pages */}
+                                    {section.id.startsWith('footer-') && (
+                                        <div className="flex flex-col gap-3 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
+                                                <span className="text-[10px] font-bold text-slate-600 uppercase">Page Content Editor</span>
+                                            </div>
+
+                                            {/* Hero Title EN/AR */}
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="block text-[9px] font-bold text-slate-500 uppercase mb-1">Hero Title (EN)</label>
+                                                    <input 
+                                                        type="text"
+                                                        value={section.heroTitle || ''}
+                                                        onChange={(e) => updateSection(section.id, 'heroTitle', e.target.value)}
+                                                        className="w-full text-xs bg-white border border-slate-200 rounded-lg py-1.5 px-3 focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                        placeholder="Hero Title"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[9px] font-bold text-slate-500 uppercase mb-1">Hero Title (AR)</label>
+                                                    <input 
+                                                        type="text"
+                                                        value={section.heroTitleAr || ''}
+                                                        onChange={(e) => updateSection(section.id, 'heroTitleAr', e.target.value)}
+                                                        dir="rtl"
+                                                        className="w-full text-xs bg-white border border-slate-200 rounded-lg py-1.5 px-3 focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                        placeholder="العنوان الرئيسي"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Hero Subtitle EN/AR */}
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="block text-[9px] font-bold text-slate-500 uppercase mb-1">Hero Subtitle (EN)</label>
+                                                    <textarea 
+                                                        value={section.heroSubtitle || ''}
+                                                        onChange={(e) => updateSection(section.id, 'heroSubtitle', e.target.value)}
+                                                        rows={2}
+                                                        className="w-full text-xs bg-white border border-slate-200 rounded-lg py-1.5 px-3 focus:ring-1 focus:ring-indigo-500 outline-none resize-none"
+                                                        placeholder="Hero Subtitle"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[9px] font-bold text-slate-500 uppercase mb-1">Hero Subtitle (AR)</label>
+                                                    <textarea 
+                                                        value={section.heroSubtitleAr || ''}
+                                                        onChange={(e) => updateSection(section.id, 'heroSubtitleAr', e.target.value)}
+                                                        dir="rtl"
+                                                        className="w-full text-xs bg-white border border-slate-200 rounded-lg py-1.5 px-3 focus:ring-1 focus:ring-indigo-500 outline-none resize-none"
+                                                        placeholder="العنوان الفرعي"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Benefits Grid Editor */}
+                                            <div className="space-y-4 pt-2 border-t border-slate-200">
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Benefits Section (4 Slots)</span>
+                                                
+                                                {/* Benefit 1 */}
+                                                <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2">
+                                                    <p className="text-[10px] font-bold text-indigo-600">Benefit 1</p>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <input 
+                                                            type="text"
+                                                            value={section.benefit1Title || ''}
+                                                            onChange={(e) => updateSection(section.id, 'benefit1Title', e.target.value)}
+                                                            className="text-[11px] border border-slate-100 rounded p-1.5"
+                                                            placeholder="Title (EN)"
+                                                        />
+                                                        <input 
+                                                            type="text"
+                                                            value={section.benefit1TitleAr || ''}
+                                                            onChange={(e) => updateSection(section.id, 'benefit1TitleAr', e.target.value)}
+                                                            dir="rtl"
+                                                            className="text-[11px] border border-slate-100 rounded p-1.5"
+                                                            placeholder="العنوان (AR)"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Benefit 2 */}
+                                                <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2">
+                                                    <p className="text-[10px] font-bold text-indigo-600">Benefit 2</p>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <input 
+                                                            type="text"
+                                                            value={section.benefit2Title || ''}
+                                                            onChange={(e) => updateSection(section.id, 'benefit2Title', e.target.value)}
+                                                            className="text-[11px] border border-slate-100 rounded p-1.5"
+                                                            placeholder="Title (EN)"
+                                                        />
+                                                        <input 
+                                                            type="text"
+                                                            value={section.benefit2TitleAr || ''}
+                                                            onChange={(e) => updateSection(section.id, 'benefit2TitleAr', e.target.value)}
+                                                            dir="rtl"
+                                                            className="text-[11px] border border-slate-100 rounded p-1.5"
+                                                            placeholder="العنوان (AR)"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                
+                                                <p className="text-[9px] text-slate-400 italic text-center italic">* Add more fields as needed for specific pages *</p>
                                             </div>
                                         </div>
                                     )}
