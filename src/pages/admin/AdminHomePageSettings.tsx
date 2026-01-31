@@ -127,6 +127,62 @@ export function AdminHomePageSettings() {
             isEnabled: true,
             selectedProducts: [],
             useManualSelection: false
+        },
+        { 
+            id: 'footer-about-us', 
+            name: 'Footer: About Us', 
+            nameAr: 'التذييل: من نحن',
+            description: 'Control visibility of About Us link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "من نحن" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-careers', 
+            name: 'Footer: Careers', 
+            nameAr: 'التذييل: الوظائف',
+            description: 'Control visibility of Careers link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "الوظائف" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-press', 
+            name: 'Footer: Press Releases', 
+            nameAr: 'التذييل: الأخبار الصحفية',
+            description: 'Control visibility of Press Releases link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "الأخبار الصحفية" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-affiliate', 
+            name: 'Footer: Affiliate', 
+            nameAr: 'التذييل: برنامج التسويق بالعمولة',
+            description: 'Control visibility of Affiliate link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "التسويق بالعمولة" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-advertise', 
+            name: 'Footer: Advertise', 
+            nameAr: 'التذييل: أعلن معنا',
+            description: 'Control visibility of Advertise link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "أعلن معنا" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-shop-card', 
+            name: 'Footer: Shop Card', 
+            nameAr: 'التذييل: بطاقة المتجر',
+            description: 'Control visibility of Shop Card link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "بطاقة المتجر" في تذييل الصفحة.',
+            isEnabled: true
+        },
+        { 
+            id: 'footer-currency', 
+            name: 'Footer: Currency Converter', 
+            nameAr: 'التذييل: محول العملات',
+            description: 'Control visibility of Currency Converter link in footer.', 
+            descriptionAr: 'التحكم في ظهور رابط "محول العملات" في تذييل الصفحة.',
+            isEnabled: true
         }
     ]);
 

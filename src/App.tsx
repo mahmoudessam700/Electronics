@@ -162,6 +162,12 @@ function AppContent() {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/forgot-password' || location.pathname === '/reset-password';
   const isAdminPage = location.pathname.startsWith('/admin');
 
+  const isFooterLinkVisible = (id: string) => {
+    if (!settings || !settings.sections) return true;
+    const section = settings.sections.find((s: any) => s.id === id);
+    return section ? section.isEnabled : true;
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <ScrollToTop />
@@ -289,24 +295,24 @@ function AppContent() {
               <div>
                 <h3 className="mb-4">{t('footer.getToKnowUs')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><button onClick={() => handleNavigate('about-us')} className="hover:underline">{t('footer.aboutUs')}</button></li>
-                  <li><button onClick={() => handleNavigate('careers')} className="hover:underline">{t('footer.careers')}</button></li>
-                  <li><button onClick={() => handleNavigate('press')} className="hover:underline">{t('footer.pressReleases')}</button></li>
+                  {isFooterLinkVisible('footer-about-us') && <li><button onClick={() => handleNavigate('about-us')} className="hover:underline">{t('footer.aboutUs')}</button></li>}
+                  {isFooterLinkVisible('footer-careers') && <li><button onClick={() => handleNavigate('careers')} className="hover:underline">{t('footer.careers')}</button></li>}
+                  {isFooterLinkVisible('footer-press') && <li><button onClick={() => handleNavigate('press')} className="hover:underline">{t('footer.pressReleases')}</button></li>}
                 </ul>
               </div>
               <div>
                 <h3 className="mb-4">{t('footer.makeMoneyWithUs')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
                   <li><button onClick={() => handleNavigate('sell')} className="hover:underline">{t('footer.sellOnShop')}</button></li>
-                  <li><button onClick={() => handleNavigate('affiliate')} className="hover:underline">{t('footer.becomeAffiliate')}</button></li>
-                  <li><button onClick={() => handleNavigate('advertise')} className="hover:underline">{t('footer.advertiseProducts')}</button></li>
+                  {isFooterLinkVisible('footer-affiliate') && <li><button onClick={() => handleNavigate('affiliate')} className="hover:underline">{t('footer.becomeAffiliate')}</button></li>}
+                  {isFooterLinkVisible('footer-advertise') && <li><button onClick={() => handleNavigate('advertise')} className="hover:underline">{t('footer.advertiseProducts')}</button></li>}
                 </ul>
               </div>
               <div>
                 <h3 className="mb-4">{t('footer.paymentProducts')}</h3>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li><button onClick={() => handleNavigate('shop-card')} className="hover:underline">{t('footer.shopCard')}</button></li>
-                  <li><button onClick={() => handleNavigate('currency-converter')} className="hover:underline">{t('footer.currencyConverter')}</button></li>
+                  {isFooterLinkVisible('footer-shop-card') && <li><button onClick={() => handleNavigate('shop-card')} className="hover:underline">{t('footer.shopCard')}</button></li>}
+                  {isFooterLinkVisible('footer-currency') && <li><button onClick={() => handleNavigate('currency-converter')} className="hover:underline">{t('footer.currencyConverter')}</button></li>}
                   <li><button onClick={() => handleNavigate('gift-cards')} className="hover:underline">{t('header.giftCards')}</button></li>
                 </ul>
               </div>

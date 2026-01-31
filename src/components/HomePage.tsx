@@ -99,6 +99,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
     return section ? section.isEnabled : true;
   };
 
+  const isFooterLinkVisible = (id: string) => {
+    if (!settings || !settings.sections) return true;
+    const section = settings.sections.find((s: any) => s.id === id);
+    return section ? section.isEnabled : true;
+  };
+
   const getSectionName = (id: string, defaultName: string) => {
     if (!settings || !settings.sections) return defaultName;
     const section = settings.sections.find((s: any) => s.id === id);
