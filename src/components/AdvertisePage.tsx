@@ -181,7 +181,7 @@ export function AdvertisePage({ onNavigate: _onNavigate }: AdvertisePageProps) {
               <div key={step.number} className="relative">
                 <Card>
                   <CardContent className="p-6 text-center">
-                    <div className="w-16 h-16 bg-[#7c3aed] text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                    <div className="w-16 h-16 bg-[#7c3aed] text-black rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                       {step.number}
                     </div>
                     <h3 className="mb-2">{step.title}</h3>
