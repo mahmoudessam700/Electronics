@@ -99,7 +99,7 @@ export function AdvertisePage({ onNavigate: _onNavigate }: AdvertisePageProps) {
   return (
     <div className="min-h-screen bg-[#EAEDED]">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#7c3aed] to-[#a855f7] text-white py-20">
+      <div className="bg-gradient-to-r from-[#7c3aed] to-[#a855f7] text-orange-200 py-20">
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -108,10 +108,10 @@ export function AdvertisePage({ onNavigate: _onNavigate }: AdvertisePageProps) {
                 {t('advertise.subtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="bg-white text-[#7c3aed] hover:bg-gray-100 px-8 py-6 text-lg">
+                <Button className="bg-white text-orange-200 hover:bg-gray-100 px-8 py-6 text-lg">
                   {t('advertise.getStarted')}
                 </Button>
-                <Button variant="outline" className="border-2 border-white text-white hover:bg-white/20 px-8 py-6 text-lg">
+                <Button variant="outline" className="border-2 border-white text-orange-200 hover:bg-white/20 px-8 py-6 text-lg">
                   {t('advertise.contactSales')}
                 </Button>
               </div>
@@ -119,8 +119,8 @@ export function AdvertisePage({ onNavigate: _onNavigate }: AdvertisePageProps) {
             <div className="hidden md:block">
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20">
                 <BarChart3 className="h-24 w-24 mb-4" />
-                <h3 className="text-2xl mb-2">{t('advertise.reachYourCustomers')}</h3>
-                <p className="text-white/90">
+                <h3 className="text-2xl mb-2 text-orange-200">{t('advertise.reachYourCustomers')}</h3>
+                <p className="text-orange-200/90">
                   {t('advertise.reachYourCustomersDesc')}
                 </p>
               </div>

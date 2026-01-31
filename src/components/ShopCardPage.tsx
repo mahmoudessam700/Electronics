@@ -74,7 +74,7 @@ export function ShopCardPage({ onNavigate: _onNavigate }: ShopCardPageProps) {
   return (
     <div className="min-h-screen bg-[#EAEDED]">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#1e40af] to-[#3b82f6] text-white py-20">
+      <div className="bg-gradient-to-r from-[#1e40af] to-[#3b82f6] text-orange-200 py-20">
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -83,10 +83,10 @@ export function ShopCardPage({ onNavigate: _onNavigate }: ShopCardPageProps) {
                 {t('shopCard.subtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="bg-white text-[#1e40af] hover:bg-gray-100 px-8 py-6 text-lg">
+                <Button className="bg-white text-orange-200 hover:bg-gray-100 px-8 py-6 text-lg">
                   {t('shopCard.applyNow')}
                 </Button>
-                <Button variant="outline" className="border-2 border-white text-white hover:bg-white/20 px-8 py-6 text-lg">
+                <Button variant="outline" className="border-2 border-white text-orange-200 hover:bg-white/20 px-8 py-6 text-lg">
                   {t('shopCard.learnMore')}
                 </Button>
               </div>
