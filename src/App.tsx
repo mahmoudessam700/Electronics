@@ -346,9 +346,14 @@ function AppContent() {
 
             <div className="border-t border-[#4A5568] pt-8 text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <div className="text-2xl font-bold">
-                  <span className="text-white">Adsolutions</span>
-                </div>
+                <a 
+                  href="https://adsolutions-eg.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-2xl font-bold hover:opacity-80 transition-opacity"
+                >
+                  <span className="text-white">adsolutions-eg.com</span>
+                </a>
               </div>
               <p className="text-sm text-gray-400">
                 {t('footer.copyright')}
