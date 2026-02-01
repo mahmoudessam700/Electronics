@@ -347,8 +347,7 @@ function AppContent() {
             <div className="border-t border-[#4A5568] pt-8 text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <div className="text-2xl font-bold">
-                  <span className="text-white">shop</span>
-                  <span className="text-[#A0AEC0]">.com</span>
+                  <span className="text-white">Adsolutions</span>
                 </div>
               </div>
               <p className="text-sm text-gray-400">
