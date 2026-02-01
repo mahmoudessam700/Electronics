@@ -365,7 +365,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
                   <ShieldCheck className="h-4 w-4 flex-shrink-0 mt-0.5" />
                   <span>Secure transaction</span>
                 </p>
-                <p>Ships from: shop.com</p>
+                <p>Ships from: Adsolutions</p>
                 <p>Sold by: TechBrand Official</p>
                 <p className="text-[#007185] hover:text-[#C7511F] cursor-pointer">
                   Return policy: Eligible for Return, Refund or Replacement within 30 days

@@ -96,7 +96,7 @@ export function ShopCardPage({ onNavigate: _onNavigate }: ShopCardPageProps) {
                 {/* Card Design */}
                 <div className="w-80 h-48 bg-gradient-to-br from-[#1e3a8a] to-[#3730a3] rounded-xl shadow-2xl p-6 text-white">
                   <div className="flex justify-between items-start">
-                    <div className="text-2xl font-bold">shop.com</div>
+                    <div className="text-2xl font-bold">Adsolutions</div>
                     <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
                       <Star className="h-6 w-6 text-yellow-700" />
                     </div>

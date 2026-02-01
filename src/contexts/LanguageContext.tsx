@@ -176,7 +176,7 @@ const en: Record<string, string> = {
     'footer.letUsHelpYou': 'Let Us Help You',
     'footer.returnsCenter': 'Returns Center',
     'footer.help': 'Help',
-    'footer.copyright': '© 2026 Shop.com, Inc. or its affiliates',
+    'footer.copyright': '© 2026 Adsolutions, Inc. or its affiliates',
 
     // About Us Page
     'aboutUs.title': 'About Us',
@@ -233,7 +233,7 @@ const en: Record<string, string> = {
     'careers.benefitBalanceDesc': 'Flexible hours and remote work options',
     'careers.benefitGrowth': 'Career Growth',
     'careers.benefitGrowthDesc': 'Clear paths for advancement and mentorship programs',
-    'careers.lifeAtShop': 'Life at Shop.com',
+    'lifeAtShop': 'Life at Adsolutions',
     'careers.lifeAtShopText1': 'We are a diverse team of passionate individuals working together to transform e-commerce in the region.',
     'careers.lifeAtShopText2': 'Our culture celebrates innovation, collaboration, and personal growth. We believe happy employees create happy customers.',
     'careers.openPositions': 'Open Positions',
@@ -1156,7 +1156,7 @@ const ar: Record<string, string> = {
     'footer.letUsHelpYou': 'دعنا نساعدك',
     'footer.returnsCenter': 'مركز الإرجاع',
     'footer.help': 'المساعدة',
-    'footer.copyright': '© 2026 Shop.com، جميع الحقوق محفوظة',
+    'footer.copyright': '© 2026 Adsolutions، جميع الحقوق محفوظة',
 
     // About Us Page
     'aboutUs.title': 'من نحن',
@@ -1213,7 +1213,7 @@ const ar: Record<string, string> = {
     'careers.benefitBalanceDesc': 'ساعات مرنة وخيارات العمل عن بعد',
     'careers.benefitGrowth': 'النمو الوظيفي',
     'careers.benefitGrowthDesc': 'مسارات واضحة للتقدم وبرامج الإرشاد',
-    'careers.lifeAtShop': 'الحياة في Shop.com',
+    'careers.lifeAtShop': 'الحياة في Adsolutions',
     'careers.lifeAtShopText1': 'نحن فريق متنوع من الأشخاص المتحمسين نعمل معاً لتحويل التجارة الإلكترونية في المنطقة.',
     'careers.lifeAtShopText2': 'ثقافتنا تحتفي بالابتكار والتعاون والنمو الشخصي. نؤمن بأن الموظفين السعداء يصنعون عملاء سعداء.',
     'careers.openPositions': 'الوظائف المتاحة',
