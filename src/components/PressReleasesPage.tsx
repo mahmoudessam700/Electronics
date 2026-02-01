@@ -78,12 +78,12 @@ export function PressReleasesPage({ onNavigate: _onNavigate }: PressReleasesPage
   const mediaContacts = [
     {
       name: 'Media Relations',
-      email: 'press@shop.com',
+      email: 'press@adsolutions.ai',
       phone: '+20 2 1234 5678'
     },
     {
       name: 'Investor Relations',
-      email: 'investors@shop.com',
+      email: 'investors@adsolutions.ai',
       phone: '+20 2 1234 5679'
     }
   ];
