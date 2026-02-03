@@ -1,7 +1,19 @@
 import 'dotenv/config';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import {
+    PrismaClient,
+    Role,
+    ShopAutomationEvent,
+    ShopCommissionLedgerType,
+    ShopInvitationStatus,
+    ShopKycStatus,
+    ShopMemberRole,
+    ShopPayoutMethod,
+    ShopPayoutSchedule,
+    ShopPayoutStatus,
+    ShopStatus,
+} from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const connectionString = process.env.DATABASE_URL!;
@@ -18,9 +30,9 @@ const demoShops = [
         email: 'cairo@demo-shops.test',
         phone: '+20 100 111 2222',
         address: 'Downtown Cairo, Egypt',
-        status: 'ACTIVE',
-        kycStatus: 'VERIFIED',
-        payoutSchedule: 'WEEKLY',
+        status: ShopStatus.ACTIVE,
+        kycStatus: ShopKycStatus.VERIFIED,
+        payoutSchedule: ShopPayoutSchedule.WEEKLY,
         defaultCommissionRate: 12.5,
     },
     {
@@ -31,9 +43,9 @@ const demoShops = [
         email: 'nile@demo-shops.test',
         phone: '+20 100 333 4444',
         address: 'Alexandria, Egypt',
-        status: 'ACTIVE',
-        kycStatus: 'SUBMITTED',
-        payoutSchedule: 'BIWEEKLY',
+        status: ShopStatus.ACTIVE,
+        kycStatus: ShopKycStatus.SUBMITTED,
+        payoutSchedule: ShopPayoutSchedule.BIWEEKLY,
         defaultCommissionRate: 15,
     },
 ];
@@ -44,21 +56,21 @@ const demoUsers = [
         email: 'owner@demo-shops.test',
         name: 'Omar Nasser',
         phone: '+20 100 555 0000',
-        role: 'SHOP_OWNER',
+        role: Role.SHOP_OWNER,
     },
     {
         id: 'user_demo_manager',
         email: 'manager@demo-shops.test',
         name: 'Layla Mansour',
         phone: '+20 100 666 0000',
-        role: 'SHOP_STAFF',
+        role: Role.SHOP_STAFF,
     },
     {
         id: 'user_demo_finance',
         email: 'finance@nile-gadgets.test',
         name: 'Karim Fahmy',
         phone: '+20 100 777 0000',
-        role: 'SHOP_STAFF',
+        role: Role.SHOP_STAFF,
     },
 ];
 
@@ -67,19 +79,19 @@ const demoMemberships = [
         id: 'shop_member_cairo_owner',
         shopSlug: 'cairo-electronics',
         userEmail: 'owner@demo-shops.test',
-        role: 'OWNER',
+        role: ShopMemberRole.OWNER,
     },
     {
         id: 'shop_member_cairo_manager',
         shopSlug: 'cairo-electronics',
         userEmail: 'manager@demo-shops.test',
-        role: 'MANAGER',
+        role: ShopMemberRole.MANAGER,
     },
     {
         id: 'shop_member_nile_finance',
         shopSlug: 'nile-gadgets',
         userEmail: 'finance@nile-gadgets.test',
-        role: 'FINANCE',
+        role: ShopMemberRole.FINANCE,
     },
 ];
 
@@ -87,7 +99,7 @@ const demoPayoutPreferences = [
     {
         id: 'shop_pref_cairo',
         shopSlug: 'cairo-electronics',
-        method: 'BANK_TRANSFER',
+        method: ShopPayoutMethod.BANK_TRANSFER,
         accountName: 'Cairo Electronics LLC',
         accountNumber: 'EG123456789',
         bankName: 'National Bank of Egypt',
@@ -96,7 +108,7 @@ const demoPayoutPreferences = [
     {
         id: 'shop_pref_nile',
         shopSlug: 'nile-gadgets',
-        method: 'MOBILE_WALLET',
+        method: ShopPayoutMethod.MOBILE_WALLET,
         walletProvider: 'Vodafone Cash',
         walletNumber: '+20 100 333 4444',
     },
@@ -106,14 +118,14 @@ const demoAutomationHooks = [
     {
         id: 'hook_cairo_orders',
         shopSlug: 'cairo-electronics',
-        event: 'ORDER_CREATED',
+        event: ShopAutomationEvent.ORDER_CREATED,
         url: 'https://webhook.site/cairo-orders',
         secret: 'whsec-cairo-demo',
     },
     {
         id: 'hook_nile_payouts',
         shopSlug: 'nile-gadgets',
-        event: 'PAYOUT_QUEUED',
+        event: ShopAutomationEvent.PAYOUT_QUEUED,
         url: 'https://webhook.site/nile-payouts',
         secret: 'whsec-nile-demo',
     },
@@ -125,7 +137,7 @@ const demoInvitations = [
         shopSlug: 'cairo-electronics',
         invitedByEmail: 'owner@demo-shops.test',
         email: 'ops@cairo-vendors.test',
-        role: 'STAFF',
+        role: ShopMemberRole.STAFF,
         token: 'invite-token-cairo-ops',
     },
 ];
@@ -136,7 +148,7 @@ const demoPayouts = [
         shopSlug: 'cairo-electronics',
         reference: 'PO-CAIRO-2026-01',
         amount: 4200,
-        status: 'SCHEDULED',
+        status: ShopPayoutStatus.SCHEDULED,
         scheduledFor: new Date(new Date().setDate(new Date().getDate() + 7)),
         notes: 'Weekly automated payout',
     },
@@ -145,7 +157,7 @@ const demoPayouts = [
         shopSlug: 'nile-gadgets',
         reference: 'PO-NILE-2026-01',
         amount: 2100,
-        status: 'PENDING',
+        status: ShopPayoutStatus.PENDING,
         scheduledFor: new Date(new Date().setDate(new Date().getDate() + 10)),
         notes: 'Bi-weekly disbursement',
     },
@@ -155,7 +167,7 @@ const demoLedgerEntries = [
     {
         id: 'ledger_cairo_order_1',
         shopSlug: 'cairo-electronics',
-        type: 'ORDER_EARNING',
+        type: ShopCommissionLedgerType.ORDER_EARNING,
         amount: 1800,
         balanceAfter: 1800,
         description: 'Commission from January launch sale',
@@ -163,7 +175,7 @@ const demoLedgerEntries = [
     {
         id: 'ledger_cairo_payout_hold',
         shopSlug: 'cairo-electronics',
-        type: 'PAYOUT',
+        type: ShopCommissionLedgerType.PAYOUT,
         amount: -4200,
         balanceAfter: -2400,
         payoutReference: 'PO-CAIRO-2026-01',
@@ -172,7 +184,7 @@ const demoLedgerEntries = [
     {
         id: 'ledger_nile_adjustment',
         shopSlug: 'nile-gadgets',
-        type: 'ADJUSTMENT',
+        type: ShopCommissionLedgerType.ADJUSTMENT,
         amount: 350,
         balanceAfter: 350,
         description: 'Manual credit for launch promotion',
@@ -323,7 +335,7 @@ async function seedShopMembers(shopMap: Record<string, { id: string }>, userMap:
             },
         });
 
-        if (membership.role === 'OWNER') {
+        if (membership.role === ShopMemberRole.OWNER) {
             await prisma.shop.update({ where: { id: shopId }, data: { ownerId: userId } });
         }
     }
@@ -399,7 +411,7 @@ async function seedInvitations(shopMap: Record<string, { id: string }>, userMap:
             update: {
                 email: invite.email,
                 role: invite.role,
-                status: 'PENDING',
+                status: ShopInvitationStatus.PENDING,
                 expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 invitedById,
             },
@@ -408,7 +420,7 @@ async function seedInvitations(shopMap: Record<string, { id: string }>, userMap:
                 shopId,
                 email: invite.email,
                 role: invite.role,
-                status: 'PENDING',
+                status: ShopInvitationStatus.PENDING,
                 token: invite.token,
                 invitedById,
                 expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),

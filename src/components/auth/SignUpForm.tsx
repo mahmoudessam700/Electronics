@@ -20,6 +20,8 @@ export function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [resending, setResending] = useState(false);
+    const [resendMessage, setResendMessage] = useState('');
     const [detecting, setDetecting] = useState(false);
 
     const handleDetectLocation = () => {
@@ -99,8 +101,39 @@ export function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
                     Please click the link to verify your account.
                 </p>
                 <p className="text-xs text-[#888] mb-4">
-                    Didn't receive it? Check your spam folder.
+                    Didn't receive it? Check your spam folder or request another email.
                 </p>
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mb-3"
+                    disabled={resending}
+                    onClick={async () => {
+                        setResendMessage('');
+                        setResending(true);
+                        try {
+                            const res = await fetch('/api/auth/resend-verification', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ email }),
+                            });
+                            const data = await res.json().catch(() => ({}));
+                            if (!res.ok) {
+                                throw new Error(data.error || 'Unable to resend email');
+                            }
+                            setResendMessage('A new verification email is on its way.');
+                        } catch (err) {
+                            setResendMessage(err instanceof Error ? err.message : 'Resend failed');
+                        } finally {
+                            setResending(false);
+                        }
+                    }}
+                >
+                    {resending ? 'Resending…' : 'Resend verification email'}
+                </Button>
+                {resendMessage && (
+                    <p className="text-xs text-[#565959] mb-4">{resendMessage}</p>
+                )}
                 <button
                     type="button"
                     onClick={onSwitchToSignIn}

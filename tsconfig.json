@@ -144,7 +144,9 @@
         "esModuleInterop": true
     },
     "include": [
-        "src"
+        "src",
+        "prisma/**/*.ts",
+        "scripts/**/*.ts"
     ],
     "exclude": [
         "api"

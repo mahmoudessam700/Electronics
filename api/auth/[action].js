@@ -12,8 +12,43 @@ const {
     getShopMemberships,
     generateId,
 } = require('../_utils/auth');
+const { sendEmailVerificationEmail } = require('../_utils/mailer');
 
 const pool = getPool();
+
+const getUserWithLock = async (client, email, forUpdate = false) => {
+    const runner = client || pool;
+    const lock = forUpdate ? 'FOR UPDATE' : '';
+    const { rows } = await runner.query(
+        `SELECT * FROM "User" WHERE email = $1 ${lock}`,
+        [email],
+    );
+    return rows[0] || null;
+};
+
+const getUserByToken = async (token, forUpdate = false) => {
+    const lock = forUpdate ? 'FOR UPDATE' : '';
+    const { rows } = await pool.query(
+        `SELECT * FROM "User" WHERE "emailVerificationToken" = $1 ${lock}`,
+        [token],
+    );
+    return rows[0] || null;
+};
+
+const setVerificationToken = async (client, userId) => {
+    const runner = client || pool;
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await runner.query(
+        `UPDATE "User"
+         SET "emailVerificationToken" = $1,
+             "emailVerificationExpires" = $2,
+             "updatedAt" = NOW()
+         WHERE id = $3`,
+        [token, expires, userId],
+    );
+    return { token, expires };
+};
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -83,8 +118,6 @@ module.exports = async (req, res) => {
             const hashedPassword = await bcrypt.hash(password, 10);
 
             // Generate verification token
-            const token = crypto.randomBytes(32).toString('hex');
-            const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
 
             // Check user count for role
             const { rows: userCount } = await pool.query('SELECT COUNT(*) FROM "User"');
@@ -104,10 +137,16 @@ module.exports = async (req, res) => {
             `, [
                 userId, email, hashedPassword, name, phone, address || null,
                 latitude || null, longitude || null, role,
-                false, token, expires
+                false, null, null
             ]);
 
             const userPayload = await buildAuthUserResponse(newUser[0]);
+            const { token: verificationToken } = await setVerificationToken(null, newUser[0].id);
+            try {
+                await sendEmailVerificationEmail({ to: email, name, token: verificationToken });
+            } catch (mailError) {
+                console.error('Failed to send verification email:', mailError);
+            }
 
             return res.status(201).json({
                 success: true,
@@ -115,6 +154,73 @@ module.exports = async (req, res) => {
                 requiresVerification: true,
                 user: userPayload
             });
+        }
+
+        if (actionName === 'verify-email') {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+            const token = req.query.token || req.query.t;
+            if (!token || typeof token !== 'string') {
+                return res.status(400).json({ error: 'Verification token is required' });
+            }
+
+            const user = await getUserByToken(token);
+            if (!user) {
+                return res.status(400).json({ error: 'Invalid or expired verification token' });
+            }
+
+            if (user.emailVerificationExpires && new Date(user.emailVerificationExpires) < new Date()) {
+                return res.status(400).json({ error: 'Verification token has expired. Please request a new one.' });
+            }
+
+            await pool.query(
+                `UPDATE "User"
+                 SET "emailVerified" = TRUE,
+                     "emailVerificationToken" = NULL,
+                     "emailVerificationExpires" = NULL,
+                     "updatedAt" = NOW()
+                 WHERE id = $1`,
+                [user.id],
+            );
+
+            return res.redirect(302, '/sign-in?verified=true');
+        }
+
+        if (actionName === 'resend-verification') {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+            const { email } = req.body || {};
+            if (!email) {
+                return res.status(400).json({ error: 'Email is required' });
+            }
+
+            const user = await getUserWithLock(null, email);
+            if (!user) {
+                return res.status(200).json({ success: true });
+            }
+
+            if (user.emailVerified) {
+                return res.status(400).json({ error: 'Email already verified' });
+            }
+
+            const now = new Date();
+            if (user.updatedAt) {
+                const lastUpdated = new Date(user.updatedAt);
+                if (!Number.isNaN(lastUpdated.getTime())) {
+                    const secondsSince = (now.getTime() - lastUpdated.getTime()) / 1000;
+                    if (secondsSince < 120) {
+                        return res.status(429).json({ error: 'Please wait a couple of minutes before trying again' });
+                    }
+                }
+            }
+
+            const { token: newToken } = await setVerificationToken(null, user.id);
+
+            try {
+                await sendEmailVerificationEmail({ to: email, name: user.name, token: newToken });
+            } catch (mailError) {
+                console.error('Failed to resend verification email:', mailError);
+            }
+
+            return res.status(200).json({ success: true });
         }
 
         if (actionName === 'register-shop') {

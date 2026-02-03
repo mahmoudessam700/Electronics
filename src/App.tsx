@@ -22,6 +22,7 @@ import { ShopCardPage } from './components/ShopCardPage';
 import { CurrencyConverterPage } from './components/CurrencyConverterPage';
 import { SignInPage } from './components/auth/SignInPage';
 import { SignUpPage } from './components/auth/SignUpPage';
+import { VerifyEmailPage } from './components/auth/VerifyEmailPage';
 import { ForgotPasswordPage } from './components/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from './components/auth/ResetPasswordPage';
 import { AdminLayout } from './layouts/AdminLayout';
@@ -182,7 +183,7 @@ function AppContent() {
     return <Navigate to="/" replace />;
   };
 
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/forgot-password' || location.pathname === '/reset-password';
+  const isAuthPage = ['/login', '/signup', '/forgot-password', '/reset-password', '/verify-email'].includes(location.pathname);
   const isAdminPage = location.pathname.startsWith('/admin');
 
   const isFooterLinkVisible = (id: string) => {
@@ -202,6 +203,7 @@ function AppContent() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/search" element={
           <ProductListingPage
             onProductClick={(product) => handleNavigate('product', product)}

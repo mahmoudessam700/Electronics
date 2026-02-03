@@ -18,6 +18,8 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [verified, setVerified] = useState(false);
+    const [resending, setResending] = useState(false);
+    const [resendMessage, setResendMessage] = useState('');
     const { login } = useAuth();
     const { t } = useLanguage();
     const navigate = useNavigate();
@@ -94,15 +96,55 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
 
             <form className="space-y-4" onSubmit={handleSubmit}>
                 {error && (
-                    <div className="rounded-lg bg-red-50 p-3 border border-red-200">
+                    <div className="rounded-lg bg-red-50 p-3 border border-red-200 space-y-2">
                         <div className="flex items-start gap-2">
                             {error.includes('verify') ? (
                                 <Mail className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
                             ) : (
                                 <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
                             )}
-                            <p className="text-sm text-red-800">{error}</p>
+                            <p className="text-sm text-red-800 flex-1">{error}</p>
                         </div>
+                        {error.includes('verify') && (
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full"
+                                    disabled={resending}
+                                    onClick={async () => {
+                                        setResendMessage('');
+                                        setResending(true);
+                                        const trimmedEmail = email.trim();
+                                        if (!trimmedEmail) {
+                                            setResendMessage('Enter your email first.');
+                                            setResending(false);
+                                            return;
+                                        }
+                                        try {
+                                            const res = await fetch('/api/auth/resend-verification', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ email: trimmedEmail }),
+                                            });
+                                            const data = await res.json().catch(() => ({}));
+                                            if (!res.ok) {
+                                                throw new Error(data.error || 'Unable to resend email');
+                                            }
+                                            setResendMessage('We sent a fresh verification email. Please check your inbox.');
+                                        } catch (err) {
+                                            setResendMessage(err instanceof Error ? err.message : 'Resend failed');
+                                        } finally {
+                                            setResending(false);
+                                        }
+                                    }}
+                                >
+                                    {resending ? 'Resending…' : 'Resend verification email'}
+                                </Button>
+                                {resendMessage && <p className="text-xs text-[#565959]">{resendMessage}</p>}
+                            </div>
+                        )}
                     </div>
                 )}
 
