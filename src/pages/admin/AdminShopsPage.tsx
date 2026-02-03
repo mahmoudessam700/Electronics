@@ -144,10 +144,10 @@ export function AdminShopsPage() {
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                         {t('admin.shops')}
                     </h1>
-                    <p className="text-gray-500 mt-1 text-sm">Manage multi-tenant vendors and their status</p>
+                    <p className="text-gray-500 mt-1 text-sm">{t('admin.shopsSubtitle')}</p>
                 </div>
                 <Button className="bg-[#4A5568] hover:bg-[#2D3748] text-white">
-                    <Plus className="h-4 w-4 mr-2" /> Add Shop
+                    <Plus className="h-4 w-4 mr-2" /> {t('admin.addShop')}
                 </Button>
             </div>
 
@@ -155,7 +155,7 @@ export function AdminShopsPage() {
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                        placeholder="Search shops by name, slug or email..."
+                        placeholder={t('admin.searchShops')}
                         className="pl-10 bg-white border-gray-200"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -172,7 +172,10 @@ export function AdminShopsPage() {
                                     : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                             }`}
                         >
-                            {status === 'ALL' ? 'All' : status}
+                            {status === 'ALL' ? t('admin.allFilter') : 
+                             status === 'ACTIVE' ? t('admin.active') :
+                             status === 'PENDING' ? t('admin.pending') :
+                             t('admin.suspended')}
                         </button>
                     ))}
                 </div>
@@ -183,11 +186,11 @@ export function AdminShopsPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-200">
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase text-gray-500">Shop</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase text-gray-500">Status</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase text-gray-500">KYC</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase text-gray-500">Commission</th>
-                                <th className="text-right py-3 px-4 text-xs font-semibold uppercase text-gray-500">Actions</th>
+                                <th className="text-left rtl:text-right py-3 px-4 text-xs font-semibold uppercase text-gray-500">{t('admin.shopColumn')}</th>
+                                <th className="text-left rtl:text-right py-3 px-4 text-xs font-semibold uppercase text-gray-500">{t('admin.status')}</th>
+                                <th className="text-left rtl:text-right py-3 px-4 text-xs font-semibold uppercase text-gray-500">{t('admin.kycColumn')}</th>
+                                <th className="text-left rtl:text-right py-3 px-4 text-xs font-semibold uppercase text-gray-500">{t('admin.commissionColumn')}</th>
+                                <th className="text-right rtl:text-left py-3 px-4 text-xs font-semibold uppercase text-gray-500">{t('admin.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -211,7 +214,7 @@ export function AdminShopsPage() {
                                                 </p>
                                                 <div className="flex items-center gap-1 text-xs text-gray-500">
                                                     <Mail className="h-3 w-3" />
-                                                    <span>{shop.email || 'No email'}</span>
+                                                    <span>{shop.email || t('admin.noEmail')}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -239,7 +242,7 @@ export function AdminShopsPage() {
                                     </td>
                                     <td className="py-3 px-4">
                                         <p className="text-sm font-semibold text-gray-900">{(shop.defaultCommissionRate * 100).toFixed(1)}%</p>
-                                        <p className="text-[10px] text-gray-400">Default Rate</p>
+                                        <p className="text-[10px] text-gray-400">{t('admin.defaultRate')}</p>
                                     </td>
                                     <td className="py-3 px-4">
                                         <div className="flex justify-end gap-1">
@@ -263,38 +266,38 @@ export function AdminShopsPage() {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
-                        <DialogTitle className="text-xl">Edit Shop: {editingShop?.name}</DialogTitle>
+                        <DialogTitle className="text-xl">{t('admin.editShop')}: {editingShop?.name}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSave} className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="shop-status" className="text-sm font-medium">Shop Status</Label>
+                            <Label htmlFor="shop-status" className="text-sm font-medium">{t('admin.shopStatus')}</Label>
                             <select
                                 id="shop-status"
                                 className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"
                                 value={formData.status}
                                 onChange={(e) => setFormData({ ...formData, status: e.target.value as ShopStatus })}
                             >
-                                <option value="PENDING">Pending (Approval Required)</option>
-                                <option value="ACTIVE">Active (Live on Site)</option>
-                                <option value="SUSPENDED">Suspended (Hidden from Site)</option>
+                                <option value="PENDING">{t('admin.pendingApproval')}</option>
+                                <option value="ACTIVE">{t('admin.activeLive')}</option>
+                                <option value="SUSPENDED">{t('admin.suspendedHidden')}</option>
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="kyc-status" className="text-sm font-medium">Verification Status (KYC)</Label>
+                            <Label htmlFor="kyc-status" className="text-sm font-medium">{t('admin.verificationKyc')}</Label>
                             <select
                                 id="kyc-status"
                                 className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"
                                 value={formData.kycStatus}
                                 onChange={(e) => setFormData({ ...formData, kycStatus: e.target.value as KycStatus })}
                             >
-                                <option value="UNVERIFIED">Unverified</option>
-                                <option value="SUBMITTED">Submitted</option>
-                                <option value="VERIFIED">Verified</option>
-                                <option value="REJECTED">Rejected</option>
+                                <option value="UNVERIFIED">{t('admin.unverified')}</option>
+                                <option value="SUBMITTED">{t('admin.submitted')}</option>
+                                <option value="VERIFIED">{t('admin.verified')}</option>
+                                <option value="REJECTED">{t('admin.rejected')}</option>
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="commission" className="text-sm font-medium">Default Commission Rate (e.g. 0.1 for 10%)</Label>
+                            <Label htmlFor="commission" className="text-sm font-medium">{t('admin.commissionRateLabel')}</Label>
                             <Input
                                 id="commission"
                                 type="number"
@@ -306,12 +309,12 @@ export function AdminShopsPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-4 pt-2 text-xs text-slate-500">
                              <div>
-                                <p className="font-bold">Contact Email</p>
-                                <p>{formData.email || 'N/A'}</p>
+                                <p className="font-bold">{t('admin.contactEmail')}</p>
+                                <p>{formData.email || t('admin.na')}</p>
                              </div>
                              <div>
-                                <p className="font-bold">Contact Phone</p>
-                                <p>{formData.phone || 'N/A'}</p>
+                                <p className="font-bold">{t('admin.contactPhone')}</p>
+                                <p>{formData.phone || t('admin.na')}</p>
                              </div>
                         </div>
                         <DialogFooter className="pt-4">
@@ -324,7 +327,7 @@ export function AdminShopsPage() {
                                 className="bg-[#4A5568] hover:bg-[#2D3748] text-white"
                             >
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Save Changes
+                                {t('admin.saveChanges')}
                             </Button>
                         </DialogFooter>
                     </form>

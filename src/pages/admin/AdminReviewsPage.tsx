@@ -209,7 +209,7 @@ export function AdminReviewsPage() {
                                             <Star key={i} className={`h-3 w-3 ${i < r.rating ? 'text-yellow-400 fill-current' : 'text-gray-200'}`} />
                                         ))}
                                     </div>
-                                    <p className="text-gray-500 line-clamp-2 italic">{r.comment || 'No comment'}</p>
+                                    <p className="text-gray-500 line-clamp-2 italic">{r.comment || t('admin.noComment')}</p>
                                 </td>
                                 <td className="py-4 px-4">
                                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -258,27 +258,27 @@ export function AdminReviewsPage() {
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>
-                            {pendingStatusChange?.status === 'REJECTED' ? 'Reject Review' : 'Update Review Status'}
+                            {pendingStatusChange?.status === 'REJECTED' ? t('admin.rejectReview') : t('admin.updateReviewStatus')}
                         </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-2">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Reason for {pendingStatusChange?.status.toLowerCase()}</label>
+                            <label className="text-sm font-medium text-slate-700">{t('admin.reasonFor')} {pendingStatusChange?.status.toLowerCase()}</label>
                             <textarea
                                 className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-100 outline-none text-sm min-h-[100px]"
-                                placeholder="E.g., Profanity, irrelevant content, spam..."
+                                placeholder={t('admin.reasonPlaceholder')}
                                 value={statusReason}
                                 onChange={(e) => setStatusReason(e.target.value)}
                             />
                         </div>
                         <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setShowStatusDialog(false)}>Cancel</Button>
+                            <Button variant="outline" onClick={() => setShowStatusDialog(false)}>{t('admin.cancel')}</Button>
                             <Button 
                                 disabled={updating || !statusReason.trim()}
                                 onClick={() => updateStatus(pendingStatusChange!.id, pendingStatusChange!.status, statusReason)}
                                 className={pendingStatusChange?.status === 'REJECTED' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-slate-900'}
                             >
-                                {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirm'}
+                                {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : t('admin.confirm')}
                             </Button>
                         </div>
                     </div>
@@ -291,7 +291,7 @@ export function AdminReviewsPage() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <History className="h-5 w-5 text-slate-500" />
-                            Moderation History
+                            {t('admin.moderationHistory')}
                         </DialogTitle>
                     </DialogHeader>
                     <div className="mt-4 space-y-4">
@@ -301,7 +301,7 @@ export function AdminReviewsPage() {
                             </div>
                         ) : logs.length === 0 ? (
                             <div className="text-center py-8 text-slate-500 text-sm">
-                                No history found for this review.
+                                {t('admin.noHistory')}
                             </div>
                         ) : (
                             <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-slate-200">

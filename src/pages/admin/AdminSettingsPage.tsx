@@ -51,7 +51,7 @@ export function AdminSettingsPage() {
         <div className="max-w-4xl mx-auto space-y-8">
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('admin.settings')}</h1>
-                <p className="text-gray-500 mt-1">Configure global store preferences and branding</p>
+                <p className="text-gray-500 mt-1">{t('admin.settingsSubtitle')}</p>
             </div>
 
             <form onSubmit={handleSave} className="space-y-6">
@@ -59,12 +59,12 @@ export function AdminSettingsPage() {
                     <div className="p-6 border-b border-gray-100 bg-gray-50/50">
                         <h2 className="text-lg font-semibold flex items-center gap-2">
                             <Globe className="h-5 w-5 text-[#4A5568]" />
-                            General Branding
+                            {t('admin.generalBranding')}
                         </h2>
                     </div>
                     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Site Name</label>
+                            <label className="text-sm font-medium text-gray-700">{t('admin.siteName')}</label>
                             <input
                                 type="text"
                                 className="w-full h-11 px-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-slate-100 outline-none"
@@ -73,7 +73,7 @@ export function AdminSettingsPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Logo URL</label>
+                            <label className="text-sm font-medium text-gray-700">{t('admin.logoUrl')}</label>
                             <div className="flex gap-2">
                                 <div className="relative flex-1">
                                     <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -94,12 +94,12 @@ export function AdminSettingsPage() {
                     <div className="p-6 border-b border-gray-100 bg-gray-50/50">
                         <h2 className="text-lg font-semibold flex items-center gap-2">
                             <Mail className="h-5 w-5 text-[#4A5568]" />
-                            Contact Information
+                            {t('admin.contactInfo')}
                         </h2>
                     </div>
                     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Support Email</label>
+                            <label className="text-sm font-medium text-gray-700">{t('admin.supportEmail')}</label>
                             <input
                                 type="email"
                                 className="w-full h-11 px-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-slate-100 outline-none"
@@ -108,7 +108,7 @@ export function AdminSettingsPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Contact Phone</label>
+                            <label className="text-sm font-medium text-gray-700">{t('admin.contactPhone')}</label>
                             <input
                                 type="text"
                                 className="w-full h-11 px-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-slate-100 outline-none"
@@ -117,7 +117,7 @@ export function AdminSettingsPage() {
                             />
                         </div>
                         <div className="md:col-span-2 space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Store Address</label>
+                            <label className="text-sm font-medium text-gray-700">{t('admin.storeAddress')}</label>
                             <textarea
                                 className="w-full p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-slate-100 outline-none min-h-[100px]"
                                 value={settings.address}
@@ -131,14 +131,14 @@ export function AdminSettingsPage() {
                     <div className="p-6 border-b border-gray-100 bg-gray-50/50">
                         <h2 className="text-lg font-semibold flex items-center gap-2">
                             <ShieldCheck className="h-5 w-5 text-[#4A5568]" />
-                            Platform Rules
+                            {t('admin.platformRules')}
                         </h2>
                     </div>
                     <div className="p-6 space-y-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="font-medium text-gray-900">Maintenance Mode</p>
-                                <p className="text-sm text-gray-500">Temporarily disable storefront for visitors</p>
+                                <p className="font-medium text-gray-900">{t('admin.maintenanceMode')}</p>
+                                <p className="text-sm text-gray-500">{t('admin.maintenanceDesc')}</p>
                             </div>
                             <button
                                 type="button"
@@ -151,8 +151,8 @@ export function AdminSettingsPage() {
 
                         <div className="flex items-center justify-between border-t border-gray-100 pt-6">
                             <div>
-                                <p className="font-medium text-gray-900">Customer Reviews</p>
-                                <p className="text-sm text-gray-500">Allow customers to post reviews on products</p>
+                                <p className="font-medium text-gray-900">{t('admin.customerReviews')}</p>
+                                <p className="text-sm text-gray-500">{t('admin.customerReviewsDesc')}</p>
                             </div>
                             <button
                                 type="button"
@@ -164,7 +164,7 @@ export function AdminSettingsPage() {
                         </div>
 
                         <div className="space-y-2 border-t border-gray-100 pt-6">
-                            <label className="text-sm font-medium text-gray-700">Default Shop Commission (%)</label>
+                            <label className="text-sm font-medium text-gray-700">{t('admin.defaultCommission')}</label>
                             <input
                                 type="number"
                                 className="w-full h-11 px-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-slate-100 outline-none max-w-[200px]"
@@ -182,7 +182,7 @@ export function AdminSettingsPage() {
                         className="bg-[#4A5568] hover:bg-[#2D3748] text-white px-8 h-12 rounded-lg font-semibold flex items-center gap-2"
                     >
                         {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
-                        Save Settings
+                        {t('admin.saveSettings')}
                     </Button>
                 </div>
             </form>

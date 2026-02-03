@@ -233,24 +233,24 @@ export function AdminShopPayoutsPage() {
                 <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-400 font-semibold flex items-center gap-2">
                         <ShieldCheck className="h-4 w-4" />
-                        Finance
+                        {t('admin.finance')}
                     </p>
-                    <h1 className="text-2xl font-bold text-slate-900">Shop payouts</h1>
+                    <h1 className="text-2xl font-bold text-slate-900">{t('admin.shopPayoutsTitle')}</h1>
                     {selectedShop && (
-                        <p className="text-sm text-slate-500">Currently viewing {selectedShop.name}</p>
+                        <p className="text-sm text-slate-500">{t('admin.currentlyViewing')} {selectedShop.name}</p>
                     )}
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={fetchPayouts} className="border-slate-200 text-slate-600">
                         <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                        {t('admin.refresh') || 'Refresh'}
+                        {t('admin.refresh')}
                     </Button>
                 </div>
             </div>
 
             <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap gap-4 items-center">
                 <div className="flex flex-col">
-                    <label className="text-xs font-semibold text-slate-500">Shop</label>
+                    <label className="text-xs font-semibold text-slate-500">{t('admin.shop')}</label>
                     <select
                         value={filters.shopId}
                         onChange={(event) => setFilters((prev) => ({ ...prev, shopId: event.target.value }))}
@@ -263,7 +263,7 @@ export function AdminShopPayoutsPage() {
                 </div>
                 <div className="flex flex-col">
                     <label className="text-xs font-semibold text-slate-500 flex items-center gap-1">
-                        <Filter className="h-3 w-3" /> Status
+                        <Filter className="h-3 w-3" /> {t('admin.status')}
                     </label>
                     <select
                         value={filters.status}
@@ -275,8 +275,8 @@ export function AdminShopPayoutsPage() {
                         ))}
                     </select>
                 </div>
-                <div className="ml-auto text-right">
-                    <p className="text-xs uppercase text-slate-500">Total records</p>
+                <div className="ml-auto text-right rtl:text-left rtl:ml-0 rtl:mr-auto">
+                    <p className="text-xs uppercase text-slate-500">{t('admin.totalRecords')}</p>
                     <p className="text-2xl font-semibold text-slate-900">{payouts.length}</p>
                 </div>
             </div>
@@ -284,11 +284,11 @@ export function AdminShopPayoutsPage() {
             <form onSubmit={handleCreate} className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
                 <div className="flex items-center gap-3">
                     <Plus className="h-5 w-5 text-emerald-600" />
-                    <h2 className="text-lg font-semibold text-slate-900">Create payout</h2>
+                    <h2 className="text-lg font-semibold text-slate-900">{t('admin.createPayout')}</h2>
                 </div>
                 <div className="grid gap-4 md:grid-cols-4">
                     <div className="space-y-2">
-                        <label className="text-xs font-semibold text-slate-500">Shop</label>
+                        <label className="text-xs font-semibold text-slate-500">{t('admin.shop')}</label>
                         <select
                             value={form.shopId}
                             onChange={(event) => setForm((prev) => ({ ...prev, shopId: event.target.value }))}
@@ -300,7 +300,7 @@ export function AdminShopPayoutsPage() {
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-xs font-semibold text-slate-500">Amount (EGP)</label>
+                        <label className="text-xs font-semibold text-slate-500">{t('admin.amountEgp')}</label>
                         <Input
                             type="number"
                             min={0}
@@ -311,7 +311,7 @@ export function AdminShopPayoutsPage() {
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-xs font-semibold text-slate-500">Status</label>
+                        <label className="text-xs font-semibold text-slate-500">{t('admin.status')}</label>
                         <select
                             value={form.status}
                             onChange={(event) => setForm((prev) => ({ ...prev, status: event.target.value }))}
@@ -323,17 +323,17 @@ export function AdminShopPayoutsPage() {
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-xs font-semibold text-slate-500">Reference</label>
+                        <label className="text-xs font-semibold text-slate-500">{t('admin.reference')}</label>
                         <Input
                             value={form.reference || ''}
                             onChange={(event) => setForm((prev) => ({ ...prev, reference: event.target.value }))}
-                            placeholder="Optional ref"
+                            placeholder={t('admin.optionalRef')}
                         />
                     </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                        <label className="text-xs font-semibold text-slate-500">Schedule date</label>
+                        <label className="text-xs font-semibold text-slate-500">{t('admin.scheduleDate')}</label>
                         <Input
                             type="date"
                             value={form.scheduledFor || ''}
@@ -341,37 +341,37 @@ export function AdminShopPayoutsPage() {
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-xs font-semibold text-slate-500">Notes</label>
+                        <label className="text-xs font-semibold text-slate-500">{t('admin.notes')}</label>
                         <Input
                             value={form.notes || ''}
                             onChange={(event) => setForm((prev) => ({ ...prev, notes: event.target.value }))}
-                            placeholder="Internal note"
+                            placeholder={t('admin.internalNote')}
                         />
                     </div>
                 </div>
                 <div className="flex justify-end">
                     <Button type="submit" disabled={saving}>
-                        {saving ? 'Saving...' : 'Create payout'}
+                        {saving ? t('admin.savingPayout') : t('admin.createPayout')}
                     </Button>
                 </div>
             </form>
 
             <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="font-semibold text-slate-900">Recent payouts</h3>
-                    <Badge variant="outline">{payouts.length} entries</Badge>
+                    <h3 className="font-semibold text-slate-900">{t('admin.recentPayouts')}</h3>
+                    <Badge variant="outline">{payouts.length} {t('admin.entries')}</Badge>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+                        <thead className="bg-slate-50 text-left rtl:text-right text-xs uppercase tracking-wider text-slate-500">
                             <tr>
-                                <th className="px-4 py-3">Reference</th>
-                                <th className="px-4 py-3">Shop</th>
-                                <th className="px-4 py-3">Amount</th>
-                                <th className="px-4 py-3">Orders</th>
-                                <th className="px-4 py-3">Status</th>
-                                <th className="px-4 py-3">Schedule</th>
-                                <th className="px-4 py-3">Actions</th>
+                                <th className="px-4 py-3">{t('admin.reference')}</th>
+                                <th className="px-4 py-3">{t('admin.shop')}</th>
+                                <th className="px-4 py-3">{t('admin.amount')}</th>
+                                <th className="px-4 py-3">{t('admin.orders')}</th>
+                                <th className="px-4 py-3">{t('admin.status')}</th>
+                                <th className="px-4 py-3">{t('admin.schedule')}</th>
+                                <th className="px-4 py-3">{t('admin.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -385,7 +385,7 @@ export function AdminShopPayoutsPage() {
                                         <tr className="hover:bg-slate-50">
                                             <td className="px-4 py-4">
                                                 <div className="font-semibold text-slate-900">{payout.reference || '—'}</div>
-                                                <div className="text-xs text-slate-500">Created {new Date(payout.createdAt).toLocaleDateString()}</div>
+                                                <div className="text-xs text-slate-500">{t('admin.created')} {new Date(payout.createdAt).toLocaleDateString()}</div>
                                             </td>
                                             <td className="px-4 py-4">
                                                 <div className="text-sm font-medium text-slate-900">{payout.shopName || selectedShop?.name || payout.shopId}</div>
@@ -395,8 +395,8 @@ export function AdminShopPayoutsPage() {
                                             </td>
                                             <td className="px-4 py-4 font-semibold">{formatAmount(payout.amount)}</td>
                                             <td className="px-4 py-4 text-sm text-slate-600">
-                                                <div>{payout.orderCount ?? 0} orders</div>
-                                                <div className="text-xs text-slate-500">Queued: E£ {queuedTotal.toFixed(2)}</div>
+                                                <div>{payout.orderCount ?? 0} {t('admin.orders').toLowerCase()}</div>
+                                                <div className="text-xs text-slate-500">{t('admin.queued')}: E£ {queuedTotal.toFixed(2)}</div>
                                             </td>
                                             <td className="px-4 py-4">
                                                 <Badge variant="outline">{payout.status}</Badge>
@@ -424,7 +424,7 @@ export function AdminShopPayoutsPage() {
                                                         ))}
                                                     </select>
                                                     <Button variant="outline" size="sm" onClick={() => togglePayoutOrders(payout.id)}>
-                                                        {expanded ? 'Hide orders' : 'View orders'}
+                                                        {expanded ? t('admin.hideOrders') : t('admin.viewOrders')}
                                                     </Button>
                                                 </div>
                                             </td>
@@ -435,7 +435,7 @@ export function AdminShopPayoutsPage() {
                                                     {ordersState?.loading ? (
                                                         <div className="flex items-center gap-2 text-slate-500">
                                                             <RefreshCw className="h-4 w-4 animate-spin" />
-                                                            <span>Loading orders…</span>
+                                                            <span>{t('admin.loadingOrders')}</span>
                                                         </div>
                                                     ) : ordersState?.data?.length ? (
                                                         <div className="space-y-2">
@@ -453,7 +453,7 @@ export function AdminShopPayoutsPage() {
                                                             ))}
                                                         </div>
                                                     ) : (
-                                                        <p className="text-slate-500">No orders linked to this payout.</p>
+                                                        <p className="text-slate-500">{t('admin.noOrdersLinked')}</p>
                                                     )}
                                                 </td>
                                             </tr>
@@ -464,7 +464,7 @@ export function AdminShopPayoutsPage() {
                             {!payouts.length && !loading && (
                                 <tr>
                                     <td colSpan={6} className="py-12 text-center text-slate-500 text-sm">
-                                        No payouts recorded yet for this shop.
+                                        {t('admin.noPayoutsYet')}
                                     </td>
                                 </tr>
                             )}
@@ -473,7 +473,7 @@ export function AdminShopPayoutsPage() {
                 </div>
                 {loading && (
                     <div className="flex items-center justify-center py-6 text-sm text-slate-500">
-                        Loading payouts…
+                        {t('admin.loadingPayouts')}
                     </div>
                 )}
             </div>
