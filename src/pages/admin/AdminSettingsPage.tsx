@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
 import { Save, Loader2, Globe, Mail, Image as ImageIcon, ShieldCheck } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { toast } from 'sonner';
 
