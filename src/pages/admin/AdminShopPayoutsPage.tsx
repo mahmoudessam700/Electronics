@@ -103,11 +103,11 @@ export function AdminShopPayoutsPage() {
         if (!filters.shopId) return;
         setLoading(true);
         try {
-            const params = new URLSearchParams({ shopId: filters.shopId });
+            const params = new URLSearchParams({ resource: 'shop-payouts', shopId: filters.shopId });
             if (filters.status !== 'ALL') {
                 params.set('status', filters.status);
             }
-            const res = await fetch(`/api/admin/shop-payouts?${params.toString()}`);
+            const res = await fetch(`/api/admin?${params.toString()}`);
             if (!res.ok) {
                 const payload = await res.json().catch(() => ({}));
                 throw new Error(payload.error || 'Failed to load payouts');
@@ -135,7 +135,7 @@ export function AdminShopPayoutsPage() {
         }
         setSaving(true);
         try {
-            const res = await fetch('/api/admin/shop-payouts', {
+            const res = await fetch('/api/admin?resource=shop-payouts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -164,7 +164,7 @@ export function AdminShopPayoutsPage() {
     const handleStatusChange = async (payoutId: string, newStatus: string) => {
         setUpdatingId(payoutId);
         try {
-            const res = await fetch(`/api/admin/shop-payouts/${payoutId}`, {
+            const res = await fetch(`/api/admin?resource=shop-payouts&id=${payoutId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus }),

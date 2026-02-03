@@ -53,7 +53,7 @@ export function AdminReviewsPage() {
 
     const fetchReviews = async () => {
         try {
-            const res = await fetch('/api/reviews', {
+            const res = await fetch('/api/products?resource=reviews', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -72,7 +72,7 @@ export function AdminReviewsPage() {
         setShowLogs(true);
         setLogsLoading(true);
         try {
-            const res = await fetch(`/api/reviews?logs=true&reviewId=${review.id}`, {
+            const res = await fetch(`/api/products?resource=reviews&logs=true&reviewId=${review.id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -99,7 +99,7 @@ export function AdminReviewsPage() {
     const updateStatus = async (id: string, status: string, reason?: string) => {
         setUpdating(true);
         try {
-            const res = await fetch(`/api/reviews?id=${id}`, {
+            const res = await fetch(`/api/products?resource=reviews&id=${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ export function AdminReviewsPage() {
     const deleteReview = async (id: string) => {
         if (!confirm('Delete this review?')) return;
         try {
-            const res = await fetch(`/api/reviews?id=${id}`, {
+            const res = await fetch(`/api/products?resource=reviews&id=${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

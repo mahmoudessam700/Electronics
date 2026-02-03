@@ -155,6 +155,161 @@ const handleFinancial = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
 };
 
+// ============ SHOP PAYOUTS HANDLERS ============
+const { requireAuth, ensureRole, createError, generateId } = require('../_utils/auth');
+const { getLatestBalance, recordPayoutLedgerEntry } = require('../_utils/ledger');
+const { withTransaction } = require('../_utils/db');
+
+const VALID_STATUSES = new Set(['PENDING', 'SCHEDULED', 'PROCESSING', 'PAID', 'FAILED', 'CANCELLED']);
+const TERMINAL_STATUSES = new Set(['PAID', 'FAILED', 'CANCELLED']);
+const RELEASE_STATUSES = new Set(['FAILED', 'CANCELLED']);
+
+const handleShopPayouts = async (req, res) => {
+    const payoutId = normalizeValue(req.query.id);
+    
+    if (req.method === 'GET') {
+        if (payoutId) {
+            const { rows } = await pool.query(`
+                SELECT sp.*, s.name AS "shopName", s.slug AS "shopSlug"
+                FROM "ShopPayout" sp
+                LEFT JOIN "Shop" s ON s.id = sp."shopId"
+                WHERE sp.id = $1
+            `, [payoutId]);
+            if (!rows[0]) return res.status(404).json({ error: 'Payout not found' });
+            return res.json({ payout: rows[0] });
+        }
+        
+        const shopId = normalizeValue(req.query.shopId);
+        const status = normalizeValue(req.query.status);
+        const params = [];
+        const conditions = [];
+        if (shopId) {
+            params.push(shopId);
+            conditions.push(`sp."shopId" = $${params.length}`);
+        }
+        if (status) {
+            params.push(status);
+            conditions.push(`sp.status = $${params.length}`);
+        }
+        const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+        
+        const { rows } = await pool.query(`
+            SELECT sp.*, s.name AS "shopName", s.slug AS "shopSlug",
+                   COALESCE(stats."orderCount", 0) AS "orderCount",
+                   COALESCE(stats."orderTotal", 0) AS "orderTotal"
+            FROM "ShopPayout" sp
+            LEFT JOIN "Shop" s ON s.id = sp."shopId"
+            LEFT JOIN (
+                SELECT "shopPayoutId",
+                       COUNT(*) AS "orderCount",
+                       COALESCE(SUM(("totalAmount" - "commissionTotal")), 0)::double precision AS "orderTotal"
+                FROM "Order"
+                WHERE "shopPayoutId" IS NOT NULL
+                GROUP BY "shopPayoutId"
+            ) AS stats ON stats."shopPayoutId" = sp.id
+            ${whereClause}
+            ORDER BY sp."createdAt" DESC
+            LIMIT 200
+        `, params);
+        return res.json({ payouts: rows });
+    }
+    
+    if (req.method === 'PATCH') {
+        if (!payoutId) return res.status(400).json({ error: 'Payout id required' });
+        const { status, notes, reference, scheduledFor } = req.body || {};
+        
+        return withTransaction(async (client) => {
+            const { rows: payouts } = await client.query(
+                'SELECT * FROM "ShopPayout" WHERE id = $1 FOR UPDATE',
+                [payoutId]
+            );
+            const payout = payouts[0];
+            if (!payout) return res.status(404).json({ error: 'Payout not found' });
+            
+            const updates = [];
+            const params = [];
+            if (status && payout.status !== status) {
+                params.push(status);
+                updates.push(`status = $${params.length}`);
+                if (status === 'PAID') {
+                    params.push(new Date());
+                    updates.push(`"processedAt" = $${params.length}`);
+                }
+            }
+            if (notes !== undefined) {
+                params.push(notes || null);
+                updates.push(`notes = $${params.length}`);
+            }
+            if (reference !== undefined) {
+                params.push(reference || payout.reference);
+                updates.push(`reference = $${params.length}`);
+            }
+            if (scheduledFor !== undefined) {
+                const date = scheduledFor ? new Date(scheduledFor) : null;
+                params.push(date);
+                updates.push(`"scheduledFor" = $${params.length}`);
+            }
+            
+            if (updates.length > 0) {
+                params.push(payoutId);
+                await client.query(
+                    `UPDATE "ShopPayout" SET ${updates.join(', ')}, "updatedAt" = NOW() WHERE id = $${params.length}`,
+                    params
+                );
+            }
+            
+            if (status === 'PAID' && payout.status !== 'PAID') {
+                await client.query(
+                    'UPDATE "Order" SET "shopPayoutStatus" = \'PAID_OUT\', "updatedAt" = NOW() WHERE "shopPayoutId" = $1',
+                    [payoutId]
+                );
+            } else if (RELEASE_STATUSES.has(status) && !RELEASE_STATUSES.has(payout.status)) {
+                await client.query(
+                    'UPDATE "Order" SET "shopPayoutStatus" = \'NOT_REQUESTED\', "shopPayoutId" = NULL, "updatedAt" = NOW() WHERE "shopPayoutId" = $1',
+                    [payoutId]
+                );
+                await recordPayoutLedgerEntry(client, {
+                    shopId: payout.shopId,
+                    payoutId: payout.id,
+                    amount: payout.amount,
+                    reference: reference || payout.reference,
+                    description: `Payout ${status.toLowerCase()}`,
+                    direction: 'CREDIT'
+                });
+            }
+            
+            const balance = await getLatestBalance(client, payout.shopId);
+            return res.json({ success: true, balance });
+        });
+    }
+    
+    if (req.method === 'POST') {
+        const { shopId, amount, currency = 'EGP', notes, status = 'PENDING', reference } = req.body || {};
+        if (!shopId || !amount) return res.status(400).json({ error: 'shopId and amount required' });
+        
+        return withTransaction(async (client) => {
+            const balance = await getLatestBalance(client, shopId);
+            if (amount > balance) return res.status(422).json({ error: 'Insufficient balance' });
+            
+            const payoutId = generateId('sp');
+            const ref = reference || `SP-${Date.now()}`;
+            await client.query(`
+                INSERT INTO "ShopPayout" (id, "shopId", amount, currency, status, reference, notes, "createdAt", "updatedAt")
+                VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+            `, [payoutId, shopId, amount, currency, status, ref, notes || null]);
+            
+            await recordPayoutLedgerEntry(client, {
+                shopId, payoutId, amount, reference: ref,
+                description: notes || `Payout ${ref}`
+            });
+            
+            return res.status(201).json({ success: true, payoutId });
+        });
+    }
+    
+    return res.status(405).json({ error: 'Method not allowed' });
+};
+
 // ============ DASHBOARD HANDLERS ============
 const handleDashboard = async (req, res) => {
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
@@ -232,9 +387,13 @@ module.exports = async (req, res) => {
             return handleDashboard(req, res);
         }
 
+        if (resource === 'shop-payouts') {
+            return handleShopPayouts(req, res);
+        }
+
         return res.status(400).json({ 
             error: 'Resource parameter required', 
-            hint: 'Use ?resource=suppliers, ?resource=financial, or ?resource=dashboard' 
+            hint: 'Use ?resource=suppliers, ?resource=financial, ?resource=dashboard, or ?resource=shop-payouts' 
         });
     } catch (error) {
         console.error('Admin API Error:', error);

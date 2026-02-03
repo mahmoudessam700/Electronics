@@ -46,7 +46,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
 
   const fetchReviews = async () => {
     try {
-      const res = await fetch(`/api/reviews?productId=${product.id}&status=APPROVED`);
+      const res = await fetch(`/api/products?resource=reviews&productId=${product.id}&status=APPROVED`);
       if (res.ok) {
         const data = await res.json();
         setReviews(data);
@@ -66,7 +66,7 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
     }
     setSubmittingReview(true);
     try {
-      const res = await fetch('/api/reviews', {
+      const res = await fetch('/api/products?resource=reviews', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
