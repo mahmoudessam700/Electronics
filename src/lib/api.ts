@@ -105,8 +105,7 @@ export interface UploadResponse {
 }
 
 export async function uploadFile(
-    file: File,
-    onProgress?: (progress: number) => void
+    file: File
 ): Promise<UploadResult> {
     const formData = new FormData();
     formData.append('file', file);

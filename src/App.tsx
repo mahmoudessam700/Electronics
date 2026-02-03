@@ -25,6 +25,7 @@ import { SignUpPage } from './components/auth/SignUpPage';
 import { ForgotPasswordPage } from './components/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from './components/auth/ResetPasswordPage';
 import { AdminLayout } from './layouts/AdminLayout';
+import { ShopLayout } from './layouts/ShopLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
@@ -36,6 +37,11 @@ import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 import { AdminFinancialPage } from './pages/admin/AdminFinancialPage';
 import { AdminHomePageSettings } from './pages/admin/AdminHomePageSettings';
 import { AdminPageContentSettings } from './pages/admin/AdminPageContentSettings';
+import { AdminShopPayoutsPage } from './pages/admin/AdminShopPayoutsPage';
+import { ShopDashboard } from './pages/shop/ShopDashboard';
+import { ShopProductsPage } from './pages/shop/ShopProductsPage';
+import { ShopOrdersPage } from './pages/shop/ShopOrdersPage';
+import { ShopPayoutsPage } from './pages/shop/ShopPayoutsPage';
 import { Product } from './components/ProductCard';
 import { toast, Toaster } from 'sonner';
 import { CheckCircle } from 'lucide-react';
@@ -231,9 +237,18 @@ function AppContent() {
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="financial" element={<AdminFinancialPage />} />
+          <Route path="shop-payouts" element={<AdminShopPayoutsPage />} />
           <Route path="homepage" element={<AdminHomePageSettings />} />
           <Route path="pages" element={<AdminPageContentSettings />} />
           <Route path="files" element={<AdminFilesPage />} />
+        </Route>
+
+        {/* Shop Owner Routes */}
+        <Route path="/shop" element={<ShopLayout />}>
+          <Route index element={<ShopDashboard />} />
+          <Route path="products" element={<ShopProductsPage />} />
+          <Route path="orders" element={<ShopOrdersPage />} />
+          <Route path="payouts" element={<ShopPayoutsPage />} />
         </Route>
 
         <Route path="/customer-service" element={<CustomerServicePage onNavigate={handleNavigate} />} />

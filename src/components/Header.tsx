@@ -19,13 +19,15 @@ interface HeaderProps {
 }
 
 export function Header({ onNavigate, cartItemCount }: HeaderProps) {
-  const { user, logout } = useAuth();
+  const { user, logout, shopMemberships, activeShop } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const [isHoverCardOpen, setIsHoverCardOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const hasShopAccess = (shopMemberships?.length || 0) > 0;
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'ar' : 'en');
@@ -147,6 +149,17 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           onClick={() => navigate('/admin')}
                         >
                           {t('header.adminDashboard')}
+                        </Button>
+                      </SheetClose>
+                    )}
+                    {hasShopAccess && (
+                      <SheetClose asChild>
+                        <Button
+                          variant="ghost"
+                          className="justify-start text-emerald-600 font-bold"
+                          onClick={() => navigate('/shop')}
+                        >
+                          {activeShop ? `${activeShop.name} Dashboard` : 'Shop Dashboard'}
                         </Button>
                       </SheetClose>
                     )}
@@ -289,6 +302,18 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                         >
                           <Settings className="h-4 w-4" />
                           {t('header.adminDashboard')}
+                        </button>
+                      )}
+                      {hasShopAccess && (
+                        <button
+                          className="flex items-center gap-3 w-full px-3 py-2 text-sm font-semibold text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                          onClick={() => {
+                            navigate('/shop');
+                            setIsHoverCardOpen(false);
+                          }}
+                        >
+                          <Settings className="h-4 w-4" />
+                          {activeShop ? `${activeShop.name} Dashboard` : 'Shop Dashboard'}
                         </button>
                       )}
 

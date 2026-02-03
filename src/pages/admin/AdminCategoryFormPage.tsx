@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Loader2, ArrowLeft, Folder, ImageIcon, Upload, FileText, Camera } from 'lucide-react';
+import { Loader2, ArrowLeft, Folder, ImageIcon, Upload, Camera } from 'lucide-react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CameraCapture } from '../../components/CameraCapture';

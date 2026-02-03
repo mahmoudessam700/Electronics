@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Loader2, ShoppingBag, Clock, TrendingUp, Package, Truck, CheckCircle2, XCircle, Search, Filter, Calendar } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { ShoppingBag, Clock, Package, Truck, CheckCircle2, XCircle, Search, Calendar } from 'lucide-react';
 import { Input } from '../../components/ui/input';
-import { Button } from '../../components/ui/button';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 interface Order {
@@ -11,6 +10,8 @@ interface Order {
     totalAmount: number;
     status: string;
     createdAt: string;
+    shopPayoutStatus?: string;
+    shopPayoutId?: string | null;
 }
 
 export function AdminOrdersPage() {
@@ -23,29 +24,40 @@ export function AdminOrdersPage() {
         DELIVERED: { label: t('admin.delivered'), icon: CheckCircle2, color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200' },
         CANCELLED: { label: t('admin.cancelled'), icon: XCircle, color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
     };
+    const PAYOUT_STATUS_OPTIONS = ['NOT_REQUESTED', 'QUEUED', 'PAID_OUT', 'WITHHELD'];
 
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('ALL');
+    const [payoutFilter, setPayoutFilter] = useState<string>('ALL');
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
-
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
+        setLoading(true);
         try {
-            const res = await fetch('/api/orders');
+            const params = new URLSearchParams();
+            if (statusFilter !== 'ALL') {
+                params.set('status', statusFilter);
+            }
+            if (payoutFilter !== 'ALL') {
+                params.set('payoutStatus', payoutFilter);
+            }
+            const query = params.toString();
+            const res = await fetch(query ? `/api/orders?${query}` : '/api/orders');
             const data = await res.json();
             if (res.ok) {
-                setOrders(data);
+                setOrders(Array.isArray(data) ? data : []);
             }
         } catch (error) {
             console.error('Failed to fetch orders', error);
         } finally {
             setLoading(false);
         }
-    };
+    }, [payoutFilter, statusFilter]);
+
+    useEffect(() => {
+        fetchOrders();
+    }, [fetchOrders]);
 
     const updateStatus = async (id: string, newStatus: string) => {
         try {
@@ -66,7 +78,8 @@ export function AdminOrdersPage() {
         const matchesSearch = order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
             order.customerEmail.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesStatus = statusFilter === 'ALL' || order.status === statusFilter;
-        return matchesSearch && matchesStatus;
+        const matchesPayout = payoutFilter === 'ALL' || order.shopPayoutStatus === payoutFilter;
+        return matchesSearch && matchesStatus && matchesPayout;
     });
 
     const stats = {
@@ -173,6 +186,25 @@ export function AdminOrdersPage() {
                 </div>
             </div>
 
+            <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Payout status</span>
+                <div className="flex gap-2 flex-wrap">
+                    {['ALL', ...PAYOUT_STATUS_OPTIONS].map((status) => (
+                        <button
+                            key={status}
+                            onClick={() => setPayoutFilter(status)}
+                            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                                payoutFilter === status
+                                    ? 'bg-[#4A5568] text-white'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                            }`}
+                        >
+                            {status === 'ALL' ? 'All payouts' : status.replace('_', ' ')}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* Orders Table */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
@@ -183,13 +215,13 @@ export function AdminOrdersPage() {
                                 <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden sm:table-cell`}>{t('admin.customer')}</th>
                                 <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell`}>{t('admin.date')}</th>
                                 <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.amount')}</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>Payout</th>
                                 <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.status')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredOrders.map((order) => {
                                 const config = STATUS_CONFIG[order.status] || STATUS_CONFIG.PENDING;
-                                const StatusIcon = config.icon;
                                 
                                 return (
                                     <tr key={order.id} className="hover:bg-gray-50 transition-colors">
@@ -222,6 +254,18 @@ export function AdminOrdersPage() {
                                             <span className="text-sm font-bold text-gray-900">
                                                 {formatCurrency(order.totalAmount)}
                                             </span>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            {order.shopPayoutStatus ? (
+                                                <div className="flex flex-col text-xs text-gray-600">
+                                                    <span className="font-semibold">{order.shopPayoutStatus.replace('_', ' ')}</span>
+                                                    {order.shopPayoutId && (
+                                                        <span className="text-[11px] text-gray-500">ID: {order.shopPayoutId}</span>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-gray-400">—</span>
+                                            )}
                                         </td>
                                         <td className="py-3 px-4">
                                             <div className="relative inline-block">

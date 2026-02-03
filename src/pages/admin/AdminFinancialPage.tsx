@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import { 
-  DollarSign, 
-  TrendingUp, 
-  TrendingDown, 
-  Plus, 
-  Calendar, 
-  ArrowUpRight, 
-  ArrowDownRight,
+    DollarSign, 
+    TrendingUp, 
+    Plus, 
+    ArrowDownRight,
   Filter,
   Download,
   Wallet,

@@ -24,39 +24,48 @@ model Category {
   updatedAt   DateTime   @updatedAt
 
   @@index([parentId])
+
   @@index([sortOrder])
 }
 
 model Product {
-  id            String      @id @default(cuid())
-  name          String
-  nameEn        String?
-  nameAr        String?
-  price         Float
-  originalPrice Float?
-  rating        Float       @default(4.5)
-  reviewCount   Int         @default(0)
-  image         String
-  isPrime       Boolean     @default(true)
-  deliveryDate  String      @default("Tomorrow")
-  category      String?     // Keep for backwards compatibility
-  categoryId    String?
-  categoryRef   Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  supplierId    String?
-  supplier      Supplier?    @relation(fields: [supplierId], references: [id], onDelete: SetNull)
-  description   String?
-  descriptionAr String?
-  costPrice     Float       @default(0)
-  inStock       Boolean     @default(true)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  orderItems    OrderItem[]
-  wishlistItems Wishlist[]
-  cartItems     CartItem[]
+  id                 String      @id @default(cuid())
+  name               String
+  nameEn             String?
+  nameAr             String?
+  price              Float
+  originalPrice      Float?
+  rating             Float       @default(4.5)
+  reviewCount        Int         @default(0)
+  image              String
+  isPrime            Boolean     @default(true)
+  deliveryDate       String      @default("Tomorrow")
+  category           String?     // Keep for backwards compatibility
+  categoryId         String?
+  categoryRef        Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  supplierId         String?
+  supplier           Supplier?    @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  shopId             String?
+  shop               Shop?        @relation(fields: [shopId], references: [id], onDelete: SetNull)
+  commissionRate     Float?
+  commissionLocked   Boolean     @default(false)
+  description        String?
+  descriptionAr      String?
+  costPrice          Float       @default(0)
+  inStock            Boolean     @default(true)
+  inventoryQuantity  Int         @default(0)
+  tracksInventory    Boolean     @default(false)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  orderItems         OrderItem[]
+  wishlistItems      Wishlist[]
+  cartItems          CartItem[]
+  ledgerEntries      ShopCommissionLedger[]
 
   @@index([category])
   @@index([categoryId])
   @@index([supplierId])
+  @@index([shopId])
 }
 
 model Order {
@@ -70,19 +79,32 @@ model Order {
   shippingAddress String?
   userId          String?
   user            User?        @relation(fields: [userId], references: [id])
+  shopId          String?
+  shop            Shop?        @relation(fields: [shopId], references: [id], onDelete: SetNull)
+  commissionTotal Float        @default(0)
+  shopPayoutStatus ShopOrderPayoutStatus @default(NOT_REQUESTED)
+  shopPayoutId    String?
+  shopPayout      ShopPayout? @relation("ShopPayoutOrders", fields: [shopPayoutId], references: [id], onDelete: SetNull)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   items       OrderItem[]
-}
+  ledgerEntries ShopCommissionLedger[]
 
+  @@index([shopId])
+  @@index([shopPayoutId])
+}
 model OrderItem {
-  id        String   @id @default(cuid())
-  orderId   String
-  productId String
-  quantity  Int
-  price     Float
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id])
+  id          String   @id @default(cuid())
+  orderId     String
+  productId   String
+  quantity    Int
+  price       Float
+  commissionRateApplied Float?
+  commissionAmount      Float    @default(0)
+  netRevenue            Float    @default(0)
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id])
+  ledgerEntries ShopCommissionLedger[]
 
   @@index([orderId])
   @@index([productId])
@@ -119,7 +141,10 @@ model User {
   resetPasswordExpires DateTime?
   wishlist             Wishlist[]
   orders               Order[]
+  shopMemberships      ShopMember[]
+  ownedShops           Shop[]       @relation("ShopOwner")
   cartItems            CartItem[]
+  sentShopInvitations  ShopInvitation[] @relation("ShopInvitationInvitedBy")
 }
 
 model Wishlist {
@@ -160,9 +185,271 @@ model Supplier {
   updatedAt DateTime  @updatedAt
 }
 
+model Shop {
+  id                    String             @id @default(cuid())
+  name                  String
+  slug                  String             @unique
+  description           String?
+  logo                  String?
+  email                 String?
+  phone                 String?
+  address               String?
+  status                ShopStatus         @default(PENDING)
+  kycStatus             ShopKycStatus      @default(UNVERIFIED)
+  defaultCommissionRate Float              @default(0)
+  payoutSchedule        ShopPayoutSchedule @default(MANUAL)
+  lastPayoutDate        DateTime?
+  nextPayoutDate        DateTime?
+  ownerId               String?
+  owner                 User?              @relation("ShopOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  products              Product[]
+  members               ShopMember[]
+  featureToggles        ShopFeatureToggle[]
+  settings              ShopSetting[]
+  invitations           ShopInvitation[]
+  ledgerEntries         ShopCommissionLedger[]
+  payouts               ShopPayout[]
+  automationHooks       ShopAutomationHook[]
+  payoutPreference      ShopPayoutPreference?
+  orders                Order[]
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  @@index([status])
+}
+
+model ShopMember {
+  id        String          @id @default(cuid())
+  userId    String
+  shopId    String
+  role      ShopMemberRole  @default(STAFF)
+  status    ShopMemberStatus @default(ACTIVE)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shop      Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, shopId])
+  @@index([shopId])
+}
+
+model ShopFeatureToggle {
+  id        String   @id @default(cuid())
+  shopId    String
+  key       String
+  enabled   Boolean  @default(true)
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, key])
+  @@index([shopId])
+}
+
+model ShopSetting {
+  id        String   @id @default(cuid())
+  shopId    String?
+  key       String
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  shop      Shop?    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, key])
+  @@index([shopId])
+}
+
+model ShopInvitation {
+  id          String               @id @default(cuid())
+  shopId      String
+  email       String
+  role        ShopMemberRole       @default(STAFF)
+  status      ShopInvitationStatus @default(PENDING)
+  token       String               @unique
+  expiresAt   DateTime
+  invitedById String?
+  invitedBy   User?                @relation("ShopInvitationInvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  shop        Shop                 @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@index([email])
+}
+
+model ShopPayoutPreference {
+  id            String           @id @default(cuid())
+  shopId        String           @unique
+  method        ShopPayoutMethod @default(BANK_TRANSFER)
+  accountName   String?
+  accountNumber String?
+  bankName      String?
+  bankSwift     String?
+  walletProvider String?
+  walletNumber  String?
+  metadata      Json?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  shop          Shop             @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  payouts       ShopPayout[]
+}
+
+model ShopCommissionLedger {
+  id           String                    @id @default(cuid())
+  shopId       String
+  orderId      String?
+  orderItemId  String?
+  productId    String?
+  payoutId     String?
+  type         ShopCommissionLedgerType
+  amount       Float
+  currency     String                    @default("EGP")
+  balanceAfter Float?
+  description  String?
+  reference    String?
+  metadata     Json?
+  createdAt    DateTime                  @default(now())
+  shop         Shop                      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  order        Order?                    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderItem    OrderItem?                @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  payout       ShopPayout?               @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  product      Product?                  @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([shopId])
+  @@index([orderId])
+  @@index([orderItemId])
+  @@index([payoutId])
+  @@index([productId])
+}
+
+model ShopPayout {
+  id           String            @id @default(cuid())
+  shopId       String
+  amount       Float
+  currency     String            @default("EGP")
+  status       ShopPayoutStatus  @default(PENDING)
+  scheduledFor DateTime?
+  processedAt  DateTime?
+  reference    String?           @unique
+  notes        String?
+  preferenceId String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  shop         Shop              @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  ledgerEntries ShopCommissionLedger[]
+  preference   ShopPayoutPreference? @relation(fields: [preferenceId], references: [id], onDelete: SetNull)
+  orders       Order[]        @relation("ShopPayoutOrders")
+
+  @@index([shopId])
+  @@index([status])
+}
+
+model ShopAutomationHook {
+  id             String               @id @default(cuid())
+  shopId         String
+  event          ShopAutomationEvent
+  url            String
+  secret         String?
+  enabled        Boolean              @default(true)
+  metadata       Json?
+  lastTriggeredAt DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  shop           Shop                 @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@unique([shopId, event])
+}
+
 enum Role {
   CUSTOMER
   ADMIN
+  SHOP_OWNER
+  SHOP_STAFF
+}
+
+enum ShopStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum ShopMemberRole {
+  OWNER
+  MANAGER
+  STAFF
+  FINANCE
+}
+
+enum ShopMemberStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+  REVOKED
+}
+
+enum ShopInvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum ShopKycStatus {
+  UNVERIFIED
+  SUBMITTED
+  VERIFIED
+  REJECTED
+}
+
+enum ShopPayoutSchedule {
+  MANUAL
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum ShopCommissionLedgerType {
+  ORDER_EARNING
+  ADJUSTMENT
+  PAYOUT
+  REVERSAL
+  FEE
+}
+
+enum ShopPayoutStatus {
+  PENDING
+  SCHEDULED
+  PROCESSING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum ShopPayoutMethod {
+  BANK_TRANSFER
+  MOBILE_WALLET
+  PAYPAL
+  CASH_COLLECTION
+}
+
+enum ShopAutomationEvent {
+  ORDER_CREATED
+  ORDER_UPDATED
+  ORDER_FULFILLED
+  COMMISSION_EARNED
+  PAYOUT_QUEUED
+  PAYOUT_COMPLETED
+}
+
+enum ShopOrderPayoutStatus {
+  NOT_REQUESTED
+  QUEUED
+  PAID_OUT
+  WITHHELD
 }
 
 model FinancialCycle {

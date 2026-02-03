@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Loader2, Trash2, ExternalLink, RefreshCw, FileImage, File, HardDrive, Search, Grid, List, Download, Calendar, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Trash2, ExternalLink, RefreshCw, File, HardDrive, Search, Grid, List, Calendar, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface FileItem {

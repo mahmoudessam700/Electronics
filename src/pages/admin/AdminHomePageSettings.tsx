@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     Layout, 
     Eye, 
@@ -93,7 +93,7 @@ interface Section {
 }
 
 export function AdminHomePageSettings() {
-    const { t, isRTL, formatCurrency } = useLanguage();
+    const { t, isRTL } = useLanguage();
 
     const [sections, setSections] = useState<Section[]>([
         { 
@@ -295,7 +295,6 @@ export function AdminHomePageSettings() {
     ]);
 
     const [uploadingSlideId, setUploadingSlideId] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         fetchSettings();

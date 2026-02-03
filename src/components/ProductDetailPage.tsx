@@ -34,14 +34,6 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
     return product.name;
   };
 
-  // Get translated product description
-  const getProductDescription = () => {
-    if (language === 'ar' && product.descriptionAr) {
-      return product.descriptionAr;
-    }
-    return product.description || '';
-  };
-
   // Mock additional images
   const images = [
     product.image,

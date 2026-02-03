@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Plus, Pencil, Trash2, Loader2, Package, Search, Filter, MoreVertical, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -19,7 +19,7 @@ interface Product {
 }
 
 export function AdminProductsPage() {
-    const { t, formatCurrency, isRTL } = useLanguage();
+    const { t, isRTL } = useLanguage();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -100,7 +100,6 @@ export function AdminProductsPage() {
                     />
                 </div>
                 <Button variant="outline" className="border-slate-200 hover:bg-slate-50 rounded-xl">
-                    <Filter className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4`} />
                     {t('common.filter')}
                 </Button>
             </div>

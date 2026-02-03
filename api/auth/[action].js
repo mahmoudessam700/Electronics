@@ -1,15 +1,19 @@
-const { Pool } = require('pg');
+// @ts-nocheck
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { serialize } = require('cookie');
+const { getPool, withTransaction } = require('../_utils/db');
+const {
+    JWT_SECRET,
+    ensureSlug,
+    normalizeCommissionRate,
+    buildAuthUserResponse,
+    getShopMemberships,
+    generateId,
+} = require('../_utils/auth');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
-
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const pool = getPool();
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -35,6 +39,7 @@ module.exports = async (req, res) => {
 
             if (!user.emailVerified) return res.status(401).json({ error: 'Please verify your email address.' });
 
+            const userPayload = await buildAuthUserResponse(user);
             const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 
             res.setHeader('Set-Cookie', serialize('auth_token', token, {
@@ -45,7 +50,7 @@ module.exports = async (req, res) => {
                 path: '/',
             }));
 
-            return res.status(200).json({ success: true, user: { id: user.id, email: user.email, name: user.name, role: user.role }, token });
+            return res.status(200).json({ success: true, user: userPayload, token });
         }
 
         if (actionName === 'me') {
@@ -56,7 +61,8 @@ module.exports = async (req, res) => {
             const decoded = jwt.verify(token, JWT_SECRET);
             const { rows } = await pool.query('SELECT id, email, name, phone, address, image, latitude, longitude, role FROM "User" WHERE id = $1', [decoded.userId]);
             if (!rows[0]) return res.status(404).json({ error: 'User not found' });
-            return res.status(200).json({ user: rows[0] });
+            const shopMemberships = await getShopMemberships(rows[0].id);
+            return res.status(200).json({ user: { ...rows[0], shopMemberships } });
         }
 
         if (actionName === 'signup') {
@@ -101,11 +107,110 @@ module.exports = async (req, res) => {
                 false, token, expires
             ]);
 
+            const userPayload = await buildAuthUserResponse(newUser[0]);
+
             return res.status(201).json({
                 success: true,
                 message: 'Account created successfully! Please check your email to verify your account.',
                 requiresVerification: true,
-                user: newUser[0]
+                user: userPayload
+            });
+        }
+
+        if (actionName === 'register-shop') {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+            const {
+                email,
+                password,
+                name,
+                phone,
+                address,
+                shopName,
+                shopDescription,
+                shopSlug,
+                defaultCommissionRate
+            } = req.body;
+
+            if (!email || !password || !name || !shopName) {
+                return res.status(400).json({ error: 'Name, email, password and shop name are required' });
+            }
+
+            const { rows: existingUsers } = await pool.query('SELECT id FROM "User" WHERE email = $1', [email]);
+            if (existingUsers.length > 0) {
+                return res.status(400).json({ error: 'An account with this email already exists' });
+            }
+
+            const slug = await ensureSlug(shopSlug || shopName);
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const commissionRate = normalizeCommissionRate(defaultCommissionRate);
+            const userId = generateId('user');
+            const shopId = generateId('shop');
+            const membershipId = generateId('shop_member');
+
+            const result = await withTransaction(async (client) => {
+                const { rows: createdUsers } = await client.query(`
+                    INSERT INTO "User" (
+                        id, email, password, name, phone, address, role,
+                        "emailVerified", "emailVerificationToken", "emailVerificationExpires",
+                        "createdAt", "updatedAt"
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NULL, NULL, NOW(), NOW())
+                    RETURNING id, email, name, role
+                `, [
+                    userId,
+                    email,
+                    hashedPassword,
+                    name,
+                    phone || null,
+                    address || null,
+                    'SHOP_OWNER',
+                    true
+                ]);
+
+                await client.query(`
+                    INSERT INTO "Shop" (
+                        id, name, slug, description, email, phone, address, status,
+                        "defaultCommissionRate", "ownerId", "createdAt", "updatedAt"
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
+                `, [
+                    shopId,
+                    shopName,
+                    slug,
+                    shopDescription || null,
+                    email,
+                    phone || null,
+                    address || null,
+                    'PENDING',
+                    commissionRate,
+                    userId
+                ]);
+
+                await client.query(`
+                    INSERT INTO "ShopMember" (
+                        id, "userId", "shopId", role, "createdAt", "updatedAt"
+                    )
+                    VALUES ($1, $2, $3, $4, NOW(), NOW())
+                `, [membershipId, userId, shopId, 'OWNER']);
+
+                return createdUsers[0];
+            });
+
+            const userPayload = await buildAuthUserResponse(result);
+
+            return res.status(201).json({
+                success: true,
+                message: 'Shop application submitted successfully. We will review it shortly.',
+                requiresApproval: true,
+                shop: {
+                    id: shopId,
+                    name: shopName,
+                    slug,
+                    status: 'PENDING',
+                    defaultCommissionRate: commissionRate
+                },
+                user: userPayload
             });
         }
 

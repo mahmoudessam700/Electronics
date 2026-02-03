@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
-import { CartItem } from './ShoppingCart';
+import type { CartItem } from '../contexts/AuthContext';
 import { Card, CardContent } from './ui/card';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';

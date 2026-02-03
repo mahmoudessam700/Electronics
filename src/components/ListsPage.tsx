@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Heart, Trash2, Loader2, ArrowRight, Bell, Share2, Lightbulb, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import type { Product } from './ProductCard';
 
 interface ListItem {
     id: string;
@@ -13,8 +14,8 @@ interface ListItem {
 }
 
 interface ListsPageProps {
-    onNavigate: (page: string, product?: any) => void;
-    onAddToCart: (product: any) => void;
+    onNavigate: (page: string, product?: Product) => void;
+    onAddToCart: (product: Product, quantity: number) => Promise<void> | void;
 }
 
 export function ListsPage({ onNavigate, onAddToCart }: ListsPageProps) {
@@ -200,6 +201,18 @@ export function ListsPage({ onNavigate, onAddToCart }: ListsPageProps) {
                             {items.map((item) => {
                                 const onSale = item.originalPrice && item.originalPrice > item.price;
                                 const savings = onSale ? item.originalPrice! - item.price : 0;
+                                const mappedProduct: Product = {
+                                    id: item.productId,
+                                    name: item.name,
+                                    price: item.price,
+                                    originalPrice: item.originalPrice,
+                                    image: item.image,
+                                    rating: 0,
+                                    reviewCount: 0,
+                                    isPrime: false,
+                                    deliveryDate: undefined,
+                                    category: undefined
+                                };
 
                                 return (
                                     <div
@@ -214,7 +227,7 @@ export function ListsPage({ onNavigate, onAddToCart }: ListsPageProps) {
                                             cursor: 'pointer'
                                         }}
                                         className="wishlist-card"
-                                        onClick={() => onNavigate('product', item)}
+                                        onClick={() => onNavigate('product', mappedProduct)}
                                     >
                                         {/* Sale Badge */}
                                         {onSale && (
@@ -335,7 +348,7 @@ export function ListsPage({ onNavigate, onAddToCart }: ListsPageProps) {
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onAddToCart(item);
+                                                    onAddToCart(mappedProduct, 1);
                                                 }}
                                                 style={{
                                                     width: '100%',

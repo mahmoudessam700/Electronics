@@ -28,7 +28,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onClick }: ProductCardProps) {
-  const { formatCurrency, t, isRTL, language } = useLanguage();
+  const { formatCurrency, t, language } = useLanguage();
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;

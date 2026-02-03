@@ -99,12 +99,6 @@ export function HomePage({ onNavigate }: HomePageProps) {
     return section ? section.isEnabled : true;
   };
 
-  const isFooterLinkVisible = (id: string) => {
-    if (!settings || !settings.sections) return true;
-    const section = settings.sections.find((s: any) => s.id === id);
-    return section ? section.isEnabled : true;
-  };
-
   const getSectionName = (id: string, defaultName: string) => {
     if (!settings || !settings.sections) return defaultName;
     const section = settings.sections.find((s: any) => s.id === id);
@@ -321,7 +315,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
                 gap: 16
               }}>
-                {dealsOfTheDay.map((product) => (
+                {dealsOfTheDay.map((product: Product) => (
                   <div
                     key={product.id}
                     style={{ cursor: 'pointer' }}

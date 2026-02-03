@@ -1,27 +1,37 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { Product } from '../components/ProductCard';
+
+type UserRole = 'ADMIN' | 'CUSTOMER' | 'SHOP_OWNER' | 'SHOP_STAFF';
+
+interface ShopSummary {
+    id: string;
+    name: string;
+    slug?: string;
+    status?: string;
+    defaultCommissionRate?: number;
+}
+
+type ShopMemberRole = 'OWNER' | 'MANAGER' | 'STAFF' | 'FINANCE';
+
+interface ShopMembership {
+    id: string;
+    shopId: string;
+    role: ShopMemberRole;
+    createdAt?: string;
+    updatedAt?: string;
+    shop?: ShopSummary;
+}
 
 interface User {
     id: string;
     email: string;
     name?: string;
-    role: 'ADMIN' | 'CUSTOMER';
+    role: UserRole;
+    shopMemberships?: ShopMembership[];
 }
 
-interface Product {
-    id: string;
-    name: string;
-    price: number;
-    originalPrice?: number;
-    image: string;
-    isPrime?: boolean;
-    deliveryDate?: string;
-    rating?: number;
-    reviewCount?: number;
-    category?: string;
-}
-
-interface CartItem {
+export interface CartItem {
     product: Product;
     quantity: number;
 }
@@ -32,7 +42,13 @@ interface AuthContextType {
     login: (token: string, user: User) => void;
     logout: () => void;
     isAdmin: boolean;
+    isShopUser: boolean;
     token: string | null;
+    shopMemberships: ShopMembership[];
+    activeShopId: string | null;
+    activeShop: ShopSummary | null;
+    selectActiveShop: (shopId: string) => void;
+    hasShopRole: (roles: ShopMemberRole | ShopMemberRole[]) => boolean;
     // Cart functionality
     cartItems: CartItem[];
     cartLoading: boolean;
@@ -49,9 +65,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const navigate = useNavigate();
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(localStorage.getItem('auth_token'));
+    const [activeShopId, setActiveShopId] = useState<string | null>(localStorage.getItem('active_shop_id'));
     const [loading, setLoading] = useState(true);
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [cartLoading, setCartLoading] = useState(false);
+    const memberships = user?.shopMemberships || [];
 
     // Load cart from localStorage for guests
     const loadLocalCart = useCallback(() => {
@@ -120,6 +138,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, [fetchCart]);
 
+    const ensureActiveShopSelection = useCallback((shopList: ShopMembership[]) => {
+        if (!shopList || shopList.length === 0) {
+            setActiveShopId(null);
+            localStorage.removeItem('active_shop_id');
+            return;
+        }
+
+        const stored = localStorage.getItem('active_shop_id');
+        const storedExists = stored && shopList.some((membership) => membership.shopId === stored);
+        const nextShopId = storedExists ? stored! : shopList[0].shopId;
+
+        setActiveShopId(nextShopId);
+        localStorage.setItem('active_shop_id', nextShopId);
+    }, []);
+
     useEffect(() => {
         checkUser();
     }, []);
@@ -134,6 +167,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         }
     }, [user, token, loading, fetchCart, loadLocalCart]);
+
+    useEffect(() => {
+        if (memberships.length > 0) {
+            ensureActiveShopSelection(memberships);
+        } else {
+            setActiveShopId(null);
+            localStorage.removeItem('active_shop_id');
+        }
+    }, [memberships, ensureActiveShopSelection]);
 
     async function checkUser() {
         try {
@@ -168,17 +210,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('auth_token', token);
         setToken(token);
         setUser(userData);
+        if (userData.shopMemberships?.length) {
+            ensureActiveShopSelection(userData.shopMemberships);
+        } else {
+            setActiveShopId(null);
+            localStorage.removeItem('active_shop_id');
+        }
         // Sync local cart to database after login
         setTimeout(() => syncCartFromLocal(), 100);
     };
 
     const logout = () => {
         localStorage.removeItem('auth_token');
+        localStorage.removeItem('active_shop_id');
         setToken(null);
         setUser(null);
         setCartItems([]);
+        setActiveShopId(null);
         navigate('/');
     };
+
+    const selectActiveShop = useCallback((shopId: string) => {
+        if (!shopId) return;
+        if (!memberships.some((membership) => membership.shopId === shopId)) {
+            return;
+        }
+        setActiveShopId(shopId);
+        localStorage.setItem('active_shop_id', shopId);
+    }, [memberships]);
+
+    const hasShopRole = useCallback((roles: ShopMemberRole | ShopMemberRole[]) => {
+        const roleList = Array.isArray(roles) ? roles : [roles];
+        return memberships.some((membership) => roleList.includes(membership.role));
+    }, [memberships]);
 
     // Cart operations
     const addToCart = async (product: Product, quantity: number) => {
@@ -282,14 +346,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const activeShop = memberships.find((membership) => membership.shopId === activeShopId)?.shop || null;
+    const isAdmin = user?.role === 'ADMIN';
+    const isShopRole = user?.role === 'SHOP_OWNER' || user?.role === 'SHOP_STAFF';
+
     return (
         <AuthContext.Provider value={{
             user,
             loading,
             login,
             logout,
-            isAdmin: user?.role === 'ADMIN',
+            isAdmin: Boolean(isAdmin),
+            isShopUser: Boolean(isShopRole || memberships.length > 0),
             token,
+            shopMemberships: memberships,
+            activeShopId,
+            activeShop,
+            selectActiveShop,
+            hasShopRole,
             cartItems,
             cartLoading,
             addToCart,

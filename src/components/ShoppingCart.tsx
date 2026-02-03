@@ -1,13 +1,8 @@
 import { Trash2, Plus, Minus, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
-import { Product } from './ProductCard';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useLanguage } from '../contexts/LanguageContext';
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-}
+import type { CartItem } from '../contexts/AuthContext';
 
 interface ShoppingCartProps {
   cartItems: CartItem[];

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
-import { Pencil, Trash2, Loader2, User, Shield, MapPin, Search, Users, UserCheck, Crown, Mail, Phone } from 'lucide-react';
+import { Pencil, Trash2, Loader2, User, MapPin, Search, Users, UserCheck, Crown, Mail, Phone } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -8,13 +8,15 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { toast } from 'sonner';
 
+type RoleOption = 'ADMIN' | 'CUSTOMER' | 'SHOP_OWNER' | 'SHOP_STAFF';
+
 interface UserData {
     id: string;
     email: string;
     name: string | null;
     phone: string | null;
     address: string | null;
-    role: 'ADMIN' | 'CUSTOMER';
+    role: RoleOption;
     latitude: number | null;
     longitude: number | null;
     createdAt: string;
@@ -36,7 +38,7 @@ export function AdminUsersPage() {
         name: '',
         phone: '',
         address: '',
-        role: 'CUSTOMER' as 'ADMIN' | 'CUSTOMER'
+        role: 'CUSTOMER' as RoleOption
     });
 
     useEffect(() => {
@@ -368,7 +370,7 @@ export function AdminUsersPage() {
                                 id="role"
                                 className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814]"
                                 value={formData.role}
-                                onChange={(e) => setFormData({ ...formData, role: e.target.value as 'ADMIN' | 'CUSTOMER' })}
+                                  onChange={(e) => setFormData({ ...formData, role: e.target.value as RoleOption })}
                             >
                                 <option value="CUSTOMER">{t('admin.customer')}</option>
                                 <option value="ADMIN">{t('admin.administrator')}</option>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Loader2, ArrowLeft, Package, DollarSign, Tag, Building2, ImageIcon, CheckSquare, FileText, Upload, Camera, Languages } from 'lucide-react';
+import { Loader2, ArrowLeft, Package, DollarSign, Tag, ImageIcon, CheckSquare, Upload, Camera, Languages } from 'lucide-react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CameraCapture } from '../../components/CameraCapture';
@@ -24,7 +24,7 @@ export function AdminProductFormPage() {
     const { id } = useParams();
     const isEditing = !!id;
     const navigate = useNavigate();
-    const { t, isRTL } = useLanguage();
+    const { t } = useLanguage();
 
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
