@@ -30,9 +30,9 @@ export function AdminFinancialPage() {
         try {
             setLoading(true);
             const [cycleRes, prevRes, expRes] = await Promise.all([
-                fetch('/api/financial'),
-                fetch('/api/financial?type=cycles'),
-                fetch('/api/financial?type=expenses')
+                fetch('/api/admin?resource=financial'),
+                fetch('/api/admin?resource=financial&type=cycles'),
+                fetch('/api/admin?resource=financial&type=expenses')
             ]);
 
             const cycleData = await cycleRes.json();
@@ -117,7 +117,7 @@ export function AdminFinancialPage() {
                             onClick={async () => {
                                 const name = prompt('Enter cycle name (e.g., February 2026):');
                                 if (name) {
-                                    await fetch('/api/financial?type=cycle', {
+                                    await fetch('/api/admin?resource=financial&type=cycle', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ name })
@@ -138,7 +138,7 @@ export function AdminFinancialPage() {
                                 const amt = prompt('Amount:');
                                 const cat = prompt('Category:');
                                 if (desc && amt && cat) {
-                                    await fetch('/api/financial?type=expense', {
+                                    await fetch('/api/admin?resource=financial&type=expense', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ 
@@ -327,7 +327,7 @@ export function AdminFinancialPage() {
                                 <button 
                                     onClick={async () => {
                                         if (confirm(`Are you sure you want to close "${currentCycle.name}"?`)) {
-                                            await fetch(`/api/financial?id=${currentCycle.id}&action=close`, { method: 'PUT' });
+                                            await fetch(`/api/admin?resource=financial&id=${currentCycle.id}&action=close`, { method: 'PUT' });
                                             fetchFinancialData();
                                         }
                                     }}

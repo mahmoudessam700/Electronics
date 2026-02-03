@@ -66,7 +66,7 @@ export function AdminProductFormPage() {
 
     const fetchSuppliers = async () => {
         try {
-            const res = await fetch('/api/suppliers');
+            const res = await fetch('/api/admin?resource=suppliers');
             const data = await res.json();
             if (res.ok) {
                 setSuppliers(data);

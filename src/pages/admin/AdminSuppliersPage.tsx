@@ -49,7 +49,7 @@ export function AdminSuppliersPage() {
 
     const fetchSuppliers = async () => {
         try {
-            const res = await fetch('/api/suppliers');
+            const res = await fetch('/api/admin?resource=suppliers');
             const data = await res.json();
             if (res.ok) {
                 setSuppliers(data);
@@ -93,7 +93,7 @@ export function AdminSuppliersPage() {
         setIsSaving(true);
 
         try {
-            const url = editingSupplier ? `/api/suppliers?id=${editingSupplier.id}` : '/api/suppliers';
+            const url = editingSupplier ? `/api/admin?resource=suppliers&id=${editingSupplier.id}` : '/api/admin?resource=suppliers';
             const method = editingSupplier ? 'PUT' : 'POST';
 
             const res = await fetch(url, {
@@ -121,7 +121,7 @@ export function AdminSuppliersPage() {
         if (!confirm('Are you sure you want to delete this supplier? Any linked products will have their supplier set to null.')) return;
 
         try {
-            const res = await fetch(`/api/suppliers?id=${id}`, {
+            const res = await fetch(`/api/admin?resource=suppliers&id=${id}`, {
                 method: 'DELETE',
             });
             if (res.ok) {

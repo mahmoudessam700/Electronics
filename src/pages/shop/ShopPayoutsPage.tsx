@@ -73,7 +73,7 @@ export function ShopPayoutsPage() {
         setLoading(true);
         try {
             const params = new URLSearchParams({ shopId: activeShopId });
-            const res = await fetch(`/api/shop-payouts?${params.toString()}`, {
+            const res = await fetch(`/api/shops?action=payouts&${params.toString()}`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
             if (!res.ok) {
@@ -127,7 +127,7 @@ export function ShopPayoutsPage() {
         setSaving(true);
         try {
             const payoutAmount = eligibleOrders.amount;
-            const res = await fetch('/api/shop-payouts', {
+            const res = await fetch('/api/shops?action=payouts', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
