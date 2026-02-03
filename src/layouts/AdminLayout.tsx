@@ -34,9 +34,9 @@ export function AdminLayout() {
         { name: t('admin.customers'), path: '/admin/users', icon: Users },
         { name: t('admin.orders'), path: '/admin/orders', icon: ShoppingCart },
         { name: t('admin.financial'), path: '/admin/financial', icon: DollarSign },
-        { name: 'Shop Payouts', path: '/admin/shop-payouts', icon: Wallet },
+        { name: t('admin.shopPayouts'), path: '/admin/shop-payouts', icon: Wallet },
         { name: t('admin.homeLayout'), path: '/admin/homepage', icon: Layout },
-        { name: t('admin.pageContent') || 'Page Content', path: '/admin/pages', icon: FileText },
+        { name: t('admin.pageContent'), path: '/admin/pages', icon: FileText },
         { name: t('admin.files'), path: '/admin/files', icon: FolderOpen },
     ];
 
