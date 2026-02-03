@@ -1,7 +1,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, Users, Zap, Menu, X, DollarSign, Layout, FileText, Wallet } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, FolderOpen, LogOut, Home, Folder, Building2, Users, Zap, Menu, X, DollarSign, Layout, FileText, Wallet, Store, MessageSquare, Settings } from 'lucide-react';
 import { useState } from 'react';
 
 export function AdminLayout() {
@@ -32,6 +32,9 @@ export function AdminLayout() {
         { name: t('admin.products'), path: '/admin/products', icon: Package },
         { name: t('admin.suppliers'), path: '/admin/suppliers', icon: Building2 },
         { name: t('admin.customers'), path: '/admin/users', icon: Users },
+        { name: t('admin.shops'), path: '/admin/shops', icon: Store },
+        { name: t('admin.reviews'), path: '/admin/reviews', icon: MessageSquare },
+        { name: t('admin.settings'), path: '/admin/settings', icon: Settings },
         { name: t('admin.orders'), path: '/admin/orders', icon: ShoppingCart },
         { name: t('admin.financial'), path: '/admin/financial', icon: DollarSign },
         { name: t('admin.shopPayouts'), path: '/admin/shop-payouts', icon: Wallet },

@@ -40,7 +40,22 @@ const baseOrderSelect = `
                FROM "OrderItem" oi
                LEFT JOIN "Product" p ON p.id = oi."productId"
                WHERE oi."orderId" = o.id
-           ) AS items
+           ) AS items,
+           (
+               SELECT json_agg(
+                   json_build_object(
+                       'id', ol.id,
+                       'oldStatus', ol."oldStatus",
+                       'newStatus', ol."newStatus",
+                       'createdAt', ol."createdAt",
+                       'userName', u.name,
+                       'userRole', u.role
+                   ) ORDER BY ol."createdAt" DESC
+               )
+               FROM "OrderLog" ol
+               LEFT JOIN "User" u ON u.id = ol."userId"
+               WHERE ol."orderId" = o.id
+           ) AS logs
     FROM "Order" o
 `;
 
@@ -84,6 +99,8 @@ const prepareOrderItems = async (items = []) => {
              p.price,
              p."shopId",
              p."commissionRate",
+             p."tracksInventory",
+             p."inventoryQuantity",
              sh."defaultCommissionRate" AS "shopCommissionRate"
         FROM "Product" p
         LEFT JOIN "Shop" sh ON sh.id = p."shopId"
@@ -113,6 +130,12 @@ const prepareOrderItems = async (items = []) => {
             throw createError(400, 'Invalid product in cart');
         }
         const quantity = Math.max(1, Number(item.quantity) || 1);
+
+        // Check inventory sufficiency if tracking is enabled
+        if (product.tracksInventory && product.inventoryQuantity < quantity) {
+            throw createError(400, `Insufficient stock for ${product.name}. Available: ${product.inventoryQuantity}`);
+        }
+
         const pricing = calculateCommission(product.price, product.commissionRate, product.shopCommissionRate);
         const unitPrice = product.price;
         const commissionPerUnit = pricing.commissionAmount;
@@ -330,6 +353,14 @@ module.exports = async (req, res) => {
                         item.commissionAmount || 0,
                         item.netRevenue || 0,
                     ]);
+
+                    // Deduct inventory if tracking is enabled
+                    await client.query(`
+                        UPDATE "Product"
+                        SET "inventoryQuantity" = "inventoryQuantity" - $1,
+                            "inStock" = CASE WHEN ("inventoryQuantity" - $1) <= 0 THEN false ELSE "inStock" END
+                        WHERE id = $2 AND "tracksInventory" = true
+                    `, [item.quantity, item.productId]);
                 }
 
                 await recordOrderLedgerEntries(client, {
@@ -383,13 +414,42 @@ module.exports = async (req, res) => {
                 }
 
                 const previousStatus = order.status;
+
+                // Determine timestamp field
+                let timestampField = null;
+                if (status === 'CONFIRMED') timestampField = 'confirmedAt';
+                else if (status === 'PROCESSING') timestampField = 'processingAt';
+                else if (status === 'SHIPPED') timestampField = 'shippedAt';
+                else if (status === 'DELIVERED') timestampField = 'deliveredAt';
+                else if (status === 'CANCELLED') timestampField = 'cancelledAt';
+
+                const timestampUpdate = timestampField ? `, "${timestampField}" = NOW()` : '';
+
                 await client.query(
-                    'UPDATE "Order" SET status = $1, "updatedAt" = NOW() WHERE id = $2',
+                    `UPDATE "Order" SET status = $1, "updatedAt" = NOW() ${timestampUpdate} WHERE id = $2`,
                     [status, orderId],
+                );
+
+                // Log the change
+                await client.query(
+                    `INSERT INTO "OrderLog" (id, "orderId", "userId", "oldStatus", "newStatus", "createdAt")
+                     VALUES ($1, $2, $3, $4, $5, NOW())`,
+                    [generateId('olog'), orderId, user.id, previousStatus, status]
                 );
 
                 if (status === 'CANCELLED' && previousStatus !== 'CANCELLED' && order.shopId) {
                     const items = await fetchOrderItemsForLedger(client, orderId);
+                    
+                    // Restore inventory
+                    for (const item of items) {
+                        await client.query(`
+                            UPDATE "Product"
+                            SET "inventoryQuantity" = "inventoryQuantity" + $1,
+                                "inStock" = true
+                            WHERE id = $2 AND "tracksInventory" = true
+                        `, [item.quantity, item.productId]);
+                    }
+
                     await recordOrderLedgerEntries(client, {
                         shopId: order.shopId,
                         orderId,

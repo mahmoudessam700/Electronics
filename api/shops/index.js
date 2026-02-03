@@ -696,6 +696,45 @@ module.exports = async (req, res) => {
             return handleMembers(req, res, user);
         }
 
+        if (action === 'stats') {
+            const user = await requireAuth(req);
+            const providedShopId = normalizeQueryValue(req.query.shopId);
+            const context = resolveShopContext(user, providedShopId);
+            ensureShopAccess(user, context.shopId);
+
+            const { rows: statsRows } = await pool.query(
+                `
+                SELECT 
+                    (SELECT COUNT(*)::int FROM "Product" WHERE "shopId" = $1) as "totalProducts",
+                    (SELECT COUNT(*)::int FROM "Order" WHERE "shopId" = $1) as "totalOrders",
+                    (SELECT COALESCE(SUM("totalAmount"), 0)::float FROM "Order" WHERE "shopId" = $1) as "totalRevenue",
+                    (SELECT COALESCE(SUM("commissionTotal"), 0)::float FROM "Order" WHERE "shopId" = $1) as "totalCommission",
+                    (SELECT COALESCE(SUM(amount), 0)::float FROM "ShopCommissionLedger" WHERE "shopId" = $1) as "ledgerBalance",
+                    (SELECT COUNT(*)::int FROM "Order" WHERE "shopId" = $1 AND status = 'PENDING') as "pendingOrders"
+                `,
+                [context.shopId]
+            );
+
+            const { rows: trendRows } = await pool.query(
+                `
+                SELECT 
+                    TO_CHAR(date_trunc('month', "createdAt"), 'Mon') as month,
+                    COALESCE(SUM("totalAmount"), 0)::float as revenue
+                FROM "Order"
+                WHERE "shopId" = $1
+                GROUP BY date_trunc('month', "createdAt"), month
+                ORDER BY date_trunc('month', "createdAt") ASC
+                LIMIT 6
+                `,
+                [context.shopId]
+            );
+
+            return res.json({
+                ...statsRows[0],
+                revenueTrend: trendRows
+            });
+        }
+
         // Default: shop CRUD operations
         if (req.method === 'GET') {
             const user = await requireAuth(req);

@@ -20,6 +20,9 @@ export interface Product {
   supplierId?: string;
   description?: string;
   descriptionAr?: string;
+  inStock?: boolean;
+  inventoryQuantity?: number;
+  tracksInventory?: boolean;
 }
 
 interface ProductCardProps {

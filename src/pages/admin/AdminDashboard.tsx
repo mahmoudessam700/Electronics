@@ -1,66 +1,85 @@
-import { Package, ShoppingCart, DollarSign, Users, TrendingUp, TrendingDown, ArrowUpRight, Clock, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Package, ShoppingCart, DollarSign, Users, TrendingUp, TrendingDown, ArrowUpRight, Clock, ChevronRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 export function AdminDashboard() {
     const { t, formatCurrency, isRTL } = useLanguage();
+    const [data, setData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await fetch('/api/admin?resource=dashboard');
+                if (res.ok) {
+                    const json = await res.json();
+                    setData(json);
+                }
+            } catch (err) {
+                console.error('Failed to fetch dashboard data', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[400px]">
+                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            </div>
+        );
+    }
 
     const stats = [
         { 
             title: t('admin.totalRevenue'), 
-            value: formatCurrency(12345), 
-            change: '+20.1%', 
+            value: formatCurrency(data?.stats?.totalRevenue || 0), 
+            change: '+0.0%', 
             trend: 'up',
             icon: DollarSign, 
             iconBg: 'bg-[#4A5568]'
         },
         { 
             title: t('admin.totalOrders'), 
-            value: '125', 
-            change: '+12.5%', 
+            value: data?.stats?.totalOrders || '0', 
+            change: '+0.0%', 
             trend: 'up',
             icon: ShoppingCart, 
             iconBg: 'bg-[#718096]'
         },
         { 
             title: t('admin.totalProducts'), 
-            value: '142', 
-            change: '+3.2%', 
+            value: data?.stats?.totalProducts || '0', 
+            change: '+0.0%', 
             trend: 'up',
             icon: Package, 
             iconBg: 'bg-[#4A5568]'
         },
         { 
             title: t('admin.totalCustomers'), 
-            value: '573', 
-            change: '-2.4%', 
-            trend: 'down',
+            value: data?.stats?.totalCustomers || '0', 
+            change: '+0.0', 
+            trend: 'up',
             icon: Users, 
             iconBg: 'bg-[#718096]'
         },
     ];
 
-    const recentSales = [
-        { name: 'Olivia Martin', email: 'olivia.martin@email.com', amount: 1999, initials: 'OM' },
-        { name: 'Jackson Lee', email: 'jackson.lee@email.com', amount: 39, initials: 'JL' },
-        { name: 'Isabella Nguyen', email: 'isabella.nguyen@email.com', amount: 299, initials: 'IN' },
-        { name: 'William Kim', email: 'will@email.com', amount: 99, initials: 'WK' },
-        { name: 'Sofia Davis', email: 'sofia.davis@email.com', amount: 450, initials: 'SD' },
-    ];
-
-    const recentOrders = [
-        { id: '#ORD-2024', customer: 'John Smith', date: '2 min ago', status: 'Processing', amount: 899 },
-        { id: '#ORD-2023', customer: 'Emma Wilson', date: '15 min ago', status: 'Shipped', amount: 1250 },
-        { id: '#ORD-2022', customer: 'Michael Brown', date: '1 hour ago', status: 'Delivered', amount: 320 },
-        { id: '#ORD-2021', customer: 'Sarah Johnson', date: '3 hours ago', status: 'Pending', amount: 567 },
-    ];
+    const recentSales = data?.recentSales || [];
+    const recentOrders = data?.recentOrders || [];
+    const revenueOverview = data?.revenueOverview || [];
 
     const getStatusStyle = (status: string) => {
-        switch (status) {
-            case 'Processing': return 'bg-blue-100 text-blue-700';
-            case 'Shipped': return 'bg-amber-100 text-amber-700';
-            case 'Delivered': return 'bg-emerald-100 text-emerald-700';
-            case 'Pending': return 'bg-gray-100 text-gray-700';
+        const s = status?.toUpperCase();
+        switch (s) {
+            case 'PROCESSING': return 'bg-blue-100 text-blue-700';
+            case 'SHIPPED': return 'bg-amber-100 text-amber-700';
+            case 'DELIVERED': return 'bg-emerald-100 text-emerald-700';
+            case 'PENDING': return 'bg-gray-100 text-gray-700';
+            case 'CANCELLED': return 'bg-red-100 text-red-700';
             default: return 'bg-gray-100 text-gray-700';
         }
     };
@@ -131,17 +150,26 @@ export function AdminDashboard() {
                     
                     {/* Chart Visualization */}
                     <div className="h-[200px] md:h-[240px] flex items-end justify-between gap-1 md:gap-2 px-2">
-                        {[65, 45, 78, 52, 85, 60, 90, 72, 88, 55, 70, 95].map((height, index) => (
-                            <div key={index} className="flex-1 flex flex-col items-center gap-2 group">
-                                <div 
-                                    className="w-full bg-[#4A5568] rounded-t opacity-70 hover:opacity-100 transition-all cursor-pointer hover:bg-[#718096]"
-                                    style={{ height: `${height * 2}px` }}
-                                />
-                                <span className="text-[9px] md:text-[10px] text-gray-400 font-medium">
-                                    {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][index]}
-                                </span>
-                            </div>
-                        ))}
+                        {revenueOverview.map((item: any, index: number) => {
+                            const maxRevenue = Math.max(...revenueOverview.map((i: any) => parseFloat(i.revenue) || 0), 1);
+                            const height = (parseFloat(item.revenue) || 0) / maxRevenue * 200;
+                            return (
+                                <div key={index} className="flex-1 flex flex-col items-center gap-2 group">
+                                    <div 
+                                        className="w-full bg-[#4A5568] rounded-t opacity-70 hover:opacity-100 transition-all cursor-pointer hover:bg-[#718096] relative"
+                                        style={{ height: `${Math.max(height, 4)}px` }}
+                                        title={formatCurrency(item.revenue)}
+                                    >
+                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                            {formatCurrency(item.revenue)}
+                                        </div>
+                                    </div>
+                                    <span className="text-[9px] md:text-[10px] text-gray-400 font-medium">
+                                        {item.month}
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -152,27 +180,29 @@ export function AdminDashboard() {
                             <h3 className="text-lg font-semibold text-gray-900">{t('admin.recentActivity')}</h3>
                             <p className="text-sm text-gray-500">{t('admin.viewAll')}</p>
                         </div>
-                        <button className="text-sm font-medium text-[#4A5568] hover:text-[#2D3748] flex items-center gap-1">
+                        <Link to="/admin/orders" className="text-sm font-medium text-[#4A5568] hover:text-[#2D3748] flex items-center gap-1">
                             {t('admin.viewAll')}
                             <ArrowUpRight className="h-4 w-4" />
-                        </button>
+                        </Link>
                     </div>
                     
                     <div className="space-y-3">
-                        {recentSales.map((sale, index) => (
+                        {recentSales.length > 0 ? recentSales.map((sale: any, index: number) => (
                             <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
                                 <div className="w-10 h-10 rounded-full bg-[#4A5568] flex items-center justify-center text-white font-semibold text-sm">
                                     {sale.initials}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate">{sale.name}</p>
-                                    <p className="text-xs text-gray-500 truncate">{sale.email}</p>
+                                    <p className="text-sm font-medium text-gray-900 truncate">{sale.name || 'Anonymous'}</p>
+                                    <p className="text-xs text-gray-500 truncate">{sale.email || 'No email'}</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-sm font-bold text-gray-900">+{formatCurrency(sale.amount)}</p>
                                 </div>
                             </div>
-                        ))}
+                        )) : (
+                            <p className="text-center text-gray-500 py-8 text-sm">No recent activity</p>
+                        )}
                     </div>
                 </div>
             </div>
@@ -184,10 +214,10 @@ export function AdminDashboard() {
                         <h3 className="text-lg font-semibold text-gray-900">{t('admin.recentOrders')}</h3>
                         <p className="text-sm text-gray-500">{t('admin.viewAll')}</p>
                     </div>
-                    <button className="text-sm font-medium text-[#4A5568] hover:text-[#2D3748] flex items-center gap-1">
+                    <Link to="/admin/orders" className="text-sm font-medium text-[#4A5568] hover:text-[#2D3748] flex items-center gap-1">
                         {t('admin.viewAll')}
                         <ArrowUpRight className="h-4 w-4" />
-                    </button>
+                    </Link>
                 </div>
                 
                 <div className="overflow-x-auto -mx-5 px-5">
@@ -202,13 +232,13 @@ export function AdminDashboard() {
                             </tr>
                         </thead>
                         <tbody>
-                            {recentOrders.map((order, index) => (
+                            {recentOrders.length > 0 ? recentOrders.map((order: any, index: number) => (
                                 <tr key={index} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                                     <td className="py-3 px-3">
-                                        <span className="font-mono text-sm font-semibold text-[#4A5568]">{order.id}</span>
+                                        <span className="font-mono text-sm font-semibold text-[#4A5568]">#{order.id.substring(0, 8)}</span>
                                     </td>
                                     <td className="py-3 px-3">
-                                        <span className="text-sm font-medium text-gray-900">{order.customer}</span>
+                                        <span className="text-sm font-medium text-gray-900">{order.customer || 'Guest'}</span>
                                     </td>
                                     <td className="py-3 px-3">
                                         <div className="flex items-center gap-1.5 text-gray-500">
@@ -225,7 +255,11 @@ export function AdminDashboard() {
                                         <span className="text-sm font-bold text-gray-900">{formatCurrency(order.amount)}</span>
                                     </td>
                                 </tr>
-                            ))}
+                            )) : (
+                                <tr>
+                                    <td colSpan={5} className="py-12 text-center text-gray-500 text-sm">No recent orders</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

@@ -61,7 +61,7 @@ model Product {
   wishlistItems      Wishlist[]
   cartItems          CartItem[]
   ledgerEntries      ShopCommissionLedger[]
-
+  reviews            Review[]
   @@index([category])
   @@index([categoryId])
   @@index([supplierId])
@@ -85,13 +85,36 @@ model Order {
   shopPayoutStatus ShopOrderPayoutStatus @default(NOT_REQUESTED)
   shopPayoutId    String?
   shopPayout      ShopPayout? @relation("ShopPayoutOrders", fields: [shopPayoutId], references: [id], onDelete: SetNull)
+  
+  // Tracking timestamps
+  confirmedAt DateTime?
+  processingAt DateTime?
+  shippedAt    DateTime?
+  deliveredAt  DateTime?
+  cancelledAt  DateTime?
+
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   items       OrderItem[]
   ledgerEntries ShopCommissionLedger[]
+  logs        OrderLog[]
 
   @@index([shopId])
   @@index([shopPayoutId])
+}
+
+model OrderLog {
+  id          String      @id @default(cuid())
+  orderId     String
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id])
+  oldStatus   OrderStatus
+  newStatus   OrderStatus
+  metadata    Json?
+  createdAt   DateTime    @default(now())
+
+  @@index([orderId])
 }
 model OrderItem {
   id          String   @id @default(cuid())
@@ -145,6 +168,48 @@ model User {
   ownedShops           Shop[]       @relation("ShopOwner")
   cartItems            CartItem[]
   sentShopInvitations  ShopInvitation[] @relation("ShopInvitationInvitedBy")
+  reviews              Review[]
+  moderatedReviews     ReviewLog[] @relation("AdminReviewLogs")
+  orderLogs            OrderLog[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  userId    String
+  productId String
+  status    ReviewStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  logs      ReviewLog[]
+
+  @@index([productId])
+  @@index([userId])
+}
+
+model ReviewLog {
+  id          String   @id @default(cuid())
+  reviewId    String
+  adminId     String
+  oldStatus   ReviewStatus
+  newStatus   ReviewStatus
+  reason      String?
+  createdAt   DateTime @default(now())
+  
+  review      Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  admin       User     @relation("AdminReviewLogs", fields: [adminId], references: [id])
+
+  @@index([reviewId])
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  HIDDEN
 }
 
 model Wishlist {

@@ -155,6 +155,61 @@ const handleFinancial = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
 };
 
+// ============ DASHBOARD HANDLERS ============
+const handleDashboard = async (req, res) => {
+    if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+    const stats = await pool.query(`
+        SELECT 
+            (SELECT COALESCE(SUM("totalAmount"), 0) FROM "Order") as "totalRevenue",
+            (SELECT COUNT(*) FROM "Order") as "totalOrders",
+            (SELECT COUNT(*) FROM "Product") as "totalProducts",
+            (SELECT COUNT(*) FROM "User" WHERE role = 'CUSTOMER') as "totalCustomers"
+    `);
+
+    const recentSales = await pool.query(`
+        SELECT o.id, o."totalAmount" as amount, u.name, u.email
+        FROM "Order" o
+        LEFT JOIN "User" u ON o."userId" = u.id
+        ORDER BY o."createdAt" DESC
+        LIMIT 5
+    `);
+
+    const recentOrders = await pool.query(`
+        SELECT o.id, o."customerName" as customer, o."createdAt" as date, o.status, o."totalAmount" as amount
+        FROM "Order" o
+        ORDER BY o."createdAt" DESC
+        LIMIT 4
+    `);
+
+    const revenueOverview = await pool.query(`
+        SELECT 
+            TO_CHAR(date_trunc('month', months.m), 'Mon') as month,
+            COALESCE(SUM(o."totalAmount"), 0) as revenue
+        FROM generate_series(
+            date_trunc('month', NOW()) - INTERVAL '11 months',
+            date_trunc('month', NOW()),
+            '1 month'::interval
+        ) AS months(m)
+        LEFT JOIN "Order" o ON date_trunc('month', o."createdAt") = months.m
+        GROUP BY months.m
+        ORDER BY months.m
+    `);
+
+    return res.json({
+        stats: stats.rows[0],
+        recentSales: recentSales.rows.map(s => ({
+            ...s,
+            initials: (s.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+        })),
+        recentOrders: recentOrders.rows.map(o => ({
+            ...o,
+            date: new Date(o.date).toLocaleString(), // Simple format
+        })),
+        revenueOverview: revenueOverview.rows
+    });
+};
+
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -173,9 +228,13 @@ module.exports = async (req, res) => {
             return handleFinancial(req, res);
         }
 
+        if (resource === 'dashboard') {
+            return handleDashboard(req, res);
+        }
+
         return res.status(400).json({ 
             error: 'Resource parameter required', 
-            hint: 'Use ?resource=suppliers or ?resource=financial' 
+            hint: 'Use ?resource=suppliers, ?resource=financial, or ?resource=dashboard' 
         });
     } catch (error) {
         console.error('Admin API Error:', error);

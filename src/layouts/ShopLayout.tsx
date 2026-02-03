@@ -2,7 +2,7 @@ import { Outlet, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMemo } from 'react';
-import { Store, Package, LogOut, Home, ChevronDown, CreditCard, Wallet } from 'lucide-react';
+import { Store, Package, LogOut, Home, ChevronDown, CreditCard, Wallet, Settings } from 'lucide-react';
 
 export function ShopLayout() {
     const { user, loading, shopMemberships, activeShopId, selectActiveShop, activeShop, logout } = useAuth();
@@ -14,7 +14,9 @@ export function ShopLayout() {
         { name: 'Overview', path: '/shop', icon: Store },
         { name: 'Products', path: '/shop/products', icon: Package },
         { name: 'Orders', path: '/shop/orders', icon: CreditCard },
+        { name: 'Team', path: '/shop/team', icon: Users },
         { name: 'Payouts', path: '/shop/payouts', icon: Wallet },
+        { name: 'Settings', path: '/shop/settings', icon: Settings },
     ]), []);
 
     if (loading) {

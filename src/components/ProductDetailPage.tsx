@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Star, MapPin, ShieldCheck, TruckIcon, RefreshCw, Heart, Share2, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Star, MapPin, ShieldCheck, TruckIcon, RefreshCw, Heart, Share2, ChevronRight, Loader2, MessageSquare, ThumbsUp, Flag, Clock } from 'lucide-react';
 import { Button } from './ui/button';
 import { Product } from './ProductCard';
 import {
@@ -11,6 +11,17 @@ import {
 } from './ui/select';
 import { Progress } from './ui/progress';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
+
+interface Review {
+  id: string;
+  userName: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  status: string;
+}
 
 interface ProductDetailPageProps {
   product: Product;
@@ -19,9 +30,68 @@ interface ProductDetailPageProps {
 }
 
 export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDetailPageProps) {
-  const { t, formatCurrency, language } = useLanguage();
+  const { t, formatCurrency, language, isRTL } = useLanguage();
+  const { user, token } = useAuth();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState('');
+
+  useEffect(() => {
+    fetchReviews();
+  }, [product.id]);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch(`/api/reviews?productId=${product.id}&status=APPROVED`);
+      if (res.ok) {
+        const data = await res.json();
+        setReviews(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch reviews', error);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) {
+      toast.error('Please sign in to write a review');
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          productId: product.id,
+          rating: newRating,
+          comment: newComment
+        })
+      });
+
+      if (res.ok) {
+        toast.success('Review submitted for moderation');
+        setNewComment('');
+        setNewRating(5);
+      } else {
+        toast.error('Failed to submit review');
+      }
+    } catch (error) {
+      toast.error('An error occurred');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   // Get translated product name
   const getProductName = () => {
@@ -52,40 +122,6 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
     'Includes carrying case and accessories',
   ];
 
-  // Mock reviews
-  const reviews = [
-    {
-      id: '1',
-      author: 'John D.',
-      rating: 5,
-      title: 'Excellent product!',
-      comment: 'This product exceeded my expectations. The quality is outstanding and it works perfectly. Highly recommended!',
-      date: 'January 20, 2026',
-      helpful: 45,
-      verified: true
-    },
-    {
-      id: '2',
-      author: 'Sarah M.',
-      rating: 4,
-      title: 'Great value for money',
-      comment: 'Good product overall. Minor issues with setup but customer service was helpful. Very satisfied with the purchase.',
-      date: 'January 18, 2026',
-      helpful: 32,
-      verified: true
-    },
-    {
-      id: '3',
-      author: 'Mike R.',
-      rating: 5,
-      title: 'Best purchase this year',
-      comment: 'Absolutely love it! The features are amazing and it\'s very easy to use. Worth every penny.',
-      date: 'January 15, 2026',
-      helpful: 28,
-      verified: true
-    }
-  ];
-
   // Mock frequently bought together
   const frequentlyBoughtTogether = [
     {
@@ -105,13 +141,11 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
   const totalPrice = product.price + frequentlyBoughtTogether.reduce((sum, item) => sum + item.price, 0);
   const discount = product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
 
-  const ratingBreakdown = [
-    { stars: 5, percentage: 71, count: 8843 },
-    { stars: 4, percentage: 17, count: 2117 },
-    { stars: 3, percentage: 7, count: 872 },
-    { stars: 2, percentage: 3, count: 374 },
-    { stars: 1, percentage: 2, count: 249 },
-  ];
+  const ratingBreakdown = [5, 4, 3, 2, 1].map(stars => {
+    const count = reviews.filter(r => r.rating === stars).length;
+    const percentage = reviews.length > 0 ? Math.round((count / reviews.length) * 100) : 0;
+    return { stars, percentage, count };
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -249,7 +283,20 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
 
             {/* Stock Status */}
             <div className="mb-4">
-              <p className="text-lg text-[#007600]">In Stock</p>
+              {product.inStock !== false ? (
+                <div>
+                  <p className="text-lg text-[#007600] font-medium">{isRTL ? 'متوفر' : 'In Stock'}</p>
+                  {product.tracksInventory && product.inventoryQuantity !== undefined && product.inventoryQuantity <= 5 && (
+                    <p className="text-xs text-amber-600 font-bold mt-0.5">
+                      {isRTL 
+                        ? `لقد تبقى لدينا ${product.inventoryQuantity} فقط - اطلب قريباً.` 
+                        : `Only ${product.inventoryQuantity} left in stock - order soon.`}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-lg text-rose-600 font-bold">{isRTL ? 'غير متوفر حالياً' : 'Currently Out of Stock'}</p>
+              )}
             </div>
 
             {/* Features */}
@@ -317,11 +364,21 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
               </div>
 
               {/* Stock */}
-              <p className="text-lg text-[#007600] mb-4">In Stock</p>
+              <div className="mb-4">
+                {product.inStock !== false ? (
+                  <p className="text-lg text-[#007600] font-medium">{isRTL ? 'متوفر' : 'In Stock'}</p>
+                ) : (
+                  <p className="text-lg text-rose-600 font-bold">{isRTL ? 'غير متوفر' : 'Out of Stock'}</p>
+                )}
+              </div>
 
               {/* Quantity Selector */}
               <div className="mb-4">
-                <Select value={quantity.toString()} onValueChange={(val: string) => setQuantity(parseInt(val))}>
+                <Select 
+                  disabled={product.inStock === false}
+                  value={quantity.toString()} 
+                  onValueChange={(val: string) => setQuantity(parseInt(val))}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Quantity" />
                   </SelectTrigger>
@@ -339,16 +396,18 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
               <Button
                 className="w-full bg-[#718096] hover:bg-[#4A5568] text-white mb-2"
                 onClick={() => onAddToCart(product, quantity)}
+                disabled={product.inStock === false}
               >
-                Add to Cart
+                {isRTL ? 'أضف إلى العربة' : 'Add to Cart'}
               </Button>
 
               {/* Buy Now Button */}
               <Button
                 className="w-full bg-[#FFA41C] hover:bg-[#FF8F00] text-[#0F1111] mb-4"
                 onClick={() => onBuyNow(product, quantity)}
+                disabled={product.inStock === false}
               >
-                Buy Now
+                {isRTL ? 'اشتري الآن' : 'Buy Now'}
               </Button>
 
               {/* Additional Info */}
@@ -445,58 +504,114 @@ export function ProductDetailPage({ product, onAddToCart, onBuyNow }: ProductDet
           </div>
 
           {/* Review Filters */}
-          <div className="flex gap-4 mb-6">
-            <Button variant="outline">All reviews</Button>
+          <div className="flex flex-wrap gap-4 mb-8">
+            <Button variant="outline" className="bg-slate-50 border-slate-200">All reviews</Button>
             <Button variant="outline">Verified purchase only</Button>
             <Button variant="outline">Images & videos</Button>
           </div>
 
+          {/* Write a Review Section */}
+          <div className="mb-12 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+            <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-slate-400" />
+              Write a Review
+            </h3>
+            {user ? (
+              <form onSubmit={handleReviewSubmit} className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium text-slate-700">Overall Rating</span>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setNewRating(star)}
+                        className="p-1 transition-transform hover:scale-110"
+                      >
+                        <Star className={`h-6 w-6 ${star <= newRating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300'}`} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <textarea
+                  className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-200 min-h-[120px] bg-white transition-all shadow-sm"
+                  placeholder="What did you like or dislike? How was the quality?..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  required
+                />
+                <Button 
+                  type="submit" 
+                  disabled={submittingReview}
+                  className="bg-slate-900 hover:bg-slate-800 text-white px-8 h-12 rounded-xl font-bold flex items-center gap-2"
+                >
+                  {submittingReview ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit Review'}
+                </Button>
+                <p className="text-[10px] text-slate-400 italic">
+                  * All reviews are moderated and will appear shortly after approval.
+                </p>
+              </form>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-slate-500 text-sm mb-4 font-medium">Please sign in to share your experience with this product.</p>
+                <Button variant="outline" className="rounded-xl px-6 border-slate-300 shadow-sm" onClick={() => window.location.href = '/login'}>
+                  Sign In
+                </Button>
+              </div>
+            )}
+          </div>
+
           {/* Individual Reviews */}
           <div className="space-y-6">
-            {reviews.map((review) => (
-              <div key={review.id} className="border-t border-[#D5D9D9] pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#EAEDED] flex items-center justify-center text-[#0F1111]">
-                    {review.author[0]}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-[#0F1111] mb-1">{review.author}</p>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex items-center">
+            {loadingReviews ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 text-slate-300 animate-spin" />
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
+                <p className="text-slate-400 font-medium">No reviews yet. Be the first to review this product!</p>
+              </div>
+            ) : (
+              reviews.map((review) => (
+                <div key={review.id} className="border-b border-slate-100 pb-8 last:border-0">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-900 font-bold text-xs shrink-0 border border-slate-200 shadow-sm">
+                      {review.userName?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <p className="font-bold text-slate-900 text-sm">{review.userName}</p>
+                        <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 mb-3">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-4 w-4 ${i < review.rating
-                              ? 'fill-[#718096] text-[#718096]'
-                              : 'fill-none text-[#718096]'
-                              }`}
+                            className={`h-3 w-3 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200'}`}
                           />
                         ))}
                       </div>
-                      <span className="font-medium text-[#0F1111]">{review.title}</span>
-                    </div>
-                    <p className="text-sm text-[#565959] mb-2">
-                      Reviewed in the United States on {review.date}
-                    </p>
-                    {review.verified && (
-                      <p className="text-xs text-[#C7511F] mb-2 flex items-center gap-1">
-                        <ShieldCheck className="h-3 w-3" />
-                        Verified Purchase
+                      <p className="text-sm text-slate-600 leading-relaxed font-medium bg-slate-50/50 p-3 rounded-lg border border-slate-100/50">
+                        {review.comment}
                       </p>
-                    )}
-                    <p className="text-sm text-[#0F1111] mb-3">{review.comment}</p>
-                    <div className="flex items-center gap-4 text-sm">
-                      <button className="text-[#565959] hover:text-[#0F1111]">
-                        Helpful ({review.helpful})
-                      </button>
-                      <button className="text-[#565959] hover:text-[#0F1111]">
-                        Report
-                      </button>
+                      <div className="flex items-center gap-6 mt-4 opacity-50 hover:opacity-100 transition-opacity">
+                        <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-900">
+                          <ThumbsUp className="h-3.5 w-3.5" />
+                          Helpful
+                        </button>
+                        <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-red-600">
+                          <Flag className="h-3.5 w-3.5" />
+                          Report
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* See More Reviews */}

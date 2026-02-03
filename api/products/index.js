@@ -19,12 +19,20 @@ const baseSelect = `
            s.name as "supplierName",
            sh.name as "shopName",
            sh.slug as "shopSlug",
-           sh."defaultCommissionRate" as "shopCommissionRate"
+           sh."defaultCommissionRate" as "shopCommissionRate",
+           COALESCE(r."avgRating", p.rating) as "rating",
+           COALESCE(r."reviewCount", p."reviewCount") as "reviewCount"
     FROM "Product" p
     LEFT JOIN "Category" c ON p."categoryId" = c.id
     LEFT JOIN "Category" cp ON c."parentId" = cp.id
     LEFT JOIN "Supplier" s ON p."supplierId" = s.id
     LEFT JOIN "Shop" sh ON p."shopId" = sh.id
+    LEFT JOIN (
+        SELECT "productId", AVG(rating) as "avgRating", COUNT(id) as "reviewCount"
+        FROM "Review"
+        WHERE status = 'APPROVED'
+        GROUP BY "productId"
+    ) r ON p.id = r."productId"
 `;
 
 const formatProductRow = (row) => {
@@ -39,6 +47,8 @@ const formatProductRow = (row) => {
         commissionRateApplied: rate,
         commissionAmount,
         displayPrice,
+        rating: parseFloat(row.rating || 0),
+        reviewCount: parseInt(row.reviewCount || 0, 10),
     };
 };
 
@@ -114,6 +124,8 @@ module.exports = async (req, res) => {
                 inStock,
                 shopId: bodyShopId,
                 commissionRate,
+                tracksInventory,
+                inventoryQuantity,
             } = req.body;
 
             if (!name || price === undefined || price === null || !image) {
@@ -133,12 +145,14 @@ module.exports = async (req, res) => {
                 INSERT INTO "Product" (
                     id, name, "nameEn", "nameAr", price, "costPrice", "originalPrice",
                     description, "descriptionAr", category, "categoryId", "supplierId",
-                    image, "inStock", "shopId", "commissionRate", "updatedAt"
+                    image, "inStock", "shopId", "commissionRate", 
+                    "tracksInventory", "inventoryQuantity", "updatedAt"
                 )
                 VALUES (
                     $1, $2, $3, $4, $5, $6, $7,
                     $8, $9, $10, $11, $12,
-                    $13, $14, $15, $16, NOW()
+                    $13, $14, $15, $16,
+                    $17, $18, NOW()
                 )
             `, [
                 productId,
@@ -157,6 +171,8 @@ module.exports = async (req, res) => {
                 inStock ?? true,
                 shopId,
                 commissionRateValue,
+                tracksInventory ?? false,
+                inventoryQuantity ?? 0,
             ]);
 
             const created = await getProductWithRelations(productId);
@@ -192,6 +208,8 @@ module.exports = async (req, res) => {
                 image,
                 inStock,
                 commissionRate,
+                tracksInventory,
+                inventoryQuantity,
             } = req.body;
 
             const hasCommissionRate = Object.prototype.hasOwnProperty.call(req.body, 'commissionRate');
@@ -216,6 +234,8 @@ module.exports = async (req, res) => {
                     image = COALESCE($13, image),
                     "inStock" = COALESCE($14, "inStock"),
                     "commissionRate" = CASE WHEN $15 THEN $16 ELSE "commissionRate" END,
+                    "tracksInventory" = COALESCE($17, "tracksInventory"),
+                    "inventoryQuantity" = COALESCE($18, "inventoryQuantity"),
                     "updatedAt" = NOW()
                 WHERE id = $1
             `, [
@@ -235,6 +255,8 @@ module.exports = async (req, res) => {
                 inStock,
                 hasCommissionRate,
                 commissionRateValue,
+                tracksInventory,
+                inventoryQuantity,
             ]);
 
             const updated = await getProductWithRelations(id);

@@ -16,6 +16,8 @@ interface ShopProduct {
     inStock?: boolean;
     image?: string;
     commissionRate?: number | null;
+    tracksInventory?: boolean;
+    inventoryQuantity?: number;
 }
 
 export function ShopProductsPage() {
@@ -98,6 +100,8 @@ export function ShopProductsPage() {
         commissionRate: selectedProduct?.commissionRate !== undefined && selectedProduct?.commissionRate !== null
             ? selectedProduct.commissionRate.toString()
             : '',
+        tracksInventory: selectedProduct?.tracksInventory ?? false,
+        inventoryQuantity: selectedProduct?.inventoryQuantity?.toString() || '0',
     }), [selectedProduct]);
 
     const handleSubmit = async (values: ShopProductFormValues) => {
@@ -129,6 +133,8 @@ export function ShopProductsPage() {
             inStock: values.inStock,
             commissionRate: values.commissionRate ? Number(values.commissionRate) : null,
             shopId: activeShop.id,
+            tracksInventory: values.tracksInventory,
+            inventoryQuantity: Number(values.inventoryQuantity) || 0,
         };
 
         const url = formMode === 'edit' && selectedProduct ? `/api/products?id=${selectedProduct.id}` : '/api/products';
@@ -208,6 +214,7 @@ export function ShopProductsPage() {
                             <th className="px-4 py-3">Commission</th>
                             <th className="px-4 py-3">Display Price</th>
                             <th className="px-4 py-3">Stock</th>
+                            <th className="px-4 py-3 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -244,30 +251,37 @@ export function ShopProductsPage() {
                                     E£ {displayPrice.toFixed(2)}
                                 </td>
                                 <td className="px-4 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                                    <div className="flex flex-col gap-1">
+                                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold w-fit ${
                                             product.inStock ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
                                         }`}>
                                             {product.inStock ? 'In Stock' : 'Out of Stock'}
                                         </span>
-                                        <div className="flex gap-1">
-                                            <Button
-                                                size="icon"
-                                                variant="ghost"
-                                                className="h-8 w-8 rounded-lg text-slate-500 hover:text-slate-800"
-                                                onClick={() => handleEdit(product)}
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                size="icon"
-                                                variant="ghost"
-                                                className="h-8 w-8 rounded-lg text-red-500 hover:text-red-700"
-                                                onClick={() => handleDelete(product)}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
+                                        {product.tracksInventory && (
+                                            <span className="text-xs text-slate-500 ml-1">
+                                                Qty: <span className="font-bold text-slate-700">{product.inventoryQuantity}</span>
+                                            </span>
+                                        )}
+                                    </div>
+                                </td>
+                                <td className="px-4 py-4">
+                                    <div className="flex justify-end gap-1">
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="h-8 w-8 rounded-lg text-slate-500 hover:text-slate-800"
+                                            onClick={() => handleEdit(product)}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="h-8 w-8 rounded-lg text-red-500 hover:text-red-700"
+                                            onClick={() => handleDelete(product)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
                                     </div>
                                 </td>
                             </tr>
@@ -275,7 +289,7 @@ export function ShopProductsPage() {
                         })}
                         {products.length === 0 && !loading && (
                             <tr>
-                                <td colSpan={5} className="text-center py-10 text-slate-500">
+                                <td colSpan={6} className="text-center py-10 text-slate-500">
                                     No products found for this shop yet.
                                 </td>
                             </tr>
