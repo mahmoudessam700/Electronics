@@ -8,10 +8,8 @@ import {
     Trash2, 
     X, 
     Loader2, 
-    CheckCircle2, 
     Clock,
-    UserCheck,
-    AlertCircle
+    UserCheck
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
@@ -190,7 +188,7 @@ export function ShopTeamPage() {
                                     }`}>
                                         {member.role}
                                     </span>
-                                    {member.userId !== user?.id && (
+                                    {member.user.id !== user?.id && (
                                         <button 
                                             onClick={() => handleRemoveMember(member.id)}
                                             className="p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"

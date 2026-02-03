@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
-import { Trash2, Loader2, Star, Search, CheckCircle, XCircle, MessageSquare, History, Clock } from 'lucide-react';
+import { Trash2, Loader2, Star, Search, CheckCircle, XCircle, History, Clock } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
@@ -34,7 +34,6 @@ export function AdminReviewsPage() {
     const [statusFilter, setStatusFilter] = useState('ALL');
     
     // Logs state
-    const [selectedReview, setSelectedReview] = useState<ReviewData | null>(null);
     const [logs, setLogs] = useState<ReviewLog[]>([]);
     const [logsLoading, setLogsLoading] = useState(false);
     const [showLogs, setShowLogs] = useState(false);
@@ -68,7 +67,6 @@ export function AdminReviewsPage() {
     };
 
     const fetchLogs = async (review: ReviewData) => {
-        setSelectedReview(review);
         setShowLogs(true);
         setLogsLoading(true);
         try {

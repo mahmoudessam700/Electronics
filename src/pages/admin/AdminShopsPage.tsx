@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
-import { Pencil, Loader2, Store, Search, ShieldCheck, ShieldAlert, Shield, Mail, Phone, ExternalLink, Plus } from 'lucide-react';
+import { Pencil, Loader2, Search, ShieldCheck, ShieldAlert, Shield, Mail, ExternalLink, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
