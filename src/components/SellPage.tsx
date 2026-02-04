@@ -43,48 +43,111 @@ export function SellPage({ onNavigate }: SellPageProps) {
       const mapContainer = document.getElementById('sell-page-map');
       if (!mapContainer || mapInstanceRef.current) return;
 
-      // Load Leaflet CSS
-      if (!document.querySelector('link[href*="leaflet"]')) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        link.crossOrigin = 'anonymous';
-        document.head.appendChild(link);
+      // Add critical Leaflet CSS inline
+      if (!document.getElementById('leaflet-inline-css')) {
+        const style = document.createElement('style');
+        style.id = 'leaflet-inline-css';
+        style.textContent = `
+          .leaflet-pane, .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow,
+          .leaflet-tile-container, .leaflet-pane > svg, .leaflet-pane > canvas,
+          .leaflet-zoom-box, .leaflet-image-layer, .leaflet-layer { position: absolute; left: 0; top: 0; }
+          .leaflet-container { overflow: hidden; }
+          .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow { user-select: none; -webkit-user-select: none; }
+          .leaflet-tile::selection { background: transparent; }
+          .leaflet-safari .leaflet-tile { image-rendering: -webkit-optimize-contrast; }
+          .leaflet-safari .leaflet-tile-container { width: 1600px; height: 1600px; -webkit-transform-origin: 0 0; }
+          .leaflet-marker-icon, .leaflet-marker-shadow { display: block; }
+          .leaflet-container .leaflet-overlay-pane svg { max-width: none !important; max-height: none !important; }
+          .leaflet-container .leaflet-marker-pane img,
+          .leaflet-container .leaflet-shadow-pane img,
+          .leaflet-container .leaflet-tile-pane img,
+          .leaflet-container img.leaflet-image-layer,
+          .leaflet-container .leaflet-tile { max-width: none !important; max-height: none !important; width: auto; padding: 0; }
+          .leaflet-container.leaflet-touch-zoom { touch-action: pan-x pan-y; }
+          .leaflet-container.leaflet-touch-drag { touch-action: none; touch-action: pinch-zoom; }
+          .leaflet-container.leaflet-touch-drag.leaflet-touch-zoom { touch-action: none; }
+          .leaflet-container { -webkit-tap-highlight-color: transparent; }
+          .leaflet-tile { filter: inherit; visibility: hidden; }
+          .leaflet-tile-loaded { visibility: inherit; }
+          .leaflet-zoom-box { width: 0; height: 0; box-sizing: border-box; z-index: 800; }
+          .leaflet-overlay-pane svg { -moz-user-select: none; }
+          .leaflet-pane { z-index: 400; }
+          .leaflet-tile-pane { z-index: 200; }
+          .leaflet-overlay-pane { z-index: 400; }
+          .leaflet-shadow-pane { z-index: 500; }
+          .leaflet-marker-pane { z-index: 600; }
+          .leaflet-tooltip-pane { z-index: 650; }
+          .leaflet-popup-pane { z-index: 700; }
+          .leaflet-map-pane canvas { z-index: 100; }
+          .leaflet-map-pane svg { z-index: 200; }
+          .leaflet-control { position: relative; z-index: 800; pointer-events: visiblePainted; pointer-events: auto; }
+          .leaflet-top, .leaflet-bottom { position: absolute; z-index: 1000; pointer-events: none; }
+          .leaflet-top { top: 0; }
+          .leaflet-right { right: 0; }
+          .leaflet-bottom { bottom: 0; }
+          .leaflet-left { left: 0; }
+          .leaflet-control { float: left; clear: both; }
+          .leaflet-right .leaflet-control { float: right; }
+          .leaflet-top .leaflet-control { margin-top: 10px; }
+          .leaflet-bottom .leaflet-control { margin-bottom: 10px; }
+          .leaflet-left .leaflet-control { margin-left: 10px; }
+          .leaflet-right .leaflet-control { margin-right: 10px; }
+          .leaflet-control-zoom-in, .leaflet-control-zoom-out { font: bold 18px 'Lucida Console', Monaco, monospace; text-indent: 1px; }
+          .leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out { font-size: 22px; }
+          .leaflet-touch .leaflet-bar a { width: 30px; height: 30px; line-height: 30px; }
+          .leaflet-touch .leaflet-bar a:first-child { border-top-left-radius: 2px; border-top-right-radius: 2px; }
+          .leaflet-touch .leaflet-bar a:last-child { border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; }
+          .leaflet-bar { box-shadow: 0 1px 5px rgba(0,0,0,0.65); border-radius: 4px; }
+          .leaflet-bar a, .leaflet-bar a:hover { background-color: #fff; border-bottom: 1px solid #ccc; width: 26px; height: 26px; line-height: 26px; display: block; text-align: center; text-decoration: none; color: black; }
+          .leaflet-bar a:hover { background-color: #f4f4f4; }
+          .leaflet-bar a:first-child { border-top-left-radius: 4px; border-top-right-radius: 4px; }
+          .leaflet-bar a:last-child { border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; border-bottom: none; }
+          .leaflet-container .leaflet-control-attribution { background: #fff; background: rgba(255,255,255,0.8); margin: 0; }
+          .leaflet-control-attribution, .leaflet-control-scale-line { padding: 0 5px; color: #333; line-height: 1.4; }
+          #sell-page-map { z-index: 0 !important; }
+          #sell-page-map .leaflet-container { background: #e5e7eb; }
+        `;
+        document.head.appendChild(style);
       }
 
       // Load Leaflet JS
       if (!(window as any).L) {
-        await new Promise<void>((resolve) => {
+        await new Promise<void>((resolve, reject) => {
           const script = document.createElement('script');
           script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-          script.crossOrigin = 'anonymous';
           script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Failed to load Leaflet'));
           document.head.appendChild(script);
         });
       }
 
-      // Wait for CSS to fully load
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait a moment for Leaflet to be ready
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const L = (window as any).L;
-      if (!L) return;
+      if (!L) {
+        console.error('Leaflet not loaded');
+        return;
+      }
       
       // Default to Cairo, Egypt
       const defaultLat = 30.0444;
       const defaultLng = 31.2357;
 
       try {
+        console.log('Initializing map...');
         const map = L.map(mapContainer, {
           center: [defaultLat, defaultLng],
           zoom: 13,
         });
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors',
+          attribution: '&copy; OpenStreetMap',
           maxZoom: 19,
         }).addTo(map);
 
         const marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+        console.log('Map initialized successfully');
       
         marker.on('dragend', function(e: any) {
           const position = e.target.getLatLng();
@@ -610,7 +673,19 @@ export function SellPage({ onNavigate }: SellPageProps) {
                           id="category"
                           value={formData.category}
                           onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                          className="w-full h-10 px-3 border border-[#D5D9D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#718096] bg-white cursor-pointer"
+                          style={{
+                            width: '100%',
+                            height: '40px',
+                            padding: '0 12px',
+                            border: '1px solid #D5D9D9',
+                            borderRadius: '8px',
+                            backgroundColor: 'white',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            WebkitAppearance: 'menulist',
+                            MozAppearance: 'menulist',
+                            appearance: 'menulist',
+                          }}
                         >
                           <option value="">{t('sell.selectCategory')}</option>
                           <option value="electronics">{t('sell.electronics')}</option>
@@ -662,7 +737,15 @@ export function SellPage({ onNavigate }: SellPageProps) {
                     <p className="text-sm text-[#565959] mb-2">{t('sell.clickMapToSetLocation')}</p>
                     <div 
                       id="sell-page-map"
-                      className="w-full h-[300px] rounded-lg border border-[#D5D9D9] bg-gray-200"
+                      style={{
+                        width: '100%',
+                        height: '300px',
+                        borderRadius: '8px',
+                        border: '1px solid #D5D9D9',
+                        backgroundColor: '#e5e7eb',
+                        position: 'relative',
+                        overflow: 'hidden',
+                      }}
                     />
                     {formData.latitude && formData.longitude && (
                       <p className="text-xs text-[#565959] mt-2" dir="ltr">
