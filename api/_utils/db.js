@@ -1,12 +1,14 @@
 // @ts-nocheck
-const { Pool } = require('pg');
+const mysql = require('mysql2/promise');
 
 let poolInstance;
 
 const createPool = () => {
-    return new Pool({
-        connectionString: process.env.DATABASE_URL,
-        ssl: process.env.DATABASE_URL?.includes('localhost') ? false : { rejectUnauthorized: false }
+    return mysql.createPool({
+        uri: process.env.DATABASE_URL,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
     });
 };
 
@@ -18,17 +20,17 @@ const getPool = () => {
 };
 
 const withTransaction = async (callback) => {
-    const client = await getPool().connect();
+    const connection = await getPool().getConnection();
     try {
-        await client.query('BEGIN');
-        const result = await callback(client);
-        await client.query('COMMIT');
+        await connection.beginTransaction();
+        const result = await callback(connection);
+        await connection.commit();
         return result;
     } catch (error) {
-        await client.query('ROLLBACK');
+        await connection.rollback();
         throw error;
     } finally {
-        client.release();
+        connection.release();
     }
 };
 
