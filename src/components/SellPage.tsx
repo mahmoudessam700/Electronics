@@ -15,7 +15,6 @@ interface SellPageProps {
 export function SellPage({ onNavigate }: SellPageProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
 
@@ -40,42 +39,49 @@ export function SellPage({ onNavigate }: SellPageProps) {
     if (user) return; // Don't init map if user is logged in
     
     // Wait for DOM to render
-    const initTimeout = setTimeout(() => {
-      if (!mapRef.current || mapInstanceRef.current) return;
+    const initTimeout = setTimeout(async () => {
+      const mapContainer = document.getElementById('sell-page-map');
+      if (!mapContainer || mapInstanceRef.current) return;
 
-      const loadLeaflet = async () => {
-        // Load Leaflet CSS
-        if (!document.querySelector('link[href*="leaflet"]')) {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-          document.head.appendChild(link);
-        }
+      // Load Leaflet CSS
+      if (!document.querySelector('link[href*="leaflet"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+      }
 
-        // Load Leaflet JS
-        if (!(window as any).L) {
-          await new Promise<void>((resolve) => {
-            const script = document.createElement('script');
-            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-            script.onload = () => resolve();
-            document.head.appendChild(script);
-          });
-        }
+      // Load Leaflet JS
+      if (!(window as any).L) {
+        await new Promise<void>((resolve) => {
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+          script.crossOrigin = 'anonymous';
+          script.onload = () => resolve();
+          document.head.appendChild(script);
+        });
+      }
 
-        // Wait a bit for CSS to load
-        await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for CSS to fully load
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-        const L = (window as any).L;
-        if (!L || !mapRef.current) return;
-        
-        // Default to Cairo, Egypt
-        const defaultLat = 30.0444;
-        const defaultLng = 31.2357;
+      const L = (window as any).L;
+      if (!L) return;
+      
+      // Default to Cairo, Egypt
+      const defaultLat = 30.0444;
+      const defaultLng = 31.2357;
 
-        const map = L.map(mapRef.current).setView([defaultLat, defaultLng], 13);
+      try {
+        const map = L.map(mapContainer, {
+          center: [defaultLat, defaultLng],
+          zoom: 13,
+        });
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 19,
         }).addTo(map);
 
         const marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
@@ -103,17 +109,36 @@ export function SellPage({ onNavigate }: SellPageProps) {
         mapInstanceRef.current = map;
         markerRef.current = marker;
 
-        // Auto-detect location on load
-        detectLocation();
-
         // Invalidate size after a short delay to fix rendering
         setTimeout(() => {
           map.invalidateSize();
-        }, 250);
-      };
-
-      loadLeaflet();
-    }, 200); // Wait 200ms for DOM to render
+          // Auto-detect location after map is ready
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const { latitude, longitude } = position.coords;
+                setFormData(prev => ({ ...prev, latitude, longitude }));
+                map.setView([latitude, longitude], 15);
+                marker.setLatLng([latitude, longitude]);
+                // Reverse geocode for address
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.display_name) {
+                      setFormData(prev => ({ ...prev, address: data.display_name }));
+                    }
+                  })
+                  .catch(console.error);
+              },
+              () => console.log('Geolocation denied'),
+              { enableHighAccuracy: true, timeout: 10000 }
+            );
+          }
+        }, 300);
+      } catch (err) {
+        console.error('Map initialization error:', err);
+      }
+    }, 500); // Wait 500ms for DOM to render
 
     return () => {
       clearTimeout(initTimeout);
@@ -585,8 +610,7 @@ export function SellPage({ onNavigate }: SellPageProps) {
                           id="category"
                           value={formData.category}
                           onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                          className="w-full h-10 px-3 border border-[#D5D9D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#718096] bg-white appearance-none cursor-pointer"
-                          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23718096\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 0.75rem center', backgroundSize: '1.25rem' }}
+                          className="w-full h-10 px-3 border border-[#D5D9D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#718096] bg-white cursor-pointer"
                         >
                           <option value="">{t('sell.selectCategory')}</option>
                           <option value="electronics">{t('sell.electronics')}</option>
@@ -637,9 +661,8 @@ export function SellPage({ onNavigate }: SellPageProps) {
 
                     <p className="text-sm text-[#565959] mb-2">{t('sell.clickMapToSetLocation')}</p>
                     <div 
-                      ref={mapRef} 
-                      className="w-full h-[250px] rounded-lg border border-[#D5D9D9] bg-gray-100"
-                      style={{ position: 'relative', zIndex: 0 }}
+                      id="sell-page-map"
+                      className="w-full h-[300px] rounded-lg border border-[#D5D9D9] bg-gray-200"
                     />
                     {formData.latitude && formData.longitude && (
                       <p className="text-xs text-[#565959] mt-2" dir="ltr">

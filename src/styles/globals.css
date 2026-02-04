@@ -281,3 +281,30 @@ html[dir="rtl"] :not(.rotate-180) svg[class*="lucide-chevron-left"],
 html[dir="rtl"] :not(.rotate-180) svg[class*="lucide-chevron-right"] {
   transform: scaleX(-1);
 }
+
+/* Leaflet Map Styles - ensure map tiles render properly */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.leaflet-tile-pane {
+  z-index: 1;
+}
+
+.leaflet-overlay-pane {
+  z-index: 2;
+}
+
+.leaflet-marker-pane {
+  z-index: 3;
+}
+
+.leaflet-popup-pane {
+  z-index: 4;
+}
+
+#sell-page-map .leaflet-container {
+  background: #f3f4f6;
+}
