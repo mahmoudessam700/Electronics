@@ -1,16 +1,212 @@
-import { Store, TrendingUp, Users, Package, DollarSign, Headphones, CheckCircle, ArrowRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Store, TrendingUp, Users, Package, DollarSign, Headphones, CheckCircle, ArrowRight, Loader2, MapPin, Navigation } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface SellPageProps {
   onNavigate: (page: string) => void;
 }
 
-export function SellPage({ onNavigate: _onNavigate }: SellPageProps) {
+export function SellPage({ onNavigate }: SellPageProps) {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    shopName: '',
+    shopDescription: '',
+    address: '',
+    category: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
+  });
+
+  // Initialize map
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+    const loadLeaflet = async () => {
+      // Load Leaflet CSS
+      if (!document.querySelector('link[href*="leaflet"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+      }
+
+      // Load Leaflet JS
+      if (!(window as any).L) {
+        await new Promise<void>((resolve) => {
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+          script.onload = () => resolve();
+          document.head.appendChild(script);
+        });
+      }
+
+      const L = (window as any).L;
+      
+      // Default to Cairo, Egypt
+      const defaultLat = 30.0444;
+      const defaultLng = 31.2357;
+
+      const map = L.map(mapRef.current).setView([defaultLat, defaultLng], 13);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      const marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+      
+      marker.on('dragend', function(e: any) {
+        const position = e.target.getLatLng();
+        setFormData(prev => ({
+          ...prev,
+          latitude: position.lat,
+          longitude: position.lng
+        }));
+        reverseGeocode(position.lat, position.lng);
+      });
+
+      map.on('click', function(e: any) {
+        marker.setLatLng(e.latlng);
+        setFormData(prev => ({
+          ...prev,
+          latitude: e.latlng.lat,
+          longitude: e.latlng.lng
+        }));
+        reverseGeocode(e.latlng.lat, e.latlng.lng);
+      });
+
+      mapInstanceRef.current = map;
+      markerRef.current = marker;
+
+      // Auto-detect location on load
+      detectLocation();
+    };
+
+    loadLeaflet();
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  const reverseGeocode = async (lat: number, lng: number) => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const data = await res.json();
+      if (data.display_name) {
+        setFormData(prev => ({ ...prev, address: data.display_name }));
+      }
+    } catch (error) {
+      console.error('Reverse geocoding failed:', error);
+    }
+  };
+
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error(t('sell.geolocationNotSupported'));
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setFormData(prev => ({
+          ...prev,
+          latitude,
+          longitude
+        }));
+
+        if (mapInstanceRef.current && markerRef.current) {
+          mapInstanceRef.current.setView([latitude, longitude], 15);
+          markerRef.current.setLatLng([latitude, longitude]);
+        }
+
+        reverseGeocode(latitude, longitude);
+        setIsDetectingLocation(false);
+        toast.success(t('sell.locationDetected'));
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setIsDetectingLocation(false);
+        toast.error(t('sell.locationDetectionFailed'));
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.email || !formData.password || !formData.shopName) {
+      toast.error(t('sell.fillRequiredFields'));
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error(t('sell.passwordsMismatch'));
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast.error(t('sell.passwordTooShort'));
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch('/api/auth?action=register-shop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          phone: formData.phone,
+          address: formData.address,
+          shopName: formData.shopName,
+          shopDescription: formData.shopDescription,
+          latitude: formData.latitude,
+          longitude: formData.longitude,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(t('sell.accountCreatedSuccess'));
+        onNavigate('sign-in');
+      } else {
+        toast.error(data.error || t('sell.registrationFailed'));
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error(t('sell.registrationFailed'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const benefits = [
     {
@@ -247,7 +443,7 @@ export function SellPage({ onNavigate: _onNavigate }: SellPageProps) {
 
         {/* Sign Up Form */}
         <section className="mb-16">
-          <Card className="max-w-[600px] mx-auto">
+          <Card className="max-w-[700px] mx-auto">
             <CardContent className="p-8">
               <div className="text-center mb-6">
                 <DollarSign className="h-12 w-12 text-[#718096] mx-auto mb-4" />
@@ -255,42 +451,202 @@ export function SellPage({ onNavigate: _onNavigate }: SellPageProps) {
                 <p className="text-[#565959]">{t('sell.createInMinutes')}</p>
               </div>
 
-              <form className="space-y-4">
-                <div>
-                  <Label htmlFor="business-name">{t('sell.businessName')}</Label>
-                  <Input id="business-name" placeholder={t('sell.businessName')} />
-                </div>
-
-                <div>
-                  <Label htmlFor="email">{t('sell.emailAddress')}</Label>
-                  <Input id="email" type="email" placeholder="you@example.com" />
-                </div>
-
-                <div>
-                  <Label htmlFor="phone">{t('sell.phoneNumber')}</Label>
-                  <Input id="phone" type="tel" placeholder="(555) 123-4567" />
-                </div>
-
-                <div>
-                  <Label htmlFor="category">{t('sell.productCategory')}</Label>
-                  <select 
-                    id="category"
-                    className="w-full h-10 px-3 border border-[#D5D9D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#718096]"
+              {user ? (
+                <div className="text-center py-8">
+                  <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">{t('sell.alreadyLoggedIn')}</h3>
+                  <p className="text-[#565959] mb-4">{t('sell.alreadyLoggedInDesc')}</p>
+                  <Button 
+                    onClick={() => onNavigate('shop/dashboard')}
+                    className="bg-[#718096] hover:bg-[#4A5568] text-white"
                   >
-                    <option>{t('sell.selectCategory')}</option>
-                    <option>{t('sell.electronics')}</option>
-                    <option>{t('sell.fashion')}</option>
-                    <option>{t('sell.homeKitchen')}</option>
-                    <option>{t('sell.books')}</option>
-                    <option>{t('sell.sportsOutdoors')}</option>
-                    <option>{t('sell.other')}</option>
-                  </select>
+                    {t('sell.goToDashboard')}
+                  </Button>
                 </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Personal Info */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="name">{t('sell.fullName')} *</Label>
+                      <Input 
+                        id="name" 
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder={t('sell.fullName')}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">{t('sell.emailAddress')} *</Label>
+                      <Input 
+                        id="email" 
+                        type="email"
+                        dir="ltr"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="you@example.com"
+                        className="text-left"
+                        required
+                      />
+                    </div>
+                  </div>
 
-                <Button className="w-full bg-[#718096] hover:bg-[#4A5568] text-white py-6 text-lg">
-                  {t('sell.createSellerAccount')}
-                </Button>
-              </form>
+                  <div>
+                    <Label htmlFor="phone">{t('sell.phoneNumber')}</Label>
+                    <Input 
+                      id="phone" 
+                      type="tel"
+                      dir="ltr"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="+20 100 123 4567"
+                      className="text-left"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="password">{t('sell.password')} *</Label>
+                      <Input 
+                        id="password" 
+                        type="password"
+                        dir="ltr"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        placeholder="••••••••"
+                        className="text-left"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="confirmPassword">{t('sell.confirmPassword')} *</Label>
+                      <Input 
+                        id="confirmPassword" 
+                        type="password"
+                        dir="ltr"
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                        placeholder="••••••••"
+                        className="text-left"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Shop Info */}
+                  <div className="border-t border-gray-200 pt-4 mt-4">
+                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                      <Store className="h-5 w-5 text-[#718096]" />
+                      {t('sell.shopInformation')}
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="shopName">{t('sell.businessName')} *</Label>
+                        <Input 
+                          id="shopName"
+                          value={formData.shopName}
+                          onChange={(e) => setFormData({ ...formData, shopName: e.target.value })}
+                          placeholder={t('sell.businessName')}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="shopDescription">{t('sell.shopDescription')}</Label>
+                        <textarea 
+                          id="shopDescription"
+                          value={formData.shopDescription}
+                          onChange={(e) => setFormData({ ...formData, shopDescription: e.target.value })}
+                          placeholder={t('sell.shopDescriptionPlaceholder')}
+                          className="w-full h-20 px-3 py-2 border border-[#D5D9D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#718096] resize-none"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="category">{t('sell.productCategory')}</Label>
+                        <select 
+                          id="category"
+                          value={formData.category}
+                          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                          className="w-full h-10 px-3 border border-[#D5D9D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#718096]"
+                        >
+                          <option value="">{t('sell.selectCategory')}</option>
+                          <option value="electronics">{t('sell.electronics')}</option>
+                          <option value="fashion">{t('sell.fashion')}</option>
+                          <option value="home">{t('sell.homeKitchen')}</option>
+                          <option value="books">{t('sell.books')}</option>
+                          <option value="sports">{t('sell.sportsOutdoors')}</option>
+                          <option value="other">{t('sell.other')}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="border-t border-gray-200 pt-4 mt-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <MapPin className="h-5 w-5 text-[#718096]" />
+                        {t('sell.shopLocation')}
+                      </h3>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={detectLocation}
+                        disabled={isDetectingLocation}
+                        className="text-sm"
+                      >
+                        {isDetectingLocation ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                        ) : (
+                          <Navigation className="h-4 w-4 mr-1" />
+                        )}
+                        {t('sell.detectMyLocation')}
+                      </Button>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="address">{t('sell.address')}</Label>
+                      <Input 
+                        id="address"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        placeholder={t('sell.addressPlaceholder')}
+                        className="mb-3"
+                      />
+                    </div>
+
+                    <p className="text-sm text-[#565959] mb-2">{t('sell.clickMapToSetLocation')}</p>
+                    <div 
+                      ref={mapRef} 
+                      className="w-full h-[250px] rounded-lg border border-[#D5D9D9] z-0"
+                    />
+                    {formData.latitude && formData.longitude && (
+                      <p className="text-xs text-[#565959] mt-2" dir="ltr">
+                        📍 {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
+                      </p>
+                    )}
+                  </div>
+
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#718096] hover:bg-[#4A5568] text-white py-6 text-lg mt-6"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                        {t('sell.creatingAccount')}
+                      </>
+                    ) : (
+                      t('sell.createSellerAccount')
+                    )}
+                  </Button>
+                </form>
+              )}
 
               <p className="text-xs text-[#565959] text-center mt-4">
                 {t('sell.termsAgreement')}

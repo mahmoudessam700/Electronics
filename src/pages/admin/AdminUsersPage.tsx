@@ -210,6 +210,8 @@ export function AdminUsersPage() {
         total: users.length,
         admins: users.filter(u => u.role === 'ADMIN').length,
         customers: users.filter(u => u.role === 'CUSTOMER').length,
+        shopOwners: users.filter(u => u.role === 'SHOP_OWNER').length,
+        shopStaff: users.filter(u => u.role === 'SHOP_STAFF').length,
     };
 
     if (loading) {
@@ -241,7 +243,7 @@ export function AdminUsersPage() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center gap-3">
                         <div className="p-2 rounded-lg bg-[#4A5568]">
@@ -272,6 +274,28 @@ export function AdminUsersPage() {
                         <div>
                             <p className="text-sm text-gray-500">{t('admin.customers')}</p>
                             <p className="text-xl font-bold text-emerald-600">{stats.customers}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-blue-100">
+                            <Store className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-500">{t('admin.shopOwners')}</p>
+                            <p className="text-xl font-bold text-blue-600">{stats.shopOwners}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-orange-100">
+                            <User className="h-5 w-5 text-orange-600" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-500">{t('admin.shopStaffs')}</p>
+                            <p className="text-xl font-bold text-orange-600">{stats.shopStaff}</p>
                         </div>
                     </div>
                 </div>

@@ -228,6 +228,8 @@ module.exports = async (req, res) => {
                 name,
                 phone,
                 address,
+                latitude,
+                longitude,
                 shopName,
                 shopDescription,
                 shopSlug,
@@ -253,11 +255,11 @@ module.exports = async (req, res) => {
             const result = await withTransaction(async (client) => {
                 await client.execute(`
                     INSERT INTO User (
-                        id, email, password, name, phone, address, role,
+                        id, email, password, name, phone, address, latitude, longitude, role,
                         emailVerified, emailVerificationToken, emailVerificationExpires,
                         createdAt, updatedAt
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NOW(), NOW())
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NOW(), NOW())
                 `, [
                     userId,
                     email,
@@ -265,6 +267,8 @@ module.exports = async (req, res) => {
                     name,
                     phone || null,
                     address || null,
+                    latitude || null,
+                    longitude || null,
                     'SHOP_OWNER',
                     true
                 ]);
@@ -276,10 +280,10 @@ module.exports = async (req, res) => {
 
                 await client.execute(`
                     INSERT INTO Shop (
-                        id, name, slug, description, email, phone, address, status,
+                        id, name, slug, description, email, phone, address, latitude, longitude, status,
                         defaultCommissionRate, ownerId, createdAt, updatedAt
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
                 `, [
                     shopId,
                     shopName,
@@ -288,6 +292,8 @@ module.exports = async (req, res) => {
                     email,
                     phone || null,
                     address || null,
+                    latitude || null,
+                    longitude || null,
                     'PENDING',
                     commissionRate,
                     userId
