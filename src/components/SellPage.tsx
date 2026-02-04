@@ -17,9 +17,19 @@ export function SellPage({ onNavigate }: SellPageProps) {
   const { user } = useAuth();
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const registrationFormRef = useRef<HTMLDivElement>(null);
+  const benefitsSectionRef = useRef<HTMLDivElement>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+
+  const scrollToRegistration = () => {
+    registrationFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const scrollToBenefits = () => {
+    benefitsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -431,10 +441,17 @@ export function SellPage({ onNavigate }: SellPageProps) {
                 {t('sell.subtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="bg-white text-[#0F1111] hover:bg-gray-100 px-8 py-6 text-lg">
+                <Button 
+                  onClick={scrollToRegistration}
+                  className="bg-white text-[#0F1111] hover:bg-gray-100 px-8 py-6 text-lg"
+                >
                   {t('sell.startSelling')}
                 </Button>
-                <Button variant="outline" className="border-2 border-white !text-black hover:bg-white/20 hover:!text-black px-8 py-6 text-lg">
+                <Button 
+                  variant="outline" 
+                  onClick={scrollToBenefits}
+                  className="border-2 border-white !text-black hover:bg-white/20 hover:!text-black px-8 py-6 text-lg"
+                >
                   {t('sell.learnMore')}
                 </Button>
               </div>
@@ -468,7 +485,7 @@ export function SellPage({ onNavigate }: SellPageProps) {
         </section>
 
         {/* Benefits */}
-        <section className="mb-16">
+        <section ref={benefitsSectionRef} className="mb-16 scroll-mt-4">
           <h2 className="text-3xl mb-8 text-center">{t('sell.whySellWithUs')}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit) => (
@@ -513,6 +530,7 @@ export function SellPage({ onNavigate }: SellPageProps) {
                     ))}
                   </ul>
                   <Button 
+                    onClick={scrollToRegistration}
                     className={`w-full ${
                       plan.recommended 
                         ? 'bg-[#718096] hover:bg-[#4A5568] text-white' 
@@ -553,7 +571,7 @@ export function SellPage({ onNavigate }: SellPageProps) {
         </section>
 
         {/* Sign Up Form */}
-        <section className="mb-16">
+        <section ref={registrationFormRef} className="mb-16 scroll-mt-4">
           <Card className="max-w-[700px] mx-auto">
             <CardContent className="p-8">
               <div className="text-center mb-6">
