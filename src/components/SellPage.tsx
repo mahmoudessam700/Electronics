@@ -434,7 +434,7 @@ export function SellPage({ onNavigate }: SellPageProps) {
                 <Button className="bg-white text-[#0F1111] hover:bg-gray-100 px-8 py-6 text-lg">
                   {t('sell.startSelling')}
                 </Button>
-                <Button variant="outline" className="border-2 border-white text-black hover:bg-white/20 px-8 py-6 text-lg">
+                <Button variant="outline" className="border-2 border-white !text-black hover:bg-white/20 hover:!text-black px-8 py-6 text-lg">
                   {t('sell.learnMore')}
                 </Button>
               </div>
