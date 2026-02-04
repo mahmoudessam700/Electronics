@@ -1,11 +1,9 @@
 // @ts-nocheck
-// Consolidated admin API for suppliers and financial management
-const { Pool } = require('pg');
+const { getPool, withTransaction } = require('../_utils/db');
+const { requireAuth, ensureRole, createError, generateId } = require('../_utils/auth');
+const { getLatestBalance, recordPayoutLedgerEntry } = require('../_utils/ledger');
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const pool = getPool();
 
 const normalizeValue = (value) => (Array.isArray(value) ? value[0] : value);
 
@@ -15,12 +13,12 @@ const handleSuppliers = async (req, res) => {
         const { id } = req.query;
 
         if (id) {
-            const { rows } = await pool.query('SELECT * FROM "Supplier" WHERE id = $1', [id]);
+            const [rows] = await pool.execute('SELECT * FROM Supplier WHERE id = ?', [id]);
             if (rows.length === 0) return res.status(404).json({ error: 'Supplier not found' });
             return res.json(rows[0]);
         }
 
-        const { rows } = await pool.query('SELECT * FROM "Supplier" ORDER BY name ASC');
+        const [rows] = await pool.execute('SELECT * FROM Supplier ORDER BY name ASC');
         return res.json(rows);
     }
 
@@ -29,12 +27,12 @@ const handleSuppliers = async (req, res) => {
         if (!name) return res.status(400).json({ error: 'Name is required' });
 
         const id = `sup_${Date.now()}`;
-        const { rows } = await pool.query(`
-            INSERT INTO "Supplier" (id, name, contact, email, phone, address, "updatedAt")
-            VALUES ($1, $2, $3, $4, $5, $6, NOW())
-            RETURNING *
+        await pool.execute(`
+            INSERT INTO Supplier (id, name, contact, email, phone, address, updatedAt)
+            VALUES (?, ?, ?, ?, ?, ?, NOW())
         `, [id, name, contact || null, email || null, phone || null, address || null]);
 
+        const [rows] = await pool.execute('SELECT * FROM Supplier WHERE id = ?', [id]);
         return res.status(201).json(rows[0]);
     }
 
@@ -44,18 +42,18 @@ const handleSuppliers = async (req, res) => {
 
         if (!id) return res.status(400).json({ error: 'ID is required' });
 
-        const { rows } = await pool.query(`
-            UPDATE "Supplier"
-            SET name = COALESCE($2, name),
-                contact = COALESCE($3, contact),
-                email = COALESCE($4, email),
-                phone = COALESCE($5, phone),
-                address = COALESCE($6, address),
-                "updatedAt" = NOW()
-            WHERE id = $1
-            RETURNING *
-        `, [id, name, contact, email, phone, address]);
+        await pool.execute(`
+            UPDATE Supplier
+            SET name = COALESCE(?, name),
+                contact = COALESCE(?, contact),
+                email = COALESCE(?, email),
+                phone = COALESCE(?, phone),
+                address = COALESCE(?, address),
+                updatedAt = NOW()
+            WHERE id = ?
+        `, [name, contact, email, phone, address, id]);
 
+        const [rows] = await pool.execute('SELECT * FROM Supplier WHERE id = ?', [id]);
         if (rows.length === 0) return res.status(404).json({ error: 'Supplier not found' });
         return res.json(rows[0]);
     }
@@ -64,8 +62,8 @@ const handleSuppliers = async (req, res) => {
         const { id } = req.query;
         if (!id) return res.status(400).json({ error: 'ID is required' });
 
-        await pool.query('UPDATE "Product" SET "supplierId" = NULL WHERE "supplierId" = $1', [id]);
-        await pool.query('DELETE FROM "Supplier" WHERE id = $1', [id]);
+        await pool.execute('UPDATE Product SET supplierId = NULL WHERE supplierId = ?', [id]);
+        await pool.execute('DELETE FROM Supplier WHERE id = ?', [id]);
 
         return res.status(204).end();
     }
@@ -79,30 +77,30 @@ const handleFinancial = async (req, res) => {
         const { type, cycleId } = req.query;
 
         if (type === 'cycles') {
-            const { rows } = await pool.query('SELECT * FROM "FinancialCycle" ORDER BY "startDate" DESC');
+            const [rows] = await pool.execute('SELECT * FROM FinancialCycle ORDER BY startDate DESC');
             return res.json(rows);
         }
 
         if (type === 'expenses') {
-            const query = cycleId 
-                ? 'SELECT * FROM "Expense" WHERE "cycleId" = $1 ORDER BY "createdAt" DESC'
-                : 'SELECT * FROM "Expense" ORDER BY "createdAt" DESC';
-            const params = cycleId ? [cycleId] : [];
-            const { rows } = await pool.query(query, params);
+            if (cycleId) {
+                const [rows] = await pool.execute('SELECT * FROM Expense WHERE cycleId = ? ORDER BY createdAt DESC', [cycleId]);
+                return res.json(rows);
+            }
+            const [rows] = await pool.execute('SELECT * FROM Expense ORDER BY createdAt DESC');
             return res.json(rows);
         }
 
         if (type === 'payouts') {
-            const query = cycleId 
-                ? 'SELECT * FROM "SupplierPayout" WHERE "cycleId" = $1 ORDER BY "createdAt" DESC'
-                : 'SELECT * FROM "SupplierPayout" ORDER BY "createdAt" DESC';
-            const params = cycleId ? [cycleId] : [];
-            const { rows } = await pool.query(query, params);
+            if (cycleId) {
+                const [rows] = await pool.execute('SELECT * FROM SupplierPayout WHERE cycleId = ? ORDER BY createdAt DESC', [cycleId]);
+                return res.json(rows);
+            }
+            const [rows] = await pool.execute('SELECT * FROM SupplierPayout ORDER BY createdAt DESC');
             return res.json(rows);
         }
 
         // Default: Get active cycle summary
-        const { rows: cycles } = await pool.query('SELECT * FROM "FinancialCycle" WHERE status = \'OPEN\' LIMIT 1');
+        const [cycles] = await pool.execute('SELECT * FROM FinancialCycle WHERE status = \'OPEN\' LIMIT 1');
         return res.json(cycles[0] || null);
     }
 
@@ -111,25 +109,27 @@ const handleFinancial = async (req, res) => {
 
         if (type === 'cycle') {
             const { name, startDate } = req.body;
-            const { rows } = await pool.query(`
-                INSERT INTO "FinancialCycle" (id, name, "startDate", status, "updatedAt")
-                VALUES ($1, $2, $3, 'OPEN', NOW())
-                RETURNING *
-            `, [`cycle_${Date.now()}`, name, startDate || new Date()]);
+            const id = `cycle_${Date.now()}`;
+            await pool.execute(`
+                INSERT INTO FinancialCycle (id, name, startDate, status, updatedAt)
+                VALUES (?, ?, ?, 'OPEN', NOW())
+            `, [id, name, startDate || new Date()]);
+            const [rows] = await pool.execute('SELECT * FROM FinancialCycle WHERE id = ?', [id]);
             return res.status(201).json(rows[0]);
         }
 
         if (type === 'expense') {
             const { description, amount, category, cycleId } = req.body;
-            const { rows } = await pool.query(`
-                INSERT INTO "Expense" (id, description, amount, category, "cycleId")
-                VALUES ($1, $2, $3, $4, $5)
-                RETURNING *
-            `, [`exp_${Date.now()}`, description, amount, category, cycleId]);
+            const id = `exp_${Date.now()}`;
+            await pool.execute(`
+                INSERT INTO Expense (id, description, amount, category, cycleId)
+                VALUES (?, ?, ?, ?, ?)
+            `, [id, description, amount, category, cycleId]);
             
             // Update cycle totals
-            await pool.query('UPDATE "FinancialCycle" SET "totalExpenses" = "totalExpenses" + $1 WHERE id = $2', [amount, cycleId]);
+            await pool.execute('UPDATE FinancialCycle SET totalExpenses = totalExpenses + ? WHERE id = ?', [amount, cycleId]);
             
+            const [rows] = await pool.execute('SELECT * FROM Expense WHERE id = ?', [id]);
             return res.status(201).json(rows[0]);
         }
 
@@ -140,12 +140,12 @@ const handleFinancial = async (req, res) => {
         const { id, action } = req.query;
 
         if (action === 'close') {
-            const { rows } = await pool.query(`
-                UPDATE "FinancialCycle" 
-                SET status = 'CLOSED', "endDate" = NOW(), "updatedAt" = NOW()
-                WHERE id = $1
-                RETURNING *
+            await pool.execute(`
+                UPDATE FinancialCycle 
+                SET status = 'CLOSED', endDate = NOW(), updatedAt = NOW()
+                WHERE id = ?
             `, [id]);
+            const [rows] = await pool.execute('SELECT * FROM FinancialCycle WHERE id = ?', [id]);
             return res.json(rows[0]);
         }
 
@@ -156,10 +156,6 @@ const handleFinancial = async (req, res) => {
 };
 
 // ============ SHOP PAYOUTS HANDLERS ============
-const { requireAuth, ensureRole, createError, generateId } = require('../_utils/auth');
-const { getLatestBalance, recordPayoutLedgerEntry } = require('../_utils/ledger');
-const { withTransaction } = require('../_utils/db');
-
 const VALID_STATUSES = new Set(['PENDING', 'SCHEDULED', 'PROCESSING', 'PAID', 'FAILED', 'CANCELLED']);
 const TERMINAL_STATUSES = new Set(['PAID', 'FAILED', 'CANCELLED']);
 const RELEASE_STATUSES = new Set(['FAILED', 'CANCELLED']);
@@ -169,11 +165,11 @@ const handleShopPayouts = async (req, res) => {
     
     if (req.method === 'GET') {
         if (payoutId) {
-            const { rows } = await pool.query(`
-                SELECT sp.*, s.name AS "shopName", s.slug AS "shopSlug"
-                FROM "ShopPayout" sp
-                LEFT JOIN "Shop" s ON s.id = sp."shopId"
-                WHERE sp.id = $1
+            const [rows] = await pool.execute(`
+                SELECT sp.*, s.name AS shopName, s.slug AS shopSlug
+                FROM ShopPayout sp
+                LEFT JOIN Shop s ON s.id = sp.shopId
+                WHERE sp.id = ?
             `, [payoutId]);
             if (!rows[0]) return res.status(404).json({ error: 'Payout not found' });
             return res.json({ payout: rows[0] });
@@ -184,31 +180,31 @@ const handleShopPayouts = async (req, res) => {
         const params = [];
         const conditions = [];
         if (shopId) {
+            conditions.push(`sp.shopId = ?`);
             params.push(shopId);
-            conditions.push(`sp."shopId" = $${params.length}`);
         }
         if (status) {
+            conditions.push(`sp.status = ?`);
             params.push(status);
-            conditions.push(`sp.status = $${params.length}`);
         }
         const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
         
-        const { rows } = await pool.query(`
-            SELECT sp.*, s.name AS "shopName", s.slug AS "shopSlug",
-                   COALESCE(stats."orderCount", 0) AS "orderCount",
-                   COALESCE(stats."orderTotal", 0) AS "orderTotal"
-            FROM "ShopPayout" sp
-            LEFT JOIN "Shop" s ON s.id = sp."shopId"
+        const [rows] = await pool.execute(`
+            SELECT sp.*, s.name AS shopName, s.slug AS shopSlug,
+                   COALESCE(stats.orderCount, 0) AS orderCount,
+                   COALESCE(stats.orderTotal, 0) AS orderTotal
+            FROM ShopPayout sp
+            LEFT JOIN Shop s ON s.id = sp.shopId
             LEFT JOIN (
-                SELECT "shopPayoutId",
-                       COUNT(*) AS "orderCount",
-                       COALESCE(SUM(("totalAmount" - "commissionTotal")), 0)::double precision AS "orderTotal"
-                FROM "Order"
-                WHERE "shopPayoutId" IS NOT NULL
-                GROUP BY "shopPayoutId"
-            ) AS stats ON stats."shopPayoutId" = sp.id
+                SELECT shopPayoutId,
+                       COUNT(*) AS orderCount,
+                       COALESCE(SUM((totalAmount - commissionTotal)), 0) AS orderTotal
+                FROM \`Order\`
+                WHERE shopPayoutId IS NOT NULL
+                GROUP BY shopPayoutId
+            ) AS stats ON stats.shopPayoutId = sp.id
             ${whereClause}
-            ORDER BY sp."createdAt" DESC
+            ORDER BY sp.createdAt DESC
             LIMIT 200
         `, params);
         return res.json({ payouts: rows });
@@ -219,8 +215,8 @@ const handleShopPayouts = async (req, res) => {
         const { status, notes, reference, scheduledFor } = req.body || {};
         
         return withTransaction(async (client) => {
-            const { rows: payouts } = await client.query(
-                'SELECT * FROM "ShopPayout" WHERE id = $1 FOR UPDATE',
+            const [payouts] = await client.execute(
+                'SELECT * FROM ShopPayout WHERE id = ? FOR UPDATE',
                 [payoutId]
             );
             const payout = payouts[0];
@@ -229,43 +225,43 @@ const handleShopPayouts = async (req, res) => {
             const updates = [];
             const params = [];
             if (status && payout.status !== status) {
+                updates.push(`status = ?`);
                 params.push(status);
-                updates.push(`status = $${params.length}`);
                 if (status === 'PAID') {
+                    updates.push(`processedAt = ?`);
                     params.push(new Date());
-                    updates.push(`"processedAt" = $${params.length}`);
                 }
             }
             if (notes !== undefined) {
+                updates.push(`notes = ?`);
                 params.push(notes || null);
-                updates.push(`notes = $${params.length}`);
             }
             if (reference !== undefined) {
+                updates.push(`reference = ?`);
                 params.push(reference || payout.reference);
-                updates.push(`reference = $${params.length}`);
             }
             if (scheduledFor !== undefined) {
                 const date = scheduledFor ? new Date(scheduledFor) : null;
+                updates.push(`scheduledFor = ?`);
                 params.push(date);
-                updates.push(`"scheduledFor" = $${params.length}`);
             }
             
             if (updates.length > 0) {
                 params.push(payoutId);
-                await client.query(
-                    `UPDATE "ShopPayout" SET ${updates.join(', ')}, "updatedAt" = NOW() WHERE id = $${params.length}`,
+                await client.execute(
+                    `UPDATE ShopPayout SET ${updates.join(', ')}, updatedAt = NOW() WHERE id = ?`,
                     params
                 );
             }
             
             if (status === 'PAID' && payout.status !== 'PAID') {
-                await client.query(
-                    'UPDATE "Order" SET "shopPayoutStatus" = \'PAID_OUT\', "updatedAt" = NOW() WHERE "shopPayoutId" = $1',
+                await client.execute(
+                    'UPDATE `Order` SET shopPayoutStatus = \'PAID_OUT\', updatedAt = NOW() WHERE shopPayoutId = ?',
                     [payoutId]
                 );
             } else if (RELEASE_STATUSES.has(status) && !RELEASE_STATUSES.has(payout.status)) {
-                await client.query(
-                    'UPDATE "Order" SET "shopPayoutStatus" = \'NOT_REQUESTED\', "shopPayoutId" = NULL, "updatedAt" = NOW() WHERE "shopPayoutId" = $1',
+                await client.execute(
+                    'UPDATE `Order` SET shopPayoutStatus = \'NOT_REQUESTED\', shopPayoutId = NULL, updatedAt = NOW() WHERE shopPayoutId = ?',
                     [payoutId]
                 );
                 await recordPayoutLedgerEntry(client, {
@@ -293,9 +289,9 @@ const handleShopPayouts = async (req, res) => {
             
             const payoutId = generateId('sp');
             const ref = reference || `SP-${Date.now()}`;
-            await client.query(`
-                INSERT INTO "ShopPayout" (id, "shopId", amount, currency, status, reference, notes, "createdAt", "updatedAt")
-                VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+            await client.execute(`
+                INSERT INTO ShopPayout (id, shopId, amount, currency, status, reference, notes, createdAt, updatedAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
             `, [payoutId, shopId, amount, currency, status, ref, notes || null]);
             
             await recordPayoutLedgerEntry(client, {
@@ -314,54 +310,51 @@ const handleShopPayouts = async (req, res) => {
 const handleDashboard = async (req, res) => {
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-    const stats = await pool.query(`
+    const [stats] = await pool.execute(`
         SELECT 
-            (SELECT COALESCE(SUM("totalAmount"), 0) FROM "Order") as "totalRevenue",
-            (SELECT COUNT(*) FROM "Order") as "totalOrders",
-            (SELECT COUNT(*) FROM "Product") as "totalProducts",
-            (SELECT COUNT(*) FROM "User" WHERE role = 'CUSTOMER') as "totalCustomers"
+            (SELECT COALESCE(SUM(totalAmount), 0) FROM \`Order\`) as totalRevenue,
+            (SELECT COUNT(*) FROM \`Order\`) as totalOrders,
+            (SELECT COUNT(*) FROM Product) as totalProducts,
+            (SELECT COUNT(*) FROM User WHERE role = 'CUSTOMER') as totalCustomers
     `);
 
-    const recentSales = await pool.query(`
-        SELECT o.id, o."totalAmount" as amount, u.name, u.email
-        FROM "Order" o
-        LEFT JOIN "User" u ON o."userId" = u.id
-        ORDER BY o."createdAt" DESC
+    const [recentSales] = await pool.execute(`
+        SELECT o.id, o.totalAmount as amount, u.name, u.email
+        FROM \`Order\` o
+        LEFT JOIN User u ON o.userId = u.id
+        ORDER BY o.createdAt DESC
         LIMIT 5
     `);
 
-    const recentOrders = await pool.query(`
-        SELECT o.id, o."customerName" as customer, o."createdAt" as date, o.status, o."totalAmount" as amount
-        FROM "Order" o
-        ORDER BY o."createdAt" DESC
+    const [recentOrders] = await pool.execute(`
+        SELECT o.id, o.customerName as customer, o.createdAt as date, o.status, o.totalAmount as amount
+        FROM \`Order\` o
+        ORDER BY o.createdAt DESC
         LIMIT 4
     `);
 
-    const revenueOverview = await pool.query(`
+    // For MySQL, we need a different approach for the monthly series
+    const [revenueOverview] = await pool.execute(`
         SELECT 
-            TO_CHAR(date_trunc('month', months.m), 'Mon') as month,
-            COALESCE(SUM(o."totalAmount"), 0) as revenue
-        FROM generate_series(
-            date_trunc('month', NOW()) - INTERVAL '11 months',
-            date_trunc('month', NOW()),
-            '1 month'::interval
-        ) AS months(m)
-        LEFT JOIN "Order" o ON date_trunc('month', o."createdAt") = months.m
-        GROUP BY months.m
-        ORDER BY months.m
+            DATE_FORMAT(o.createdAt, '%b') as month,
+            COALESCE(SUM(o.totalAmount), 0) as revenue
+        FROM \`Order\` o
+        WHERE o.createdAt >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        GROUP BY YEAR(o.createdAt), MONTH(o.createdAt), month
+        ORDER BY YEAR(o.createdAt), MONTH(o.createdAt)
     `);
 
     return res.json({
-        stats: stats.rows[0],
-        recentSales: recentSales.rows.map(s => ({
+        stats: stats[0],
+        recentSales: recentSales.map(s => ({
             ...s,
             initials: (s.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
         })),
-        recentOrders: recentOrders.rows.map(o => ({
+        recentOrders: recentOrders.map(o => ({
             ...o,
-            date: new Date(o.date).toLocaleString(), // Simple format
+            date: new Date(o.date).toLocaleString(),
         })),
-        revenueOverview: revenueOverview.rows
+        revenueOverview
     });
 };
 

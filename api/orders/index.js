@@ -20,44 +20,32 @@ const SHOP_PAYOUT_STATUS_SET = new Set(['NOT_REQUESTED', 'QUEUED', 'PAID_OUT', '
 
 const normalizeQueryValue = (value) => (Array.isArray(value) ? value[0] : value);
 
-const baseOrderSelect = `
-    SELECT o.*,
-           (
-               SELECT json_agg(
-                   json_build_object(
-                       'id', oi.id,
-                       'orderId', oi."orderId",
-                       'productId', oi."productId",
-                       'quantity', oi.quantity,
-                       'price', oi.price,
-                       'commissionRateApplied', oi."commissionRateApplied",
-                       'commissionAmount', oi."commissionAmount",
-                       'netRevenue', oi."netRevenue",
-                       'productName', COALESCE(p.name, oi."productId"),
-                       'productImage', p.image
-                   )
-               )
-               FROM "OrderItem" oi
-               LEFT JOIN "Product" p ON p.id = oi."productId"
-               WHERE oi."orderId" = o.id
-           ) AS items,
-           (
-               SELECT json_agg(
-                   json_build_object(
-                       'id', ol.id,
-                       'oldStatus', ol."oldStatus",
-                       'newStatus', ol."newStatus",
-                       'createdAt', ol."createdAt",
-                       'userName', u.name,
-                       'userRole', u.role
-                   ) ORDER BY ol."createdAt" DESC
-               )
-               FROM "OrderLog" ol
-               LEFT JOIN "User" u ON u.id = ol."userId"
-               WHERE ol."orderId" = o.id
-           ) AS logs
-    FROM "Order" o
-`;
+const getOrderWithItems = async (orderId) => {
+    const [orderRows] = await pool.execute('SELECT * FROM `Order` WHERE id = ?', [orderId]);
+    const order = orderRows[0];
+    if (!order) return null;
+
+    const [itemRows] = await pool.execute(`
+        SELECT oi.*, p.name AS productName, p.image AS productImage
+        FROM OrderItem oi
+        LEFT JOIN Product p ON p.id = oi.productId
+        WHERE oi.orderId = ?
+    `, [orderId]);
+
+    const [logRows] = await pool.execute(`
+        SELECT ol.*, u.name AS userName, u.role AS userRole
+        FROM OrderLog ol
+        LEFT JOIN User u ON u.id = ol.userId
+        WHERE ol.orderId = ?
+        ORDER BY ol.createdAt DESC
+    `, [orderId]);
+
+    return {
+        ...order,
+        items: itemRows,
+        logs: logRows,
+    };
+};
 
 const getScope = (user) => {
     if (user.role === 'ADMIN') {
@@ -78,11 +66,6 @@ const ensureShopScope = (scope) => {
     }
 };
 
-const getOrderWithItems = async (whereClause, params) => {
-    const { rows } = await pool.query(`${baseOrderSelect} ${whereClause}`, params);
-    return rows[0] || null;
-};
-
 const prepareOrderItems = async (items = []) => {
     if (!Array.isArray(items) || items.length === 0) {
         throw createError(400, 'At least one item is required');
@@ -93,19 +76,14 @@ const prepareOrderItems = async (items = []) => {
         throw createError(400, 'Each item must include a productId');
     }
 
-    const { rows } = await pool.query(`
-         SELECT p.id,
-             p.name,
-             p.price,
-             p."shopId",
-             p."commissionRate",
-             p."tracksInventory",
-             p."inventoryQuantity",
-             sh."defaultCommissionRate" AS "shopCommissionRate"
-        FROM "Product" p
-        LEFT JOIN "Shop" sh ON sh.id = p."shopId"
-        WHERE p.id = ANY($1::text[])
-    `, [uniqueProductIds]);
+    const placeholders = uniqueProductIds.map(() => '?').join(',');
+    const [rows] = await pool.execute(`
+        SELECT p.id, p.name, p.price, p.shopId, p.commissionRate, p.tracksInventory, p.inventoryQuantity,
+               sh.defaultCommissionRate AS shopCommissionRate
+        FROM Product p
+        LEFT JOIN Shop sh ON sh.id = p.shopId
+        WHERE p.id IN (${placeholders})
+    `, uniqueProductIds);
 
     if (rows.length !== uniqueProductIds.length) {
         throw createError(400, 'One or more products were not found');
@@ -131,7 +109,6 @@ const prepareOrderItems = async (items = []) => {
         }
         const quantity = Math.max(1, Number(item.quantity) || 1);
 
-        // Check inventory sufficiency if tracking is enabled
         if (product.tracksInventory && product.inventoryQuantity < quantity) {
             throw createError(400, `Insufficient stock for ${product.name}. Available: ${product.inventoryQuantity}`);
         }
@@ -172,31 +149,19 @@ const VALID_STATUSES_FOR_UPDATE = new Set(['PENDING', 'CONFIRMED', 'PROCESSING',
 
 const fetchOrderSummary = async (executor, orderId) => {
     const runner = executor || pool;
-    const { rows } = await runner.query(
-        'SELECT id, "orderNumber", "shopId", status FROM "Order" WHERE id = $1',
-        [orderId],
-    );
+    const [rows] = await runner.execute('SELECT id, orderNumber, shopId, status FROM `Order` WHERE id = ?', [orderId]);
     return rows[0] || null;
 };
 
 const fetchOrderItemsForLedger = async (executor, orderId) => {
-    const { rows } = await executor.query(
-        `
-        SELECT
-            oi.id,
-            oi."productId",
-            oi.quantity,
-            oi.price AS "unitPrice",
-            oi."commissionRateApplied" AS "commissionRate",
-            oi."commissionAmount",
-            oi."netRevenue",
-            COALESCE(p.name, 'Product') AS "productName"
-        FROM "OrderItem" oi
-        LEFT JOIN "Product" p ON p.id = oi."productId"
-        WHERE oi."orderId" = $1
-    `,
-        [orderId],
-    );
+    const [rows] = await executor.execute(`
+        SELECT oi.id, oi.productId, oi.quantity, oi.price AS unitPrice,
+               oi.commissionRateApplied AS commissionRate, oi.commissionAmount, oi.netRevenue,
+               COALESCE(p.name, 'Product') AS productName
+        FROM OrderItem oi
+        LEFT JOIN Product p ON p.id = oi.productId
+        WHERE oi.orderId = ?
+    `, [orderId]);
     return rows;
 };
 
@@ -239,67 +204,84 @@ module.exports = async (req, res) => {
             }
 
             if (id) {
-                let whereClause = 'WHERE (o.id = $1 OR o."orderNumber" = $1)';
-                const params = [id];
-
-                if (scope.mode === 'SHOP') {
-                    params.push(scope.shopIds);
-                    whereClause += ` AND o."shopId" = ANY($${params.length}::text[])`;
-                } else if (scope.mode === 'CUSTOMER') {
-                    params.push(scope.userId);
-                    whereClause += ` AND o."userId" = $${params.length}`;
+                // Try to find by id or orderNumber
+                const [orderRows] = await pool.execute('SELECT * FROM `Order` WHERE id = ? OR orderNumber = ?', [id, id]);
+                let order = orderRows[0];
+                
+                if (order) {
+                    // Check access
+                    if (scope.mode === 'SHOP' && !scope.shopIds.includes(order.shopId)) {
+                        return res.status(404).json({ error: 'Order not found' });
+                    }
+                    if (scope.mode === 'CUSTOMER' && order.userId !== scope.userId) {
+                        return res.status(404).json({ error: 'Order not found' });
+                    }
+                    
+                    // Fetch items and logs
+                    const fullOrder = await getOrderWithItems(order.id);
+                    return res.json(fullOrder);
                 }
-
-                const order = await getOrderWithItems(whereClause, params);
-                if (!order) return res.status(404).json({ error: 'Order not found' });
-                return res.json(order);
+                return res.status(404).json({ error: 'Order not found' });
             }
 
+            // List orders with filters
             const conditions = [];
             const params = [];
 
             if (scope.mode === 'SHOP' && !requestedShopId) {
-                params.push(scope.shopIds);
-                conditions.push(`o."shopId" = ANY($${params.length}::text[])`);
+                const placeholders = scope.shopIds.map(() => '?').join(',');
+                conditions.push(`shopId IN (${placeholders})`);
+                params.push(...scope.shopIds);
             } else if (scope.mode === 'CUSTOMER') {
+                conditions.push('userId = ?');
                 params.push(scope.userId);
-                conditions.push(`o."userId" = $${params.length}`);
             }
 
             if (requestedShopId) {
                 if (scope.mode === 'ADMIN') {
+                    conditions.push('shopId = ?');
                     params.push(requestedShopId);
-                    conditions.push(`o."shopId" = $${params.length}`);
                 } else if (scope.mode === 'SHOP') {
                     if (!(scope.shopIds || []).includes(requestedShopId)) {
                         throw createError(403, 'You do not have access to this shop');
                     }
+                    conditions.push('shopId = ?');
                     params.push(requestedShopId);
-                    conditions.push(`o."shopId" = $${params.length}`);
                 } else {
                     throw createError(400, 'shopId filter is not available for this account');
                 }
             }
 
             if (statusFilter) {
+                conditions.push('status = ?');
                 params.push(statusFilter);
-                conditions.push(`o.status = $${params.length}`);
             }
 
             if (payoutStatusFilter) {
+                conditions.push('shopPayoutStatus = ?');
                 params.push(payoutStatusFilter);
-                conditions.push(`o."shopPayoutStatus" = $${params.length}`);
             }
 
             if (payoutIdFilter) {
+                conditions.push('shopPayoutId = ?');
                 params.push(payoutIdFilter);
-                conditions.push(`o."shopPayoutId" = $${params.length}`);
             }
 
             const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-            const query = `${baseOrderSelect} ${whereClause} ORDER BY o."createdAt" DESC`;
-            const { rows } = await pool.query(query, params);
-            return res.json(rows);
+            const [orders] = await pool.execute(`SELECT * FROM \`Order\` ${whereClause} ORDER BY createdAt DESC`, params);
+            
+            // Fetch items for each order
+            const ordersWithItems = await Promise.all(orders.map(async (order) => {
+                const [items] = await pool.execute(`
+                    SELECT oi.*, p.name AS productName, p.image AS productImage
+                    FROM OrderItem oi
+                    LEFT JOIN Product p ON p.id = oi.productId
+                    WHERE oi.orderId = ?
+                `, [order.id]);
+                return { ...order, items };
+            }));
+
+            return res.json(ordersWithItems);
         }
 
         if (req.method === 'POST') {
@@ -318,13 +300,9 @@ module.exports = async (req, res) => {
             }));
 
             await withTransaction(async (client) => {
-                await client.query(`
-                    INSERT INTO "Order" (
-                        id, "orderNumber", "totalAmount", "commissionTotal",
-                        "customerName", "customerEmail", "customerPhone", "shippingAddress",
-                        "userId", "shopId", "shopPayoutStatus", "updatedAt"
-                    )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+                await client.execute(`
+                    INSERT INTO \`Order\` (id, orderNumber, totalAmount, commissionTotal, customerName, customerEmail, customerPhone, shippingAddress, userId, shopId, shopPayoutStatus, updatedAt)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'NOT_REQUESTED', NOW())
                 `, [
                     orderId,
                     orderNumber,
@@ -336,13 +314,12 @@ module.exports = async (req, res) => {
                     shippingAddress || null,
                     userId,
                     orderComputation.shopId,
-                    'NOT_REQUESTED',
                 ]);
 
                 for (const item of enrichedItems) {
-                    await client.query(`
-                        INSERT INTO "OrderItem" (id, "orderId", "productId", quantity, price, "commissionRateApplied", "commissionAmount", "netRevenue")
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                    await client.execute(`
+                        INSERT INTO OrderItem (id, orderId, productId, quantity, price, commissionRateApplied, commissionAmount, netRevenue)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     `, [
                         item.id,
                         orderId,
@@ -354,13 +331,12 @@ module.exports = async (req, res) => {
                         item.netRevenue || 0,
                     ]);
 
-                    // Deduct inventory if tracking is enabled
-                    await client.query(`
-                        UPDATE "Product"
-                        SET "inventoryQuantity" = "inventoryQuantity" - $1,
-                            "inStock" = CASE WHEN ("inventoryQuantity" - $1) <= 0 THEN false ELSE "inStock" END
-                        WHERE id = $2 AND "tracksInventory" = true
-                    `, [item.quantity, item.productId]);
+                    await client.execute(`
+                        UPDATE Product
+                        SET inventoryQuantity = inventoryQuantity - ?,
+                            inStock = CASE WHEN (inventoryQuantity - ?) <= 0 THEN false ELSE inStock END
+                        WHERE id = ? AND tracksInventory = true
+                    `, [item.quantity, item.quantity, item.productId]);
                 }
 
                 await recordOrderLedgerEntries(client, {
@@ -375,18 +351,18 @@ module.exports = async (req, res) => {
                 const tax = finalTotal * 0.14;
                 const netProfit = finalTotal - tax;
 
-                await pool.query(`
-                    UPDATE "FinancialCycle"
-                    SET "totalRevenue" = "totalRevenue" + $1,
-                        "totalTax" = "totalTax" + $2,
-                        "netProfit" = "netProfit" + $3
+                await pool.execute(`
+                    UPDATE FinancialCycle
+                    SET totalRevenue = totalRevenue + ?,
+                        totalTax = totalTax + ?,
+                        netProfit = netProfit + ?
                     WHERE status = 'OPEN'
                 `, [finalTotal, tax, netProfit]);
             } catch (financialError) {
                 console.error('Failed to update financial cycle:', financialError);
             }
 
-            const createdOrder = await getOrderWithItems('WHERE o.id = $1', [orderId]);
+            const createdOrder = await getOrderWithItems(orderId);
             return res.status(201).json(createdOrder);
         }
 
@@ -415,7 +391,6 @@ module.exports = async (req, res) => {
 
                 const previousStatus = order.status;
 
-                // Determine timestamp field
                 let timestampField = null;
                 if (status === 'CONFIRMED') timestampField = 'confirmedAt';
                 else if (status === 'PROCESSING') timestampField = 'processingAt';
@@ -423,30 +398,26 @@ module.exports = async (req, res) => {
                 else if (status === 'DELIVERED') timestampField = 'deliveredAt';
                 else if (status === 'CANCELLED') timestampField = 'cancelledAt';
 
-                const timestampUpdate = timestampField ? `, "${timestampField}" = NOW()` : '';
+                if (timestampField) {
+                    await client.execute(`UPDATE \`Order\` SET status = ?, ${timestampField} = NOW(), updatedAt = NOW() WHERE id = ?`, [status, orderId]);
+                } else {
+                    await client.execute('UPDATE `Order` SET status = ?, updatedAt = NOW() WHERE id = ?', [status, orderId]);
+                }
 
-                await client.query(
-                    `UPDATE "Order" SET status = $1, "updatedAt" = NOW() ${timestampUpdate} WHERE id = $2`,
-                    [status, orderId],
-                );
-
-                // Log the change
-                await client.query(
-                    `INSERT INTO "OrderLog" (id, "orderId", "userId", "oldStatus", "newStatus", "createdAt")
-                     VALUES ($1, $2, $3, $4, $5, NOW())`,
-                    [generateId('olog'), orderId, user.id, previousStatus, status]
-                );
+                await client.execute(`
+                    INSERT INTO OrderLog (id, orderId, userId, oldStatus, newStatus, createdAt)
+                    VALUES (?, ?, ?, ?, ?, NOW())
+                `, [generateId('olog'), orderId, user.id, previousStatus, status]);
 
                 if (status === 'CANCELLED' && previousStatus !== 'CANCELLED' && order.shopId) {
                     const items = await fetchOrderItemsForLedger(client, orderId);
                     
-                    // Restore inventory
                     for (const item of items) {
-                        await client.query(`
-                            UPDATE "Product"
-                            SET "inventoryQuantity" = "inventoryQuantity" + $1,
-                                "inStock" = true
-                            WHERE id = $2 AND "tracksInventory" = true
+                        await client.execute(`
+                            UPDATE Product
+                            SET inventoryQuantity = inventoryQuantity + ?,
+                                inStock = true
+                            WHERE id = ? AND tracksInventory = true
                         `, [item.quantity, item.productId]);
                     }
 
@@ -459,10 +430,7 @@ module.exports = async (req, res) => {
                     });
                 }
 
-                const { rows } = await client.query(
-                    'SELECT id, status, "orderNumber", "shopPayoutStatus", "updatedAt" FROM "Order" WHERE id = $1',
-                    [orderId],
-                );
+                const [rows] = await client.execute('SELECT id, status, orderNumber, shopPayoutStatus, updatedAt FROM `Order` WHERE id = ?', [orderId]);
                 return rows[0];
             });
 

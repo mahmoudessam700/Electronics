@@ -22,45 +22,45 @@ const handleReviews = async (req, res) => {
             if (user.role !== 'ADMIN') throw createError(403, 'Unauthorized');
 
             let logQuery = `
-                SELECT l.*, u.name as "adminName"
-                FROM "ReviewLog" l
-                LEFT JOIN "User" u ON u.id = l."adminId"
+                SELECT l.*, u.name as adminName
+                FROM ReviewLog l
+                LEFT JOIN User u ON u.id = l.adminId
             `;
             const logParams = [];
             if (reviewId) {
+                logQuery += ` WHERE l.reviewId = ?`;
                 logParams.push(reviewId);
-                logQuery += ` WHERE l."reviewId" = $${logParams.length}`;
             }
-            logQuery += ' ORDER BY l."createdAt" DESC';
+            logQuery += ' ORDER BY l.createdAt DESC';
 
-            const { rows } = await pool.query(logQuery, logParams);
+            const [rows] = await pool.execute(logQuery, logParams);
             return res.json(rows);
         }
 
         let query = `
-            SELECT r.*, u.name as "userName", p.name as "productName"
-            FROM "Review" r
-            INNER JOIN "User" u ON u.id = r."userId"
-            INNER JOIN "Product" p ON p.id = r."productId"
+            SELECT r.*, u.name as userName, p.name as productName
+            FROM Review r
+            INNER JOIN User u ON u.id = r.userId
+            INNER JOIN Product p ON p.id = r.productId
         `;
         const params = [];
         const conditions = [];
         
         if (productId) {
+            conditions.push(`r.productId = ?`);
             params.push(productId);
-            conditions.push(`r."productId" = $${params.length}`);
         }
         if (status) {
+            conditions.push(`r.status = ?`);
             params.push(status);
-            conditions.push(`r.status = $${params.length}`);
         }
         
         if (conditions.length) {
             query += ' WHERE ' + conditions.join(' AND ');
         }
         
-        query += ' ORDER BY r."createdAt" DESC';
-        const { rows } = await pool.query(query, params);
+        query += ' ORDER BY r.createdAt DESC';
+        const [rows] = await pool.execute(query, params);
         return res.json(rows);
     }
 
@@ -73,13 +73,13 @@ const handleReviews = async (req, res) => {
         }
 
         const reviewId = generateId('rev');
-        const { rows } = await pool.query(
-            `INSERT INTO "Review" (id, rating, comment, "userId", "productId", status, "createdAt", "updatedAt")
-             VALUES ($1, $2, $3, $4, $5, 'PENDING', NOW(), NOW())
-             RETURNING *`,
+        await pool.execute(
+            `INSERT INTO Review (id, rating, comment, userId, productId, status, createdAt, updatedAt)
+             VALUES (?, ?, ?, ?, ?, 'PENDING', NOW(), NOW())`,
             [reviewId, rating, comment || null, user.id, productId]
         );
 
+        const [rows] = await pool.execute('SELECT * FROM Review WHERE id = ?', [reviewId]);
         return res.status(201).json(rows[0]);
     }
 
@@ -97,22 +97,23 @@ const handleReviews = async (req, res) => {
         }
 
         const result = await withTransaction(async (client) => {
-            const { rows: current } = await client.query('SELECT status FROM "Review" WHERE id = $1', [id]);
+            const [current] = await client.execute('SELECT status FROM Review WHERE id = ?', [id]);
             if (!current.length) throw createError(404, 'Review not found');
             const oldStatus = current[0].status;
 
-            const { rows: updated } = await client.query(
-                'UPDATE "Review" SET status = $1, "updatedAt" = NOW() WHERE id = $2 RETURNING *',
+            await client.execute(
+                'UPDATE Review SET status = ?, updatedAt = NOW() WHERE id = ?',
                 [status, id]
             );
 
             const logId = generateId('revlog');
-            await client.query(
-                `INSERT INTO "ReviewLog" (id, "reviewId", "adminId", "oldStatus", "newStatus", reason, "createdAt")
-                 VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+            await client.execute(
+                `INSERT INTO ReviewLog (id, reviewId, adminId, oldStatus, newStatus, reason, createdAt)
+                 VALUES (?, ?, ?, ?, ?, ?, NOW())`,
                 [logId, id, user.id, oldStatus, status, reason || null]
             );
 
+            const [updated] = await client.execute('SELECT * FROM Review WHERE id = ?', [id]);
             return updated[0];
         });
 
@@ -123,14 +124,14 @@ const handleReviews = async (req, res) => {
         const user = await requireAuth(req);
         const { id } = req.query;
         
-        const { rows: existing } = await pool.query('SELECT "userId" FROM "Review" WHERE id = $1', [id]);
+        const [existing] = await pool.execute('SELECT userId FROM Review WHERE id = ?', [id]);
         if (!existing.length) throw createError(404, 'Review not found');
         
         if (user.role !== 'ADMIN' && existing[0].userId !== user.id) {
             throw createError(403, 'Unauthorized');
         }
 
-        await pool.query('DELETE FROM "Review" WHERE id = $1', [id]);
+        await pool.execute('DELETE FROM Review WHERE id = ?', [id]);
         return res.status(204).end();
     }
 
@@ -141,25 +142,25 @@ const handleReviews = async (req, res) => {
 
 const baseSelect = `
     SELECT p.*,
-           c.name as "subcategoryName",
-           cp.name as "parentCategoryName",
-           s.name as "supplierName",
-           sh.name as "shopName",
-           sh.slug as "shopSlug",
-           sh."defaultCommissionRate" as "shopCommissionRate",
-           COALESCE(r."avgRating", p.rating) as "rating",
-           COALESCE(r."reviewCount", p."reviewCount") as "reviewCount"
-    FROM "Product" p
-    LEFT JOIN "Category" c ON p."categoryId" = c.id
-    LEFT JOIN "Category" cp ON c."parentId" = cp.id
-    LEFT JOIN "Supplier" s ON p."supplierId" = s.id
-    LEFT JOIN "Shop" sh ON p."shopId" = sh.id
+           c.name as subcategoryName,
+           cp.name as parentCategoryName,
+           s.name as supplierName,
+           sh.name as shopName,
+           sh.slug as shopSlug,
+           sh.defaultCommissionRate as shopCommissionRate,
+           COALESCE(r.avgRating, p.rating) as rating,
+           COALESCE(r.reviewCount, p.reviewCount) as reviewCount
+    FROM Product p
+    LEFT JOIN Category c ON p.categoryId = c.id
+    LEFT JOIN Category cp ON c.parentId = cp.id
+    LEFT JOIN Supplier s ON p.supplierId = s.id
+    LEFT JOIN Shop sh ON p.shopId = sh.id
     LEFT JOIN (
-        SELECT "productId", AVG(rating) as "avgRating", COUNT(id) as "reviewCount"
-        FROM "Review"
+        SELECT productId, AVG(rating) as avgRating, COUNT(id) as reviewCount
+        FROM Review
         WHERE status = 'APPROVED'
-        GROUP BY "productId"
-    ) r ON p.id = r."productId"
+        GROUP BY productId
+    ) r ON p.id = r.productId
 `;
 
 const formatProductRow = (row) => {
@@ -180,12 +181,12 @@ const formatProductRow = (row) => {
 };
 
 const getProductWithRelations = async (id) => {
-    const { rows } = await pool.query(`${baseSelect} WHERE p.id = $1`, [id]);
+    const [rows] = await pool.execute(`${baseSelect} WHERE p.id = ?`, [id]);
     return formatProductRow(rows[0]);
 };
 
 const getProductMeta = async (id) => {
-    const { rows } = await pool.query('SELECT id, "shopId" FROM "Product" WHERE id = $1', [id]);
+    const [rows] = await pool.execute('SELECT id, shopId FROM Product WHERE id = ?', [id]);
     return rows[0];
 };
 
@@ -218,25 +219,25 @@ module.exports = async (req, res) => {
             const conditions = [];
 
             if (categoryId) {
+                conditions.push(`p.categoryId = ?`);
                 params.push(categoryId);
-                conditions.push(`p."categoryId" = $${params.length}`);
             } else if (category) {
-                params.push(category);
-                conditions.push(`(p.category = $${params.length} OR c.name = $${params.length})`);
+                conditions.push(`(p.category = ? OR c.name = ?)`);
+                params.push(category, category);
             }
 
             if (shopId) {
+                conditions.push(`p.shopId = ?`);
                 params.push(shopId);
-                conditions.push(`p."shopId" = $${params.length}`);
             }
 
             if (conditions.length > 0) {
                 query += ' WHERE ' + conditions.join(' AND ');
             }
 
-            query += ' ORDER BY p."createdAt" DESC';
+            query += ' ORDER BY p.createdAt DESC';
 
-            const { rows } = await pool.query(query, params);
+            const [rows] = await pool.execute(query, params);
             return res.json(rows.map(formatProductRow));
         }
 
@@ -275,19 +276,14 @@ module.exports = async (req, res) => {
 
             const productId = generateId('prod');
 
-            await pool.query(`
-                INSERT INTO "Product" (
-                    id, name, "nameEn", "nameAr", price, "costPrice", "originalPrice",
-                    description, "descriptionAr", category, "categoryId", "supplierId",
-                    image, "inStock", "shopId", "commissionRate", 
-                    "tracksInventory", "inventoryQuantity", "updatedAt"
+            await pool.execute(`
+                INSERT INTO Product (
+                    id, name, nameEn, nameAr, price, costPrice, originalPrice,
+                    description, descriptionAr, category, categoryId, supplierId,
+                    image, inStock, shopId, commissionRate, 
+                    tracksInventory, inventoryQuantity, updatedAt
                 )
-                VALUES (
-                    $1, $2, $3, $4, $5, $6, $7,
-                    $8, $9, $10, $11, $12,
-                    $13, $14, $15, $16,
-                    $17, $18, NOW()
-                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             `, [
                 productId,
                 name,
@@ -352,28 +348,27 @@ module.exports = async (req, res) => {
                 commissionRateValue = commissionRate === null ? null : normalizeCommissionRate(commissionRate);
             }
 
-            await pool.query(`
-                UPDATE "Product"
-                SET name = COALESCE($2, name),
-                    "nameEn" = COALESCE($3, "nameEn"),
-                    "nameAr" = COALESCE($4, "nameAr"),
-                    price = COALESCE($5, price),
-                    "costPrice" = COALESCE($6, "costPrice"),
-                    "originalPrice" = COALESCE($7, "originalPrice"),
-                    description = COALESCE($8, description),
-                    "descriptionAr" = COALESCE($9, "descriptionAr"),
-                    category = COALESCE($10, category),
-                    "categoryId" = COALESCE($11, "categoryId"),
-                    "supplierId" = COALESCE($12, "supplierId"),
-                    image = COALESCE($13, image),
-                    "inStock" = COALESCE($14, "inStock"),
-                    "commissionRate" = CASE WHEN $15 THEN $16 ELSE "commissionRate" END,
-                    "tracksInventory" = COALESCE($17, "tracksInventory"),
-                    "inventoryQuantity" = COALESCE($18, "inventoryQuantity"),
-                    "updatedAt" = NOW()
-                WHERE id = $1
+            await pool.execute(`
+                UPDATE Product
+                SET name = COALESCE(?, name),
+                    nameEn = COALESCE(?, nameEn),
+                    nameAr = COALESCE(?, nameAr),
+                    price = COALESCE(?, price),
+                    costPrice = COALESCE(?, costPrice),
+                    originalPrice = COALESCE(?, originalPrice),
+                    description = COALESCE(?, description),
+                    descriptionAr = COALESCE(?, descriptionAr),
+                    category = COALESCE(?, category),
+                    categoryId = COALESCE(?, categoryId),
+                    supplierId = COALESCE(?, supplierId),
+                    image = COALESCE(?, image),
+                    inStock = COALESCE(?, inStock),
+                    commissionRate = CASE WHEN ? THEN ? ELSE commissionRate END,
+                    tracksInventory = COALESCE(?, tracksInventory),
+                    inventoryQuantity = COALESCE(?, inventoryQuantity),
+                    updatedAt = NOW()
+                WHERE id = ?
             `, [
-                id,
                 name,
                 nameEn,
                 nameAr,
@@ -391,6 +386,7 @@ module.exports = async (req, res) => {
                 commissionRateValue,
                 tracksInventory,
                 inventoryQuantity,
+                id,
             ]);
 
             const updated = await getProductWithRelations(id);
@@ -411,7 +407,7 @@ module.exports = async (req, res) => {
                 throw createError(403, 'Only admins can delete unassigned products');
             }
 
-            await pool.query('DELETE FROM "Product" WHERE id = $1', [id]);
+            await pool.execute('DELETE FROM Product WHERE id = ?', [id]);
             return res.status(204).end();
         }
 
