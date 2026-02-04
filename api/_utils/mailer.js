@@ -183,9 +183,84 @@ async function sendRoleChangeEmail({ to, name, newRole }) {
     }
 }
 
+async function sendWelcomeEmail({ to, name, role, password, shopName }) {
+    if (!transporter) {
+        console.warn('SMTP credentials not configured, skipping welcome email.');
+        return;
+    }
+
+    if (!to) {
+        console.warn('Missing recipient, skipping welcome email.');
+        return;
+    }
+
+    const loginLink = `${getBaseUrl()}/sign-in`;
+    const roleLabels = {
+        'ADMIN': 'Administrator',
+        'CUSTOMER': 'Customer',
+        'SHOP_OWNER': 'Shop Owner',
+        'SHOP_STAFF': 'Shop Staff'
+    };
+    const roleLabel = roleLabels[role] || role;
+
+    let shopSection = '';
+    if (shopName && role === 'SHOP_OWNER') {
+        shopSection = `
+            <div style="background: #E8F5E9; border-left: 4px solid #4CAF50; padding: 15px 20px; margin: 20px 0; border-radius: 4px;">
+              <p style="color: #2E7D32; margin: 0; font-size: 14px;"><strong>🏪 Your Shop: ${shopName}</strong></p>
+              <p style="color: #2E7D32; margin: 10px 0 0 0; font-size: 13px;">Your shop has been created and is ready to accept products!</p>
+            </div>
+        `;
+    }
+
+    let passwordSection = '';
+    if (password) {
+        passwordSection = `
+            <div style="background: #FFF3E0; border-left: 4px solid #FF9800; padding: 15px 20px; margin: 20px 0; border-radius: 4px;">
+              <p style="color: #E65100; margin: 0; font-size: 14px;"><strong>🔐 Your Temporary Password</strong></p>
+              <p style="color: #E65100; margin: 10px 0 0 0; font-size: 16px; font-family: monospace; letter-spacing: 1px;">${password}</p>
+              <p style="color: #E65100; margin: 10px 0 0 0; font-size: 12px;">Please change this password after your first login.</p>
+            </div>
+        `;
+    }
+
+    try {
+        await transporter.sendMail({
+            from: `Adsolutions Electronics <${process.env.SMTP_FROM}>`,
+            to,
+            subject: `Welcome to Adsolutions Electronics${shopName ? ' - Your Shop is Ready!' : ''}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f9f9f9; padding: 40px 20px;">
+                  <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <h1 style="color: #232F3E; margin-top: 0;">Welcome${name ? `, ${name}` : ''}! 🎉</h1>
+                    <p style="color: #555; font-size: 15px;">An administrator has created an account for you on Adsolutions Electronics.</p>
+                    
+                    <div style="background: #E3F2FD; border-left: 4px solid #2196F3; padding: 15px 20px; margin: 20px 0; border-radius: 4px;">
+                      <p style="color: #1565C0; margin: 0; font-size: 14px;"><strong>Account Type: ${roleLabel}</strong></p>
+                      <p style="color: #1565C0; margin: 5px 0 0 0; font-size: 13px;">Email: ${to}</p>
+                    </div>
+
+                    ${passwordSection}
+                    ${shopSection}
+
+                    <div style="text-align: center; margin: 30px 0;">
+                      <a href="${loginLink}" style="background: linear-gradient(to bottom, #FFD814, #F7CA00); color: #0F1111; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Sign In Now</a>
+                    </div>
+
+                    <p style="color: #777; font-size: 13px; margin-top: 30px;">If you have any questions, please contact our support team.</p>
+                  </div>
+                </div>
+            `,
+        });
+    } catch (error) {
+        console.error('Error sending welcome email:', error);
+    }
+}
+
 module.exports = {
     sendEmailVerificationEmail,
     sendShopPendingEmail,
     sendShopVerifiedEmail,
     sendRoleChangeEmail,
+    sendWelcomeEmail,
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/button';
-import { Pencil, Trash2, Loader2, User, MapPin, Search, Users, UserCheck, Crown, Mail, Phone } from 'lucide-react';
+import { Pencil, Trash2, Loader2, User, MapPin, Search, Users, UserCheck, Crown, Mail, Phone, Plus, Store } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -29,16 +29,30 @@ export function AdminUsersPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<UserData | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [roleFilter, setRoleFilter] = useState<string>('ALL');
 
-    // Form state
+    // Form state for editing
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
         address: '',
         role: 'CUSTOMER' as RoleOption
+    });
+
+    // Form state for creating
+    const [createFormData, setCreateFormData] = useState({
+        email: '',
+        name: '',
+        phone: '',
+        address: '',
+        role: 'CUSTOMER' as RoleOption,
+        password: '',
+        sendInvite: true,
+        shopName: '',
+        shopDescription: ''
     });
 
     useEffect(() => {
@@ -128,6 +142,63 @@ export function AdminUsersPage() {
         }
     };
 
+    const handleOpenCreateDialog = () => {
+        setCreateFormData({
+            email: '',
+            name: '',
+            phone: '',
+            address: '',
+            role: 'CUSTOMER',
+            password: '',
+            sendInvite: true,
+            shopName: '',
+            shopDescription: ''
+        });
+        setIsCreateDialogOpen(true);
+    };
+
+    const handleCreateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!createFormData.email || !createFormData.name) {
+            toast.error(t('admin.emailNameRequired'));
+            return;
+        }
+        if (!createFormData.sendInvite && !createFormData.password) {
+            toast.error(t('admin.passwordRequired'));
+            return;
+        }
+        if (createFormData.role === 'SHOP_OWNER' && !createFormData.shopName) {
+            toast.error(t('admin.shopNameRequired'));
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const res = await fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(createFormData),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                toast.success(createFormData.sendInvite ? t('admin.userCreatedInviteSent') : t('admin.userCreatedSuccess'));
+                fetchUsers();
+                setIsCreateDialogOpen(false);
+            } else {
+                toast.error(data.error || 'Failed to create user');
+            }
+        } catch (error) {
+            console.error('Failed to create user', error);
+            toast.error('Failed to create user');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const filteredUsers = users.filter(user => {
         const matchesSearch = user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (user.name?.toLowerCase() || '').includes(searchQuery.toLowerCase());
@@ -160,6 +231,13 @@ export function AdminUsersPage() {
                     </h1>
                     <p className="text-gray-500 mt-1 text-sm">{t('admin.userManagementSubtitle')}</p>
                 </div>
+                <Button
+                    onClick={handleOpenCreateDialog}
+                    className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
+                >
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('admin.addUser')}
+                </Button>
             </div>
 
             {/* Stats */}
@@ -390,6 +468,154 @@ export function AdminUsersPage() {
                             >
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {t('admin.saveChanges')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Create User Dialog */}
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl">{t('admin.addNewUser')}</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateUser} className="space-y-4 py-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="create-name" className="text-sm font-medium">{t('admin.fullName')} *</Label>
+                                <Input
+                                    id="create-name"
+                                    value={createFormData.name}
+                                    onChange={(e) => setCreateFormData({ ...createFormData, name: e.target.value })}
+                                    className="rounded-xl"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-email" className="text-sm font-medium">{t('admin.email')} *</Label>
+                                <Input
+                                    id="create-email"
+                                    type="email"
+                                    dir="ltr"
+                                    value={createFormData.email}
+                                    onChange={(e) => setCreateFormData({ ...createFormData, email: e.target.value })}
+                                    className="rounded-xl text-left"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="create-phone" className="text-sm font-medium">{t('admin.phoneNumber')}</Label>
+                                <Input
+                                    id="create-phone"
+                                    dir="ltr"
+                                    value={createFormData.phone}
+                                    onChange={(e) => setCreateFormData({ ...createFormData, phone: e.target.value })}
+                                    className="rounded-xl text-left"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="create-role" className="text-sm font-medium">{t('admin.userRole')} *</Label>
+                                <select
+                                    id="create-role"
+                                    className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814]"
+                                    value={createFormData.role}
+                                    onChange={(e) => setCreateFormData({ ...createFormData, role: e.target.value as RoleOption })}
+                                >
+                                    <option value="CUSTOMER">{t('admin.customer')}</option>
+                                    <option value="ADMIN">{t('admin.administrator')}</option>
+                                    <option value="SHOP_OWNER">{t('admin.shopOwner')}</option>
+                                    <option value="SHOP_STAFF">{t('admin.shopStaff')}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="create-address" className="text-sm font-medium">{t('admin.address')}</Label>
+                            <Input
+                                id="create-address"
+                                value={createFormData.address}
+                                onChange={(e) => setCreateFormData({ ...createFormData, address: e.target.value })}
+                                className="rounded-xl"
+                            />
+                        </div>
+
+                        {/* Shop fields - show only for SHOP_OWNER */}
+                        {createFormData.role === 'SHOP_OWNER' && (
+                            <div className="border border-dashed border-gray-300 rounded-xl p-4 space-y-4 bg-gray-50">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                    <Store className="h-4 w-4" />
+                                    {t('admin.shopDetails')}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="create-shopName" className="text-sm font-medium">{t('admin.shopName')} *</Label>
+                                    <Input
+                                        id="create-shopName"
+                                        value={createFormData.shopName}
+                                        onChange={(e) => setCreateFormData({ ...createFormData, shopName: e.target.value })}
+                                        className="rounded-xl"
+                                        required={createFormData.role === 'SHOP_OWNER'}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="create-shopDescription" className="text-sm font-medium">{t('admin.shopDescription')}</Label>
+                                    <Input
+                                        id="create-shopDescription"
+                                        value={createFormData.shopDescription}
+                                        onChange={(e) => setCreateFormData({ ...createFormData, shopDescription: e.target.value })}
+                                        className="rounded-xl"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Password options */}
+                        <div className="border border-gray-200 rounded-xl p-4 space-y-3">
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="checkbox"
+                                    id="send-invite"
+                                    checked={createFormData.sendInvite}
+                                    onChange={(e) => setCreateFormData({ ...createFormData, sendInvite: e.target.checked, password: '' })}
+                                    className="w-4 h-4 rounded border-gray-300 text-[#4A5568] focus:ring-[#4A5568]"
+                                />
+                                <Label htmlFor="send-invite" className="text-sm font-medium cursor-pointer">
+                                    {t('admin.sendEmailInvite')}
+                                </Label>
+                            </div>
+                            <p className="text-xs text-gray-500 ml-7">{t('admin.sendEmailInviteDesc')}</p>
+                            
+                            {!createFormData.sendInvite && (
+                                <div className="space-y-2 mt-3">
+                                    <Label htmlFor="create-password" className="text-sm font-medium">{t('admin.temporaryPassword')} *</Label>
+                                    <Input
+                                        id="create-password"
+                                        type="password"
+                                        dir="ltr"
+                                        value={createFormData.password}
+                                        onChange={(e) => setCreateFormData({ ...createFormData, password: e.target.value })}
+                                        className="rounded-xl text-left"
+                                        placeholder={t('admin.enterTempPassword')}
+                                        required={!createFormData.sendInvite}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <DialogFooter className="pt-4 gap-2">
+                            <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="rounded-lg">
+                                {t('admin.cancel')}
+                            </Button>
+                            <Button 
+                                type="submit" 
+                                disabled={isSaving}
+                                className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
+                            >
+                                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {t('admin.createUser')}
                             </Button>
                         </DialogFooter>
                     </form>
