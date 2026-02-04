@@ -350,9 +350,10 @@ export function AdminUsersPage() {
                             <Label htmlFor="phone" className="text-sm font-medium">{t('admin.phoneNumber')}</Label>
                             <Input
                                 id="phone"
+                                dir="ltr"
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                className="rounded-xl"
+                                className="rounded-xl text-left"
                             />
                         </div>
                         <div className="space-y-2">
