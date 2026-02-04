@@ -1,6 +1,7 @@
 // @ts-nocheck
 const { getPool } = require('../_utils/db');
 const jwt = require('jsonwebtoken');
+const { sendRoleChangeEmail } = require('../_utils/mailer');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
 
@@ -46,6 +47,12 @@ module.exports = async (req, res) => {
 
             if (!id) return res.status(400).json({ error: 'User ID is required' });
 
+            // Get current user data to detect role change
+            const [currentUsers] = await pool.execute('SELECT email, name, role FROM User WHERE id = ?', [id]);
+            if (currentUsers.length === 0) return res.status(404).json({ error: 'User not found' });
+            const currentUser = currentUsers[0];
+            const previousRole = currentUser.role;
+
             await pool.execute(`
                 UPDATE User
                 SET name = COALESCE(?, name),
@@ -60,6 +67,20 @@ module.exports = async (req, res) => {
 
             const [rows] = await pool.execute('SELECT id, email, name, phone, address, latitude, longitude, role FROM User WHERE id = ?', [id]);
             if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
+
+            // Send role change email if role was updated
+            if (role && role !== previousRole) {
+                try {
+                    await sendRoleChangeEmail({
+                        to: rows[0].email,
+                        name: rows[0].name,
+                        newRole: role
+                    });
+                } catch (mailError) {
+                    console.error('Failed to send role change email:', mailError);
+                }
+            }
+
             return res.json(rows[0]);
         }
 

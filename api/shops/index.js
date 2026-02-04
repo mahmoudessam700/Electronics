@@ -18,6 +18,7 @@ const {
     getLatestBalance,
     recordPayoutLedgerEntry,
 } = require('../_utils/ledger');
+const { sendShopVerifiedEmail } = require('../_utils/mailer');
 
 const pool = getPool();
 
@@ -474,6 +475,11 @@ module.exports = async (req, res) => {
             const isAdmin = user.role === 'ADMIN';
             if (!isAdmin) ensureShopRole(user, id, SHOP_ADMIN_ROLES);
 
+            // Get current shop data to detect status change
+            const [currentShops] = await pool.execute('SELECT status, ownerId, name, email FROM Shop WHERE id = ?', [id]);
+            const currentShop = currentShops[0];
+            const previousStatus = currentShop?.status;
+
             const { name, description, logo, email, phone, address, defaultCommissionRate, status, kycStatus, payoutSchedule, ownerId } = req.body || {};
             const updates = {};
             const generalFields = { name, description, logo, email, phone, address };
@@ -498,6 +504,34 @@ module.exports = async (req, res) => {
             });
 
             const updated = await getShopById(id);
+
+            // Send shop verified email if status changed from PENDING to ACTIVE
+            if (status === 'ACTIVE' && previousStatus === 'PENDING' && currentShop) {
+                try {
+                    // Get owner email
+                    const ownerIdToUse = ownerId || currentShop.ownerId;
+                    if (ownerIdToUse) {
+                        const [ownerRows] = await pool.execute('SELECT email, name FROM User WHERE id = ?', [ownerIdToUse]);
+                        if (ownerRows[0]) {
+                            await sendShopVerifiedEmail({
+                                to: ownerRows[0].email,
+                                name: ownerRows[0].name,
+                                shopName: name || currentShop.name
+                            });
+                        }
+                    } else if (currentShop.email) {
+                        // Use shop email if no owner
+                        await sendShopVerifiedEmail({
+                            to: currentShop.email,
+                            name: null,
+                            shopName: name || currentShop.name
+                        });
+                    }
+                } catch (mailError) {
+                    console.error('Failed to send shop verified email:', mailError);
+                }
+            }
+
             return res.json(updated);
         }
 

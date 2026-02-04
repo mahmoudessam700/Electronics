@@ -12,7 +12,7 @@ const {
     getShopMemberships,
     generateId,
 } = require('../_utils/auth');
-const { sendEmailVerificationEmail } = require('../_utils/mailer');
+const { sendEmailVerificationEmail, sendShopPendingEmail } = require('../_utils/mailer');
 
 const pool = getPool();
 
@@ -304,6 +304,13 @@ module.exports = async (req, res) => {
             });
 
             const userPayload = await buildAuthUserResponse(result);
+
+            // Send email notifying shop owner that their application is pending
+            try {
+                await sendShopPendingEmail({ to: email, name, shopName });
+            } catch (mailError) {
+                console.error('Failed to send shop pending email:', mailError);
+            }
 
             return res.status(201).json({
                 success: true,
