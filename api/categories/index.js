@@ -1,9 +1,7 @@
-const { Pool } = require('pg');
+// @ts-nocheck
+const { getPool, withTransaction } = require('../_utils/db');
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const pool = getPool();
 
 module.exports = async (req, res) => {
     // Enable CORS
@@ -19,23 +17,27 @@ module.exports = async (req, res) => {
 
             // Single category detail
             if (id) {
-                const { rows } = await pool.query(`
-                    SELECT c.*, 
-                           (SELECT json_agg(p.*) FROM "Product" p WHERE p."categoryId" = c.id) as products
-                    FROM "Category" c 
-                    WHERE c.id = $1
+                const [rows] = await pool.execute(`
+                    SELECT c.* 
+                    FROM Category c 
+                    WHERE c.id = ?
                 `, [id]);
 
                 if (rows.length === 0) return res.status(404).json({ error: 'Category not found' });
+                
+                // Get products for this category
+                const [products] = await pool.execute('SELECT * FROM Product WHERE categoryId = ?', [id]);
+                rows[0].products = products;
+                
                 return res.json(rows[0]);
             }
 
             // List categories with tree support
-            const { rows } = await pool.query(`
+            const [rows] = await pool.execute(`
                 SELECT c.*, 
-                       (SELECT count(*) FROM "Product" p WHERE p."categoryId" = c.id)::int as product_count
-                FROM "Category" c
-                ORDER BY c."sortOrder" ASC
+                       (SELECT COUNT(*) FROM Product p WHERE p.categoryId = c.id) as product_count
+                FROM Category c
+                ORDER BY c.sortOrder ASC
             `);
 
             const buildTree = (items, pId = null) => {
@@ -44,7 +46,7 @@ module.exports = async (req, res) => {
                     .map(item => ({
                         ...item,
                         children: buildTree(items, item.id),
-                        _count: { products: item.product_count }
+                        _count: { products: Number(item.product_count) }
                     }));
             };
 
@@ -58,14 +60,14 @@ module.exports = async (req, res) => {
                 const filtered = rows.filter(c => c.parentId === parentId);
                 return res.json(filtered.map(c => ({
                     ...c,
-                    _count: { products: c.product_count }
+                    _count: { products: Number(c.product_count) }
                 })));
             }
 
             // Return flat list with _count for consistency
             return res.json(rows.map(c => ({
                 ...c,
-                _count: { products: c.product_count }
+                _count: { products: Number(c.product_count) }
             })));
         }
 
@@ -76,12 +78,12 @@ module.exports = async (req, res) => {
             const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             const id = `cat_${Date.now()}`;
 
-            const { rows } = await pool.query(`
-                INSERT INTO "Category" (id, name, "nameEn", "nameAr", slug, description, image, "parentId", "sortOrder", "updatedAt")
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
-                RETURNING *
+            await pool.execute(`
+                INSERT INTO Category (id, name, nameEn, nameAr, slug, description, image, parentId, sortOrder, updatedAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             `, [id, name, nameEn || name, nameAr || null, slug, description || null, image || null, parentId || null, sortOrder || 0]);
 
+            const [rows] = await pool.execute('SELECT * FROM Category WHERE id = ?', [id]);
             return res.status(201).json(rows[0]);
         }
 
@@ -91,41 +93,36 @@ module.exports = async (req, res) => {
 
             // Batch update for reordering
             if (batchUpdates && Array.isArray(batchUpdates)) {
-                await pool.query('BEGIN');
-                try {
+                await withTransaction(async (conn) => {
                     for (const update of batchUpdates) {
-                        await pool.query(`
-                            UPDATE "Category"
-                            SET "sortOrder" = $2,
-                                "parentId" = $3,
-                                "updatedAt" = NOW()
-                            WHERE id = $1
-                        `, [update.id, update.sortOrder, update.parentId || null]);
+                        await conn.execute(`
+                            UPDATE Category
+                            SET sortOrder = ?,
+                                parentId = ?,
+                                updatedAt = NOW()
+                            WHERE id = ?
+                        `, [update.sortOrder, update.parentId || null, update.id]);
                     }
-                    await pool.query('COMMIT');
-                    return res.json({ success: true });
-                } catch (e) {
-                    await pool.query('ROLLBACK');
-                    throw e;
-                }
+                });
+                return res.json({ success: true });
             }
 
             if (!id) return res.status(400).json({ error: 'ID is required' });
 
-            const { rows } = await pool.query(`
-                UPDATE "Category"
-                SET name = COALESCE($2, name),
-                    "nameEn" = COALESCE($3, "nameEn"),
-                    "nameAr" = COALESCE($4, "nameAr"),
-                    description = COALESCE($5, description),
-                    image = COALESCE($6, image),
-                    "parentId" = COALESCE($7, "parentId"),
-                    "sortOrder" = COALESCE($8, "sortOrder"),
-                    "updatedAt" = NOW()
-                WHERE id = $1
-                RETURNING *
-            `, [id, name, nameEn, nameAr, description, image, parentId, sortOrder]);
+            await pool.execute(`
+                UPDATE Category
+                SET name = COALESCE(?, name),
+                    nameEn = COALESCE(?, nameEn),
+                    nameAr = COALESCE(?, nameAr),
+                    description = COALESCE(?, description),
+                    image = COALESCE(?, image),
+                    parentId = COALESCE(?, parentId),
+                    sortOrder = COALESCE(?, sortOrder),
+                    updatedAt = NOW()
+                WHERE id = ?
+            `, [name, nameEn, nameAr, description, image, parentId, sortOrder, id]);
 
+            const [rows] = await pool.execute('SELECT * FROM Category WHERE id = ?', [id]);
             return res.json(rows[0]);
         }
 
@@ -133,7 +130,7 @@ module.exports = async (req, res) => {
             const { id } = req.query;
             if (!id) return res.status(400).json({ error: 'ID is required' });
 
-            await pool.query('DELETE FROM "Category" WHERE id = $1', [id]);
+            await pool.execute('DELETE FROM Category WHERE id = ?', [id]);
             return res.status(204).end();
         }
 

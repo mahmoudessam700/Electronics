@@ -1,12 +1,10 @@
-const { Pool } = require('pg');
+// @ts-nocheck
+const { getPool } = require('../_utils/db');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const pool = getPool();
 
 // Helper to verify JWT and get user ID
 function getUserFromToken(req) {
@@ -40,13 +38,13 @@ module.exports = async (req, res) => {
     try {
         // GET - Fetch user's cart
         if (req.method === 'GET') {
-            const { rows } = await pool.query(`
-                SELECT ci.id, ci."productId", ci.quantity, ci."createdAt",
-                       p.name, p.price, p."originalPrice", p.image, p."isPrime", p."deliveryDate", p.rating, p."reviewCount", p.category
-                FROM "CartItem" ci
-                JOIN "Product" p ON ci."productId" = p.id
-                WHERE ci."userId" = $1
-                ORDER BY ci."createdAt" DESC
+            const [rows] = await pool.execute(`
+                SELECT ci.id, ci.productId, ci.quantity, ci.createdAt,
+                       p.name, p.price, p.originalPrice, p.image, p.isPrime, p.deliveryDate, p.rating, p.reviewCount, p.category
+                FROM CartItem ci
+                JOIN Product p ON ci.productId = p.id
+                WHERE ci.userId = ?
+                ORDER BY ci.createdAt DESC
             `, [userId]);
 
             const cartItems = rows.map(row => ({
@@ -77,23 +75,24 @@ module.exports = async (req, res) => {
             }
 
             // Check if item already exists in cart
-            const { rows: existing } = await pool.query(
-                'SELECT id, quantity FROM "CartItem" WHERE "userId" = $1 AND "productId" = $2',
+            const [existing] = await pool.execute(
+                'SELECT id, quantity FROM CartItem WHERE userId = ? AND productId = ?',
                 [userId, productId]
             );
 
             if (existing.length > 0) {
                 // Update quantity
                 const newQuantity = existing[0].quantity + quantity;
-                await pool.query(
-                    'UPDATE "CartItem" SET quantity = $1, "updatedAt" = NOW() WHERE id = $2',
+                await pool.execute(
+                    'UPDATE CartItem SET quantity = ?, updatedAt = NOW() WHERE id = ?',
                     [newQuantity, existing[0].id]
                 );
             } else {
                 // Insert new item
-                await pool.query(
-                    'INSERT INTO "CartItem" (id, "userId", "productId", quantity, "createdAt", "updatedAt") VALUES (gen_random_uuid(), $1, $2, $3, NOW(), NOW())',
-                    [userId, productId, quantity]
+                const id = `cart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                await pool.execute(
+                    'INSERT INTO CartItem (id, userId, productId, quantity, createdAt, updatedAt) VALUES (?, ?, ?, ?, NOW(), NOW())',
+                    [id, userId, productId, quantity]
                 );
             }
 
@@ -110,13 +109,13 @@ module.exports = async (req, res) => {
 
             if (quantity <= 0) {
                 // Remove item if quantity is 0 or less
-                await pool.query(
-                    'DELETE FROM "CartItem" WHERE "userId" = $1 AND "productId" = $2',
+                await pool.execute(
+                    'DELETE FROM CartItem WHERE userId = ? AND productId = ?',
                     [userId, productId]
                 );
             } else {
-                await pool.query(
-                    'UPDATE "CartItem" SET quantity = $1, "updatedAt" = NOW() WHERE "userId" = $2 AND "productId" = $3',
+                await pool.execute(
+                    'UPDATE CartItem SET quantity = ?, updatedAt = NOW() WHERE userId = ? AND productId = ?',
                     [quantity, userId, productId]
                 );
             }
@@ -130,11 +129,11 @@ module.exports = async (req, res) => {
             
             if (clearAll === 'true') {
                 // Clear entire cart
-                await pool.query('DELETE FROM "CartItem" WHERE "userId" = $1', [userId]);
+                await pool.execute('DELETE FROM CartItem WHERE userId = ?', [userId]);
             } else if (productId) {
                 // Remove specific item
-                await pool.query(
-                    'DELETE FROM "CartItem" WHERE "userId" = $1 AND "productId" = $2',
+                await pool.execute(
+                    'DELETE FROM CartItem WHERE userId = ? AND productId = ?',
                     [userId, productId]
                 );
             } else {

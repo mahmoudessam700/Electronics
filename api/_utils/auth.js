@@ -36,8 +36,8 @@ const ensureSlug = async (candidate) => {
     let suffix = 1;
 
     while (true) {
-        const { rowCount } = await pool.query('SELECT 1 FROM "Shop" WHERE slug = $1', [slug]);
-        if (rowCount === 0) return slug;
+        const [rows] = await pool.execute('SELECT 1 FROM Shop WHERE slug = ?', [slug]);
+        if (rows.length === 0) return slug;
         slug = `${base}-${suffix++}`;
     }
 };
@@ -64,26 +64,26 @@ const getTokenFromRequest = (req) => {
 const getShopMemberships = async (userId) => {
     if (!userId) return [];
     const pool = getPool();
-    const { rows } = await pool.query(`
+    const [rows] = await pool.execute(`
         SELECT
-            sm.id AS "membershipId",
-            sm."shopId" AS "shopId",
-            sm.role AS "membershipRole",
-            sm.status AS "membershipStatus",
-            sm."createdAt" AS "membershipCreatedAt",
-            sm."updatedAt" AS "membershipUpdatedAt",
-            s.name AS "shopName",
-            s.slug AS "shopSlug",
-            s.status AS "shopStatus",
-            s."defaultCommissionRate" AS "shopCommissionRate",
-            s."payoutSchedule" AS "shopPayoutSchedule",
-            s."kycStatus" AS "shopKycStatus",
-            s.logo AS "shopLogo",
-            s.email AS "shopEmail",
-            s.phone AS "shopPhone"
-        FROM "ShopMember" sm
-        INNER JOIN "Shop" s ON s.id = sm."shopId"
-        WHERE sm."userId" = $1
+            sm.id AS membershipId,
+            sm.shopId AS shopId,
+            sm.role AS membershipRole,
+            sm.status AS membershipStatus,
+            sm.createdAt AS membershipCreatedAt,
+            sm.updatedAt AS membershipUpdatedAt,
+            s.name AS shopName,
+            s.slug AS shopSlug,
+            s.status AS shopStatus,
+            s.defaultCommissionRate AS shopCommissionRate,
+            s.payoutSchedule AS shopPayoutSchedule,
+            s.kycStatus AS shopKycStatus,
+            s.logo AS shopLogo,
+            s.email AS shopEmail,
+            s.phone AS shopPhone
+        FROM ShopMember sm
+        INNER JOIN Shop s ON s.id = sm.shopId
+        WHERE sm.userId = ?
         ORDER BY s.name ASC
     `, [userId]);
     return rows.map((row) => ({
@@ -132,7 +132,7 @@ const getRequestContext = async (req, { requireUser = false } = {}) => {
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         const pool = getPool();
-        const { rows } = await pool.query('SELECT id, email, name, role FROM "User" WHERE id = $1', [decoded.userId]);
+        const [rows] = await pool.execute('SELECT id, email, name, role FROM User WHERE id = ?', [decoded.userId]);
         if (!rows[0]) {
             if (requireUser) {
                 throw createError(401, 'Authentication required');

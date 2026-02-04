@@ -1,10 +1,8 @@
-const { Pool } = require('pg');
+// @ts-nocheck
+const { getPool } = require('../_utils/db');
 const jwt = require('jsonwebtoken');
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const pool = getPool();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
 
@@ -27,13 +25,13 @@ module.exports = async (req, res) => {
         const userId = decoded.userId;
 
         if (req.method === 'GET') {
-            const { rows } = await pool.query(`
-                SELECT w.id, w."productId", w."createdAt",
-                       p.name, p.price, p.image, p."originalPrice"
-                FROM "Wishlist" w
-                JOIN "Product" p ON w."productId" = p.id
-                WHERE w."userId" = $1
-                ORDER BY w."createdAt" DESC
+            const [rows] = await pool.execute(`
+                SELECT w.id, w.productId, w.createdAt,
+                       p.name, p.price, p.image, p.originalPrice
+                FROM Wishlist w
+                JOIN Product p ON w.productId = p.id
+                WHERE w.userId = ?
+                ORDER BY w.createdAt DESC
             `, [userId]);
             return res.json(rows);
         }
@@ -43,18 +41,18 @@ module.exports = async (req, res) => {
             if (!productId) return res.status(400).json({ error: 'Product ID is required' });
 
             // Check if already in wishlist
-            const existing = await pool.query('SELECT id FROM "Wishlist" WHERE "userId" = $1 AND "productId" = $2', [userId, productId]);
-            if (existing.rows.length > 0) {
+            const [existing] = await pool.execute('SELECT id FROM Wishlist WHERE userId = ? AND productId = ?', [userId, productId]);
+            if (existing.length > 0) {
                 return res.status(200).json({ message: 'Product already in wishlist', alreadyExists: true });
             }
 
             const id = `wish_${Date.now()}`;
-            const { rows } = await pool.query(`
-                INSERT INTO "Wishlist" (id, "userId", "productId", "createdAt")
-                VALUES ($1, $2, $3, NOW())
-                RETURNING *
+            await pool.execute(`
+                INSERT INTO Wishlist (id, userId, productId, createdAt)
+                VALUES (?, ?, ?, NOW())
             `, [id, userId, productId]);
 
+            const [rows] = await pool.execute('SELECT * FROM Wishlist WHERE id = ?', [id]);
             return res.status(201).json(rows[0]);
         }
 
@@ -62,7 +60,7 @@ module.exports = async (req, res) => {
             const { productId } = req.query;
             if (!productId) return res.status(400).json({ error: 'Product ID is required' });
 
-            await pool.query('DELETE FROM "Wishlist" WHERE "userId" = $1 AND "productId" = $2', [userId, productId]);
+            await pool.execute('DELETE FROM Wishlist WHERE userId = ? AND productId = ?', [userId, productId]);
             return res.status(204).end();
         }
 

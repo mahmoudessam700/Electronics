@@ -10,12 +10,12 @@ const getExecutor = (client) => client || getPool();
 
 const getLatestBalance = async (executor, shopId) => {
     if (!shopId) return 0;
-    const { rows } = await executor.query(
+    const [rows] = await executor.execute(
         `
-        SELECT "balanceAfter"
-        FROM "ShopCommissionLedger"
-        WHERE "shopId" = $1
-        ORDER BY "createdAt" DESC, id DESC
+        SELECT balanceAfter
+        FROM ShopCommissionLedger
+        WHERE shopId = ?
+        ORDER BY createdAt DESC, id DESC
         LIMIT 1
     `,
         [shopId],
@@ -24,9 +24,6 @@ const getLatestBalance = async (executor, shopId) => {
     if (!latest) return 0;
     if (typeof latest.balanceAfter === 'number') {
         return latest.balanceAfter;
-    }
-    if (typeof latest.balanceafter === 'number') {
-        return latest.balanceafter;
     }
     return 0;
 };
@@ -65,13 +62,13 @@ const recordOrderLedgerEntries = async (
         };
         const descriptor = isReversal ? 'Reversal' : `${item.quantity || 1}x sale`;
 
-        await executor.query(
+        await executor.execute(
             `
-            INSERT INTO "ShopCommissionLedger" (
-                id, "shopId", "orderId", "orderItemId", "productId",
-                type, amount, "balanceAfter", description, reference, metadata
+            INSERT INTO ShopCommissionLedger (
+                id, shopId, orderId, orderItemId, productId,
+                type, amount, balanceAfter, description, reference, metadata
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
             [
                 ledgerId,
@@ -117,12 +114,12 @@ const recordPayoutLedgerEntry = async (
         ...metadata,
     };
 
-    await executor.query(
+    await executor.execute(
         `
-        INSERT INTO "ShopCommissionLedger" (
-            id, "shopId", "payoutId", type, amount, "balanceAfter", description, reference, metadata
+        INSERT INTO ShopCommissionLedger (
+            id, shopId, payoutId, type, amount, balanceAfter, description, reference, metadata
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
         [
             ledgerId,

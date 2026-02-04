@@ -1,9 +1,7 @@
-const { Pool } = require('pg');
+// @ts-nocheck
+const { getPool } = require('../_utils/db');
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const pool = getPool();
 
 module.exports = async (req, res) => {
     // Standard Headers
@@ -24,7 +22,7 @@ module.exports = async (req, res) => {
         if (req.method === 'GET') {
             if (type === 'homepage') {
                 try {
-                    const { rows } = await pool.query('SELECT value FROM "Setting" WHERE key = $1', ['homepage_sections']);
+                    const [rows] = await pool.execute('SELECT value FROM Setting WHERE `key` = ?', ['homepage_sections']);
                     
                     if (rows.length > 0) {
                         let data = rows[0].value;
@@ -51,7 +49,7 @@ module.exports = async (req, res) => {
                     }
                 } catch (dbError) {
                     // Check if table missing
-                    if (dbError.message.includes('Setting" does not exist')) {
+                    if (dbError.message.includes('doesn\'t exist')) {
                         return res.status(400).json({ 
                             error: 'Table Missing', 
                             message: 'The "Setting" table does not exist in your database yet. Please run: npx prisma db push' 
@@ -72,10 +70,11 @@ module.exports = async (req, res) => {
 
                 const payload = JSON.stringify({ sections, heroSlides: heroSlides || [] });
 
-                await pool.query(`
-                    INSERT INTO "Setting" (key, value, "updatedAt") 
-                    VALUES ($1, $2, NOW())
-                    ON CONFLICT (key) DO UPDATE SET value = $2, "updatedAt" = NOW()
+                // MySQL upsert using ON DUPLICATE KEY UPDATE
+                await pool.execute(`
+                    INSERT INTO Setting (\`key\`, value, updatedAt) 
+                    VALUES (?, ?, NOW())
+                    ON DUPLICATE KEY UPDATE value = VALUES(value), updatedAt = NOW()
                 `, ['homepage_sections', payload]);
 
                 return res.json({ success: true });

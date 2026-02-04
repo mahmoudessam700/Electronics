@@ -1,12 +1,10 @@
-const { Pool } = require('pg');
+// @ts-nocheck
+const { getPool } = require('../_utils/db');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-this';
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const pool = getPool();
 
 module.exports = async (req, res) => {
     // Enable CORS
@@ -33,12 +31,12 @@ module.exports = async (req, res) => {
         if (req.method === 'GET') {
             const { id } = req.query;
             if (id) {
-                const { rows } = await pool.query('SELECT id, email, name, phone, address, latitude, longitude, role, "createdAt" FROM "User" WHERE id = $1', [id]);
+                const [rows] = await pool.execute('SELECT id, email, name, phone, address, latitude, longitude, role, createdAt FROM User WHERE id = ?', [id]);
                 if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
                 return res.json(rows[0]);
             }
 
-            const { rows } = await pool.query('SELECT id, email, name, phone, address, latitude, longitude, role, "createdAt" FROM "User" ORDER BY "createdAt" DESC');
+            const [rows] = await pool.execute('SELECT id, email, name, phone, address, latitude, longitude, role, createdAt FROM User ORDER BY createdAt DESC');
             return res.json(rows);
         }
 
@@ -48,19 +46,19 @@ module.exports = async (req, res) => {
 
             if (!id) return res.status(400).json({ error: 'User ID is required' });
 
-            const { rows } = await pool.query(`
-                UPDATE "User"
-                SET name = COALESCE($2, name),
-                    phone = COALESCE($3, phone),
-                    address = COALESCE($4, address),
-                    role = COALESCE($5, role),
-                    latitude = COALESCE($6, latitude),
-                    longitude = COALESCE($7, longitude),
-                    "updatedAt" = NOW()
-                WHERE id = $1
-                RETURNING id, email, name, phone, address, latitude, longitude, role
-            `, [id, name, phone, address, role, latitude, longitude]);
+            await pool.execute(`
+                UPDATE User
+                SET name = COALESCE(?, name),
+                    phone = COALESCE(?, phone),
+                    address = COALESCE(?, address),
+                    role = COALESCE(?, role),
+                    latitude = COALESCE(?, latitude),
+                    longitude = COALESCE(?, longitude),
+                    updatedAt = NOW()
+                WHERE id = ?
+            `, [name, phone, address, role, latitude, longitude, id]);
 
+            const [rows] = await pool.execute('SELECT id, email, name, phone, address, latitude, longitude, role FROM User WHERE id = ?', [id]);
             if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
             return res.json(rows[0]);
         }
@@ -69,10 +67,7 @@ module.exports = async (req, res) => {
             const { id } = req.query;
             if (!id) return res.status(400).json({ error: 'User ID is required' });
 
-            // Prevent self-deletion if possible, but for simplicity we allow it.
-            // In a real app, you'd check if (decoded.userId === id).
-
-            await pool.query('DELETE FROM "User" WHERE id = $1', [id]);
+            await pool.execute('DELETE FROM User WHERE id = ?', [id]);
             return res.status(204).end();
         }
 
