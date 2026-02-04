@@ -210,8 +210,8 @@ export function AdminUsersPage() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <div className="flex gap-2">
-                    {['ALL', 'ADMIN', 'CUSTOMER'].map((role) => (
+                <div className="flex gap-2 flex-wrap">
+                    {['ALL', 'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'SHOP_STAFF'].map((role) => (
                         <button
                             key={role}
                             onClick={() => setRoleFilter(role)}
@@ -221,7 +221,7 @@ export function AdminUsersPage() {
                                     : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                             }`}
                         >
-                            {role === 'ALL' ? t('admin.allUsers') : role === 'ADMIN' ? t('admin.admins') : t('admin.customers')}
+                            {role === 'ALL' ? t('admin.allUsers') : role === 'ADMIN' ? t('admin.admins') : role === 'CUSTOMER' ? t('admin.customers') : role === 'SHOP_OWNER' ? t('admin.shopOwners') : t('admin.shopStaffs')}
                         </button>
                     ))}
                 </div>
