@@ -370,10 +370,12 @@ export function AdminUsersPage() {
                                 id="role"
                                 className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814]"
                                 value={formData.role}
-                                  onChange={(e) => setFormData({ ...formData, role: e.target.value as RoleOption })}
+                                onChange={(e) => setFormData({ ...formData, role: e.target.value as RoleOption })}
                             >
                                 <option value="CUSTOMER">{t('admin.customer')}</option>
                                 <option value="ADMIN">{t('admin.administrator')}</option>
+                                <option value="SHOP_OWNER">{t('admin.shopOwner')}</option>
+                                <option value="SHOP_STAFF">{t('admin.shopStaff')}</option>
                             </select>
                         </div>
                         <DialogFooter className="pt-4 gap-2">

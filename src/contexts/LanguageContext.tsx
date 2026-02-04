@@ -905,6 +905,8 @@ const en: Record<string, string> = {
     'admin.address': 'Address',
     'admin.userRole': 'User Role',
     'admin.administrator': 'Administrator',
+    'admin.shopOwner': 'Shop Owner',
+    'admin.shopStaff': 'Shop Staff',
     'admin.loadingUsers': 'Loading users...',
     'admin.unnamedUser': 'Unnamed User',
     
@@ -2031,6 +2033,8 @@ const ar: Record<string, string> = {
     'admin.address': 'العنوان',
     'admin.userRole': 'دور المستخدم',
     'admin.administrator': 'مسؤول',
+    'admin.shopOwner': 'صاحب متجر',
+    'admin.shopStaff': 'موظف متجر',
     'admin.loadingUsers': 'جاري تحميل المستخدمين...',
     'admin.unnamedUser': 'مستخدم بدون اسم',
     
