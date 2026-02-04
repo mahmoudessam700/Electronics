@@ -1,8 +1,10 @@
+import { useState, useRef } from 'react';
 import { Gift, Heart, Baby, Home, GraduationCap, Users, Plus, Search, Share2 } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useLanguage } from '../contexts/LanguageContext';
+import { toast } from 'sonner';
 
 interface RegistryPageProps {
   onNavigate: (page: string) => void;
@@ -10,6 +12,38 @@ interface RegistryPageProps {
 
 export function RegistryPage({ onNavigate }: RegistryPageProps) {
   const { t, formatCurrency } = useLanguage();
+  const registryTypesRef = useRef<HTMLDivElement>(null);
+  const findRegistryRef = useRef<HTMLDivElement>(null);
+  
+  const [searchForm, setSearchForm] = useState({
+    firstName: '',
+    lastName: '',
+    eventDate: ''
+  });
+
+  const scrollToRegistryTypes = () => {
+    registryTypesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const scrollToFindRegistry = () => {
+    findRegistryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleCreateRegistry = (type?: string) => {
+    toast.success(t('registry.comingSoon') || 'Registry feature coming soon! You will be able to create your registry here.');
+    if (type) {
+      console.log('Creating registry of type:', type);
+    }
+  };
+
+  const handleSearchRegistries = () => {
+    if (!searchForm.firstName && !searchForm.lastName) {
+      toast.error(t('registry.enterNameToSearch') || 'Please enter a first or last name to search');
+      return;
+    }
+    toast.info(t('registry.searchingRegistries') || `Searching registries for ${searchForm.firstName} ${searchForm.lastName}...`);
+    // In a real implementation, this would call an API
+  };
 
   const registryTypes = [
     {
@@ -106,11 +140,18 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
             {t('registry.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="bg-white text-[#0F1111] hover:bg-gray-100 px-8 py-6 text-lg">
+            <Button 
+              onClick={scrollToRegistryTypes}
+              className="bg-white text-[#0F1111] hover:bg-gray-100 px-8 py-6 text-lg"
+            >
               <Plus className="h-5 w-5 mr-2" />
               {t('registry.createRegistry')}
             </Button>
-            <Button variant="outline" className="border-2 border-white !text-black hover:bg-white/20 hover:!text-black px-8 py-6 text-lg">
+            <Button 
+              variant="outline" 
+              onClick={scrollToFindRegistry}
+              className="border-2 border-white !text-black hover:bg-white/20 hover:!text-black px-8 py-6 text-lg"
+            >
               <Search className="h-5 w-5 mr-2" />
               {t('registry.findRegistry')}
             </Button>
@@ -120,7 +161,7 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
 
       <div className="max-w-[1200px] mx-auto px-4 py-12">
         {/* Registry Types */}
-        <section className="mb-12">
+        <section ref={registryTypesRef} className="mb-12 scroll-mt-4">
           <h2 className="text-3xl mb-6">{t('registry.chooseType')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {registryTypes.map((type) => (
@@ -133,7 +174,10 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
                     <div className="flex-1">
                       <h3 className="text-xl mb-2 group-hover:text-[#C7511F]">{type.title}</h3>
                       <p className="text-[#565959] mb-4">{type.description}</p>
-                      <Button className="bg-[#718096] hover:bg-[#4A5568] text-white">
+                      <Button 
+                        onClick={() => handleCreateRegistry(type.title)}
+                        className="bg-[#718096] hover:bg-[#4A5568] text-white"
+                      >
                         {t('registry.getStarted')}
                       </Button>
                     </div>
@@ -145,16 +189,41 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
         </section>
 
         {/* Find a Registry */}
-        <section className="mb-12">
+        <section ref={findRegistryRef} className="mb-12 scroll-mt-4">
           <Card>
             <CardContent className="p-8">
               <h2 className="text-2xl mb-6">{t('registry.findRegistry')}</h2>
               <div className="grid md:grid-cols-3 gap-4">
-                <Input id="registry-first-name" name="firstName" placeholder={t('registry.firstName')} autoComplete="off" />
-                <Input id="registry-last-name" name="lastName" placeholder={t('registry.lastName')} autoComplete="off" />
-                <Input id="registry-event-date" name="eventDate" placeholder={t('registry.eventDate')} type="date" autoComplete="off" />
+                <Input 
+                  id="registry-first-name" 
+                  name="firstName" 
+                  placeholder={t('registry.firstName')} 
+                  autoComplete="off"
+                  value={searchForm.firstName}
+                  onChange={(e) => setSearchForm(prev => ({ ...prev, firstName: e.target.value }))}
+                />
+                <Input 
+                  id="registry-last-name" 
+                  name="lastName" 
+                  placeholder={t('registry.lastName')} 
+                  autoComplete="off"
+                  value={searchForm.lastName}
+                  onChange={(e) => setSearchForm(prev => ({ ...prev, lastName: e.target.value }))}
+                />
+                <Input 
+                  id="registry-event-date" 
+                  name="eventDate" 
+                  placeholder={t('registry.eventDate')} 
+                  type="date" 
+                  autoComplete="off"
+                  value={searchForm.eventDate}
+                  onChange={(e) => setSearchForm(prev => ({ ...prev, eventDate: e.target.value }))}
+                />
               </div>
-              <Button className="mt-4 bg-[#718096] hover:bg-[#4A5568] text-white">
+              <Button 
+                onClick={handleSearchRegistries}
+                className="mt-4 bg-[#718096] hover:bg-[#4A5568] text-white"
+              >
                 <Search className="h-4 w-4 mr-2" />
                 {t('registry.searchRegistries')}
               </Button>
@@ -216,13 +285,16 @@ export function RegistryPage({ onNavigate }: RegistryPageProps) {
                 {t('registry.readyToCreateDesc')}
               </p>
               <div className="flex gap-4 justify-center">
-                <Button className="bg-white text-[#0F1111] hover:bg-gray-100 px-8 py-6 text-lg">
+                <Button 
+                  onClick={scrollToRegistryTypes}
+                  className="bg-white text-[#0F1111] hover:bg-gray-100 px-8 py-6 text-lg"
+                >
                   {t('registry.createRegistry')}
                 </Button>
                 <Button 
                   onClick={() => onNavigate('search')}
                   variant="outline" 
-                  className="border-2 border-white text-white hover:bg-white/20 px-8 py-6 text-lg"
+                  className="border-2 border-white !text-black hover:bg-white/20 hover:!text-black px-8 py-6 text-lg"
                 >
                   {t('registry.browseProducts')}
                 </Button>
