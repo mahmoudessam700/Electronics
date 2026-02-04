@@ -500,11 +500,11 @@ export function AdminUsersPage() {
 
             {/* Create User Dialog */}
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
+                <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
+                    <DialogHeader className="flex-shrink-0">
                         <DialogTitle className="text-xl">{t('admin.addNewUser')}</DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleCreateUser} className="space-y-4 py-4">
+                    <form onSubmit={handleCreateUser} className="space-y-4 py-4 overflow-y-auto flex-1 px-1">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="create-name" className="text-sm font-medium">{t('admin.fullName')} *</Label>
@@ -629,7 +629,7 @@ export function AdminUsersPage() {
                             )}
                         </div>
 
-                        <DialogFooter className="pt-4 gap-2">
+                        <DialogFooter className="pt-4 gap-2 flex-shrink-0 border-t mt-4">
                             <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="rounded-lg">
                                 {t('admin.cancel')}
                             </Button>
