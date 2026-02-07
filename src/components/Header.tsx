@@ -13,6 +13,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { AuthModal } from './auth/AuthModal';
 import { useVoiceControl } from '../lib/useVoiceControl';
+import { processVoiceCommand } from '../lib/voiceCommands';
 
 interface HeaderProps {
   onNavigate: (page: string, product?: any, category?: string) => void;
@@ -31,12 +32,24 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const { isListening, transcript, error: voiceError, startListening, stopListening, isSupported: voiceSupported } = useVoiceControl();
+  const [voiceMessage, setVoiceMessage] = useState('');
 
-  // When voice transcript arrives, put it in search and navigate
+  // When voice transcript arrives, process it as a command or search
   useEffect(() => {
     if (transcript) {
-      setSearchQuery(transcript);
-      navigate(`/search?q=${encodeURIComponent(transcript)}`);
+      const result = processVoiceCommand(transcript);
+
+      if (result.type === 'navigate' && result.path) {
+        setVoiceMessage(`✅ ${transcript}`);
+        navigate(result.path);
+      } else if (result.type === 'search') {
+        setSearchQuery(result.query || transcript);
+        setVoiceMessage(`🔍 ${transcript}`);
+        navigate(result.path || `/search?q=${encodeURIComponent(transcript)}`);
+      }
+
+      // Clear the message after 3 seconds
+      setTimeout(() => setVoiceMessage(''), 3000);
     }
   }, [transcript]);
 
@@ -279,9 +292,11 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                   <Search className="h-5 w-5" />
                 </Button>
               </div>
-              {/* Voice error message */}
-              {voiceError && (
-                <p className="text-xs text-yellow-300 mt-1 px-1">{voiceError}</p>
+              {/* Voice feedback message */}
+              {(voiceError || voiceMessage) && (
+                <p className={`text-xs mt-1 px-1 ${voiceError ? 'text-yellow-300' : 'text-green-300'}`}>
+                  {voiceError || voiceMessage}
+                </p>
               )}
             </div>
 
