@@ -1,8 +1,9 @@
 export interface VoiceCommandResult {
-  type: 'navigate' | 'search';
-  path: string;
+  type: 'navigate' | 'search' | 'category';
+  path?: string;
   label?: string;
   query?: string;
+  category?: string;
   matched: boolean;
 }
 
@@ -70,21 +71,21 @@ const pageCommands: CommandRule[] = [
 ];
 
 // =============================================
-// PRODUCT CATEGORIES
+// PRODUCT CATEGORIES — use exact names from Header menu
 // =============================================
-const categoryCommands: CommandRule[] = [
-  { keywords: ['laptops', 'laptop', 'لابتوب', 'لاب توب', 'لابتوبات', 'اجهزة لابتوب', 'أجهزة لاب توب', 'اجهزة اللابتوب', 'أجهزة اللابتوب'], path: '/search?q=Laptops', label: 'Laptops' },
-  { keywords: ['headphones', 'headphone', 'earphones', 'earbuds', 'هيدفون', 'سماعات', 'سماعة', 'سماعه', 'سماعات الرأس', 'سماعات راس', 'ايربودز'], path: '/search?q=Headphones', label: 'Headphones' },
-  { keywords: ['keyboards', 'keyboard', 'كيبورد', 'كيبوردات', 'لوحة مفاتيح', 'لوحات المفاتيح', 'لوحه مفاتيح'], path: '/search?q=Keyboards', label: 'Keyboards' },
-  { keywords: ['mouse', 'mice', 'ماوس', 'فأرة', 'فاره', 'الفأرات', 'ماوسات'], path: '/search?q=Mice', label: 'Mice' },
-  { keywords: ['mouse pad', 'mouse pads', 'mousepad', 'mousepads', 'ماوس باد', 'وسادة ماوس', 'وسائد الماوس', 'باد'], path: '/search?q=Mouse+Pads', label: 'Mouse Pads' },
-  { keywords: ['cables', 'cable', 'كابل', 'كابلات', 'سلك', 'اسلاك', 'الكابلات'], path: '/search?q=Cables', label: 'Cables' },
-  { keywords: ['hard drive', 'hard drives', 'hard disk', 'ssd', 'هارد', 'هارد درايف', 'هارد ديسك', 'الأقراص الصلبة', 'اقراص صلبة', 'اس اس دي'], path: '/search?q=Hard+Drives', label: 'Hard Drives' },
-  { keywords: ['monitor', 'monitors', 'screen', 'screens', 'display', 'شاشة', 'شاشات', 'مونيتور', 'شاشه'], path: '/search?q=Monitors', label: 'Monitors' },
-  { keywords: ['pc', 'pcs', 'computer', 'computers', 'desktop', 'كمبيوتر', 'كومبيوتر', 'كمبيوترات', 'كومبيوترات', 'بي سي', 'حاسوب', 'حاسب', 'اجهزة الكمبيوتر', 'أجهزة الكمبيوتر', 'اجهزة الكومبيوتر', 'ديسكتوب'], path: '/search?q=PCs', label: 'PCs' },
-  { keywords: ['books', 'book', 'كتب', 'كتاب', 'الكتب'], path: '/search?q=Books', label: 'Books' },
-  { keywords: ['fashion', 'clothes', 'clothing', 'ملابس', 'موضة', 'الموضة', 'ازياء', 'أزياء'], path: '/search?q=Fashion', label: 'Fashion' },
-  { keywords: ['home kitchen', 'home and kitchen', 'kitchen', 'المنزل والمطبخ', 'المنزل', 'المطبخ', 'مطبخ', 'ادوات منزلية', 'أدوات منزلية'], path: '/search?q=Home+%26+Kitchen', label: 'Home & Kitchen' },
+const categoryCommands: (CommandRule & { category: string })[] = [
+  { keywords: ['laptops', 'laptop', 'لابتوب', 'لاب توب', 'لابتوبات', 'اجهزه لابتوب', 'اجهزه اللابتوب', 'اجهزة لابتوب', 'أجهزة لاب توب', 'اجهزة اللابتوب', 'أجهزة اللابتوب'], path: '/search', label: 'Laptops', category: 'Laptops' },
+  { keywords: ['headphones', 'headphone', 'earphones', 'earbuds', 'هيدفون', 'سماعات', 'سماعه', 'سماعات الراس', 'سماعات راس', 'ايربودز'], path: '/search', label: 'Headphones', category: 'Headphones' },
+  { keywords: ['keyboards', 'keyboard', 'كيبورد', 'كيبوردات', 'لوحه مفاتيح', 'لوحات المفاتيح'], path: '/search', label: 'Keyboards', category: 'Keyboards' },
+  { keywords: ['mouse', 'mice', 'ماوس', 'فاره', 'الفارات', 'ماوسات'], path: '/search', label: 'Mice', category: 'Mice' },
+  { keywords: ['mouse pad', 'mouse pads', 'mousepad', 'mousepads', 'ماوس باد', 'وساده ماوس', 'وسائد الماوس', 'باد'], path: '/search', label: 'Mouse Pads', category: 'Mouse Pads' },
+  { keywords: ['cables', 'cable', 'كابل', 'كابلات', 'سلك', 'اسلاك', 'الكابلات'], path: '/search', label: 'Cables', category: 'Cables' },
+  { keywords: ['hard drive', 'hard drives', 'hard disk', 'ssd', 'هارد', 'هارد درايف', 'هارد ديسك', 'الاقراص الصلبه', 'اقراص صلبه', 'اس اس دي'], path: '/search', label: 'Hard Drives', category: 'Hard Drives' },
+  { keywords: ['monitor', 'monitors', 'screen', 'screens', 'display', 'شاشه', 'شاشات', 'مونيتور'], path: '/search', label: 'Monitors', category: 'Monitors' },
+  { keywords: ['pc', 'pcs', 'computer', 'computers', 'desktop', 'كمبيوتر', 'كومبيوتر', 'كمبيوترات', 'كومبيوترات', 'بي سي', 'حاسوب', 'حاسب', 'اجهزه الكمبيوتر', 'اجهزه الكومبيوتر', 'ديسكتوب'], path: '/search', label: 'PCs', category: 'PCs' },
+  { keywords: ['books', 'book', 'كتب', 'كتاب', 'الكتب'], path: '/search', label: 'Books', category: 'Books' },
+  { keywords: ['fashion', 'clothes', 'clothing', 'ملابس', 'موضه', 'الموضه', 'ازياء'], path: '/search', label: 'Fashion', category: 'Fashion' },
+  { keywords: ['home kitchen', 'home and kitchen', 'kitchen', 'المنزل والمطبخ', 'المنزل', 'المطبخ', 'مطبخ', 'ادوات منزليه'], path: '/search', label: 'Home & Kitchen', category: 'Home & Kitchen' },
 ];
 
 // =============================================
@@ -150,7 +151,7 @@ export function processVoiceCommand(transcript: string): VoiceCommandResult & { 
     for (const cmd of categoryCommands) {
       for (const keyword of cmd.keywords) {
         if (target.includes(keyword)) {
-          return { type: 'navigate', path: cmd.path, label: cmd.label, matched: true };
+          return { type: 'category', path: cmd.path, label: cmd.label, category: cmd.category, matched: true };
         }
       }
     }
@@ -175,7 +176,7 @@ export function processVoiceCommand(transcript: string): VoiceCommandResult & { 
   for (const cmd of sortedCategories) {
     for (const keyword of cmd.keywords) {
       if (text.includes(keyword)) {
-        return { type: 'navigate', path: cmd.path, label: cmd.label, matched: true };
+        return { type: 'category', path: cmd.path, label: cmd.label, category: cmd.category, matched: true };
       }
     }
   }

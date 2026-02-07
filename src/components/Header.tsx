@@ -78,6 +78,9 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
           setVoiceMessage(`⏹️ Stopped`);
           break;
       }
+    } else if (result.type === 'category' && result.category) {
+      setVoiceMessage(`✅ "${transcript}" → ${result.label}`);
+      onNavigate('search', undefined, result.category);
     } else if (result.type === 'navigate' && result.path) {
       setVoiceMessage(`✅ "${transcript}" → ${result.label || result.path}`);
       navigate(result.path);
