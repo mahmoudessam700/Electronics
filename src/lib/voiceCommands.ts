@@ -143,15 +143,15 @@ export function processVoiceCommand(transcript: string): VoiceCommandResult & { 
   if (goToMatch) {
     const target = normalize(goToMatch[1]);
 
-    // Try pages first, then categories
-    for (const cmd of pageCommands) {
+    // Try categories FIRST (more specific), then pages
+    for (const cmd of categoryCommands) {
       for (const keyword of cmd.keywords) {
         if (target.includes(keyword)) {
           return { type: 'navigate', path: cmd.path, label: cmd.label, matched: true };
         }
       }
     }
-    for (const cmd of categoryCommands) {
+    for (const cmd of pageCommands) {
       for (const keyword of cmd.keywords) {
         if (target.includes(keyword)) {
           return { type: 'navigate', path: cmd.path, label: cmd.label, matched: true };
@@ -161,15 +161,30 @@ export function processVoiceCommand(transcript: string): VoiceCommandResult & { 
   }
 
   // 4. Direct keyword matching (without prefix)
-  // Check longer keywords first to avoid partial matches
-  const allCommands = [...pageCommands, ...categoryCommands]
-    .sort((a, b) => {
-      const maxA = Math.max(...a.keywords.map(k => k.length));
-      const maxB = Math.max(...b.keywords.map(k => k.length));
-      return maxB - maxA;
-    });
+  // Check CATEGORIES first — they are more specific than page names
+  // Sort each group by longest keyword first to prefer exact matches
+  const sortedCategories = [...categoryCommands].sort((a, b) => {
+    const maxA = Math.max(...a.keywords.map(k => k.length));
+    const maxB = Math.max(...b.keywords.map(k => k.length));
+    return maxB - maxA;
+  });
 
-  for (const cmd of allCommands) {
+  for (const cmd of sortedCategories) {
+    for (const keyword of cmd.keywords) {
+      if (text.includes(keyword)) {
+        return { type: 'navigate', path: cmd.path, label: cmd.label, matched: true };
+      }
+    }
+  }
+
+  // Then check pages
+  const sortedPages = [...pageCommands].sort((a, b) => {
+    const maxA = Math.max(...a.keywords.map(k => k.length));
+    const maxB = Math.max(...b.keywords.map(k => k.length));
+    return maxB - maxA;
+  });
+
+  for (const cmd of sortedPages) {
     for (const keyword of cmd.keywords) {
       if (text.includes(keyword)) {
         return { type: 'navigate', path: cmd.path, label: cmd.label, matched: true };
