@@ -1,5 +1,5 @@
-import { Search, ShoppingCart, Bell, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse, Headphones, Keyboard, Cable, Grid3x3, HardDrive, LogIn, UserPlus, User, Package, List, Settings, Globe } from 'lucide-react';
-import { useState } from 'react';
+import { Search, ShoppingCart, Bell, MapPin, Menu, ChevronDown, Laptop, Monitor, Mouse, Headphones, Keyboard, Cable, Grid3x3, HardDrive, LogIn, UserPlus, User, Package, List, Settings, Globe, Mic, MicOff } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription, SheetClose } from './ui/sheet';
@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { AuthModal } from './auth/AuthModal';
+import { useVoiceControl } from '../lib/useVoiceControl';
 
 interface HeaderProps {
   onNavigate: (page: string, product?: any, category?: string) => void;
@@ -26,6 +27,40 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const { isListening, transcript, error: voiceError, startListening, stopListening, isSupported: voiceSupported } = useVoiceControl();
+
+  // When voice transcript arrives, put it in search and navigate
+  useEffect(() => {
+    if (transcript) {
+      setSearchQuery(transcript);
+      navigate(`/search?q=${encodeURIComponent(transcript)}`);
+    }
+  }, [transcript]);
+
+  const handleVoiceClick = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening(language === 'ar' ? 'ar-EG' : 'en-US');
+    }
+  };
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/search');
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const hasShopAccess = (shopMemberships?.length || 0) > 0;
 
@@ -206,7 +241,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
 
             {/* Search Bar - Full width on mobile */}
             <div className="flex-1 w-full lg:w-auto lg:max-w-[800px] order-last lg:order-none mx-0 lg:mx-4">
-              <div className="flex items-center">
+              <div className="flex items-center relative">
                 <select className="hidden sm:block h-10 px-2 bg-[#F3F3F3] border-none rounded-l-md text-[#0F1111] text-sm focus:outline-none focus:ring-2 focus:ring-[#718096]">
                   <option>{t('header.all')}</option>
                   <option>{t('category.books')}</option>
@@ -214,17 +249,39 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                   <option>{t('category.homeKitchen')}</option>
                 </select>
                 <Input
+                  ref={searchInputRef}
                   type="text"
-                  placeholder={t('header.searchPlaceholder')}
-                  className="h-10 flex-1 rounded-md sm:rounded-none sm:rounded-r-none border-none focus-visible:ring-0"
+                  placeholder={isListening ? (language === 'ar' ? '🎤 اتكلم دلوقتي...' : '🎤 Listening...') : t('header.searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleSearchKeyDown}
+                  className={`h-10 flex-1 rounded-md sm:rounded-none sm:rounded-r-none border-none focus-visible:ring-0 ${isListening ? 'bg-red-50 animate-pulse' : ''}`}
                 />
+                {/* Voice Search Button */}
+                {voiceSupported && (
+                  <Button
+                    onClick={handleVoiceClick}
+                    className={`h-10 px-3 rounded-none border-l border-gray-200 ${
+                      isListening
+                        ? 'bg-red-500 hover:bg-red-600 text-white'
+                        : 'bg-white hover:bg-gray-100 text-gray-600'
+                    }`}
+                    title={isListening ? (language === 'ar' ? 'إيقاف' : 'Stop') : (language === 'ar' ? 'بحث بالصوت' : 'Voice search')}
+                  >
+                    {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                  </Button>
+                )}
                 <Button
-                  onClick={() => navigate('/search')}
-                  className="h-10 bg-[#718096] hover:bg-[#4A5568] text-white rounded-md rounded-l-none px-4 ml-[-4px] z-10"
+                  onClick={handleSearch}
+                  className="h-10 bg-[#718096] hover:bg-[#4A5568] text-white rounded-md rounded-l-none px-4 z-10"
                 >
                   <Search className="h-5 w-5" />
                 </Button>
               </div>
+              {/* Voice error message */}
+              {voiceError && (
+                <p className="text-xs text-red-400 mt-1 px-1">{voiceError}</p>
+              )}
             </div>
 
             {/* Account & Orders (Desktop) */}

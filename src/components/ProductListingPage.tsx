@@ -14,6 +14,7 @@ import {
 } from './ui/select';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from './ui/sheet';
 import { getProducts } from '../lib/api';
+import { useSearchParams } from 'react-router-dom';
 
 interface ProductListingPageProps {
   onProductClick: (product: Product) => void;
@@ -22,6 +23,8 @@ interface ProductListingPageProps {
 }
 
 export function ProductListingPage({ onProductClick, selectedCategory, onNavigate }: ProductListingPageProps) {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +41,7 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
         setError(null);
         const data = await getProducts({
           category: selectedCategory || undefined,
+          search: searchQuery || undefined,
         });
         setProducts(data as Product[]);
       } catch (err: unknown) {
@@ -49,7 +53,7 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
       }
     }
     fetchProducts();
-  }, [selectedCategory]);
+  }, [selectedCategory, searchQuery]);
 
   // Filter products by price range
   const filteredByCategory = products.filter(
