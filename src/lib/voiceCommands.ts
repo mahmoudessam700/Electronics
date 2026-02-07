@@ -91,10 +91,14 @@ const categoryCommands: CommandRule[] = [
 // ACTIONS (browser actions, not navigation)
 // =============================================
 const actionKeywords: { keywords: string[]; action: string }[] = [
-  { keywords: ['scroll down', 'انزل', 'نزل', 'تحت'], action: 'scrollDown' },
-  { keywords: ['scroll up', 'اطلع', 'طلع', 'فوق'], action: 'scrollUp' },
-  { keywords: ['go back', 'back', 'رجوع', 'ارجع', 'رجعني'], action: 'goBack' },
+  { keywords: ['scroll down', 'انزل', 'نزل', 'تحت', 'نزول'], action: 'scrollDown' },
+  { keywords: ['scroll up', 'اطلع', 'طلع', 'فوق', 'طلوع'], action: 'scrollUp' },
+  { keywords: ['go to end', 'go to bottom', 'bottom', 'end of page', 'اخر الصفحة', 'اخر الصفحه', 'آخر الصفحة', 'النهاية', 'النهايه', 'الاخر', 'الآخر', 'تحت خالص', 'اخر'], action: 'scrollToBottom' },
+  { keywords: ['go to top', 'top', 'top of page', 'اول الصفحة', 'اول الصفحه', 'أول الصفحة', 'البداية', 'البدايه', 'فوق خالص', 'الاول'], action: 'scrollToTop' },
+  { keywords: ['go back', 'back', 'رجوع', 'ارجع', 'رجعني', 'رجع'], action: 'goBack' },
+  { keywords: ['go forward', 'forward', 'قدام', 'للأمام', 'للامام'], action: 'goForward' },
   { keywords: ['refresh', 'reload', 'تحديث', 'حدث', 'ريفريش', 'ريلود'], action: 'refresh' },
+  { keywords: ['stop', 'cancel', 'الغاء', 'إلغاء', 'توقف', 'ستوب', 'كانسل'], action: 'stop' },
 ];
 
 function normalize(text: string): string {

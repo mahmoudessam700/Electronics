@@ -31,49 +31,65 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const { isListening, transcript, error: voiceError, startListening, stopListening, isSupported: voiceSupported } = useVoiceControl();
+  const { isListening, voiceEvent, error: voiceError, startListening, stopListening, isSupported: voiceSupported } = useVoiceControl();
   const [voiceMessage, setVoiceMessage] = useState('');
 
-  // When voice transcript arrives, process it as a command or search
+  // When voice event arrives, process it as a command or search
   useEffect(() => {
-    if (transcript) {
-      console.log('[Voice] Heard:', transcript);
-      const result = processVoiceCommand(transcript);
-      console.log('[Voice] Result:', result);
+    if (!voiceEvent) return;
+    const transcript = voiceEvent.text;
 
-      // Handle browser actions
-      if (result.action) {
-        switch (result.action) {
-          case 'scrollDown':
-            window.scrollBy({ top: 500, behavior: 'smooth' });
-            setVoiceMessage(`⬇️ Scrolling down`);
-            break;
-          case 'scrollUp':
-            window.scrollBy({ top: -500, behavior: 'smooth' });
-            setVoiceMessage(`⬆️ Scrolling up`);
-            break;
-          case 'goBack':
-            window.history.back();
-            setVoiceMessage(`⬅️ Going back`);
-            break;
-          case 'refresh':
-            setVoiceMessage(`🔄 Refreshing...`);
-            setTimeout(() => window.location.reload(), 500);
-            break;
-        }
-      } else if (result.type === 'navigate' && result.path) {
-        setVoiceMessage(`✅ "${transcript}" → ${result.label || result.path}`);
-        navigate(result.path);
-      } else if (result.type === 'search') {
-        setSearchQuery(result.query || transcript);
-        setVoiceMessage(`🔍 "${transcript}"`);
-        navigate(result.path || `/search?q=${encodeURIComponent(transcript)}`);
+    console.log('[Voice] Heard:', transcript, '(event #' + voiceEvent.id + ')');
+    const result = processVoiceCommand(transcript);
+    console.log('[Voice] Result:', result);
+
+    // Handle browser actions
+    if (result.action) {
+      switch (result.action) {
+        case 'scrollDown':
+          window.scrollBy({ top: 500, behavior: 'smooth' });
+          setVoiceMessage(`⬇️ Scrolling down`);
+          break;
+        case 'scrollUp':
+          window.scrollBy({ top: -500, behavior: 'smooth' });
+          setVoiceMessage(`⬆️ Scrolling up`);
+          break;
+        case 'scrollToBottom':
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+          setVoiceMessage(`⬇️⬇️ Going to bottom`);
+          break;
+        case 'scrollToTop':
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setVoiceMessage(`⬆️⬆️ Going to top`);
+          break;
+        case 'goBack':
+          window.history.back();
+          setVoiceMessage(`⬅️ Going back`);
+          break;
+        case 'goForward':
+          window.history.forward();
+          setVoiceMessage(`➡️ Going forward`);
+          break;
+        case 'refresh':
+          setVoiceMessage(`🔄 Refreshing...`);
+          setTimeout(() => window.location.reload(), 500);
+          break;
+        case 'stop':
+          setVoiceMessage(`⏹️ Stopped`);
+          break;
       }
-
-      // Clear the message after 4 seconds
-      setTimeout(() => setVoiceMessage(''), 4000);
+    } else if (result.type === 'navigate' && result.path) {
+      setVoiceMessage(`✅ "${transcript}" → ${result.label || result.path}`);
+      navigate(result.path);
+    } else if (result.type === 'search') {
+      setSearchQuery(result.query || transcript);
+      setVoiceMessage(`🔍 "${transcript}"`);
+      navigate(result.path || `/search?q=${encodeURIComponent(transcript)}`);
     }
-  }, [transcript]);
+
+    // Clear the message after 4 seconds
+    setTimeout(() => setVoiceMessage(''), 4000);
+  }, [voiceEvent]);
 
   const handleVoiceClick = () => {
     if (isListening) {

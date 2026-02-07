@@ -1,18 +1,24 @@
 import { useState, useRef, useCallback } from 'react';
 
+interface VoiceEvent {
+  text: string;
+  id: number;  // unique ID so same words still trigger useEffect
+}
+
 interface VoiceControlResult {
   isListening: boolean;
-  transcript: string;
+  voiceEvent: VoiceEvent | null;
   error: string | null;
   startListening: (lang?: string) => void;
   stopListening: () => void;
-  clearTranscript: () => void;
   isSupported: boolean;
 }
 
+let eventCounter = 0;
+
 export function useVoiceControl(): VoiceControlResult {
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [voiceEvent, setVoiceEvent] = useState<VoiceEvent | null>(null);
   const [error, setError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
@@ -49,8 +55,9 @@ export function useVoiceControl(): VoiceControlResult {
       };
 
       recognition.onresult = (event: any) => {
-        const result = event.results[0][0].transcript;
-        setTranscript(result);
+        const text = event.results[0][0].transcript;
+        eventCounter++;
+        setVoiceEvent({ text, id: eventCounter });
         setIsListening(false);
       };
 
@@ -92,18 +99,12 @@ export function useVoiceControl(): VoiceControlResult {
     setIsListening(false);
   }, []);
 
-  const clearTranscript = useCallback(() => {
-    setTranscript('');
-    setError(null);
-  }, []);
-
   return {
     isListening,
-    transcript,
+    voiceEvent,
     error,
     startListening,
     stopListening,
-    clearTranscript,
     isSupported,
   };
 }
