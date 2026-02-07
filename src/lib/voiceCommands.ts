@@ -81,7 +81,7 @@ const categoryCommands: CommandRule[] = [
   { keywords: ['cables', 'cable', 'كابل', 'كابلات', 'سلك', 'اسلاك', 'الكابلات'], path: '/search?q=Cables', label: 'Cables' },
   { keywords: ['hard drive', 'hard drives', 'hard disk', 'ssd', 'هارد', 'هارد درايف', 'هارد ديسك', 'الأقراص الصلبة', 'اقراص صلبة', 'اس اس دي'], path: '/search?q=Hard+Drives', label: 'Hard Drives' },
   { keywords: ['monitor', 'monitors', 'screen', 'screens', 'display', 'شاشة', 'شاشات', 'مونيتور', 'شاشه'], path: '/search?q=Monitors', label: 'Monitors' },
-  { keywords: ['pc', 'pcs', 'computer', 'computers', 'desktop', 'كمبيوتر', 'كمبيوترات', 'بي سي', 'حاسوب', 'اجهزة الكمبيوتر', 'أجهزة الكمبيوتر', 'ديسكتوب'], path: '/search?q=PCs', label: 'PCs' },
+  { keywords: ['pc', 'pcs', 'computer', 'computers', 'desktop', 'كمبيوتر', 'كومبيوتر', 'كمبيوترات', 'كومبيوترات', 'بي سي', 'حاسوب', 'حاسب', 'اجهزة الكمبيوتر', 'أجهزة الكمبيوتر', 'اجهزة الكومبيوتر', 'ديسكتوب'], path: '/search?q=PCs', label: 'PCs' },
   { keywords: ['books', 'book', 'كتب', 'كتاب', 'الكتب'], path: '/search?q=Books', label: 'Books' },
   { keywords: ['fashion', 'clothes', 'clothing', 'ملابس', 'موضة', 'الموضة', 'ازياء', 'أزياء'], path: '/search?q=Fashion', label: 'Fashion' },
   { keywords: ['home kitchen', 'home and kitchen', 'kitchen', 'المنزل والمطبخ', 'المنزل', 'المطبخ', 'مطبخ', 'ادوات منزلية', 'أدوات منزلية'], path: '/search?q=Home+%26+Kitchen', label: 'Home & Kitchen' },
@@ -105,8 +105,11 @@ function normalize(text: string): string {
   return text
     .toLowerCase()
     .trim()
-    .replace(/[.,!?؟،:;'"]/g, '')
-    .replace(/\s+/g, ' ');
+    .replace(/[.,!?؟،:;'"٪%]/g, '')  // remove punctuation
+    .replace(/\s+/g, ' ')             // collapse whitespace
+    .replace(/ة/g, 'ه')              // taa marbuta → haa
+    .replace(/ى/g, 'ي')              // alef maqsura → yaa
+    .replace(/أ|إ|آ/g, 'ا');          // normalize alef variants
 }
 
 export function processVoiceCommand(transcript: string): VoiceCommandResult & { action?: string } {
