@@ -255,7 +255,8 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
-                  className="h-10 flex-1 rounded-md sm:rounded-none sm:rounded-r-none border-none focus-visible:ring-0 bg-white text-gray-700 placeholder:text-gray-400"
+                  style={{ backgroundColor: '#ffffff', color: '#374151' }}
+                  className="h-10 flex-1 rounded-md sm:rounded-none sm:rounded-r-none border-none focus-visible:ring-0 !bg-white !text-gray-700 placeholder:!text-gray-400"
                 />
                 {/* Voice Search Button */}
                 {voiceSupported && (
