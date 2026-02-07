@@ -37,19 +37,21 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   // When voice transcript arrives, process it as a command or search
   useEffect(() => {
     if (transcript) {
+      console.log('[Voice] Heard:', transcript);
       const result = processVoiceCommand(transcript);
+      console.log('[Voice] Result:', result);
 
       if (result.type === 'navigate' && result.path) {
-        setVoiceMessage(`✅ ${transcript}`);
+        setVoiceMessage(`✅ "${transcript}" → navigating...`);
         navigate(result.path);
       } else if (result.type === 'search') {
         setSearchQuery(result.query || transcript);
-        setVoiceMessage(`🔍 ${transcript}`);
+        setVoiceMessage(`🔍 "${transcript}"`);
         navigate(result.path || `/search?q=${encodeURIComponent(transcript)}`);
       }
 
-      // Clear the message after 3 seconds
-      setTimeout(() => setVoiceMessage(''), 3000);
+      // Clear the message after 4 seconds
+      setTimeout(() => setVoiceMessage(''), 4000);
     }
   }, [transcript]);
 

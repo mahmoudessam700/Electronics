@@ -1,194 +1,133 @@
 export interface VoiceCommandResult {
-  type: 'navigate' | 'search' | 'action';
+  type: 'navigate' | 'search';
   path?: string;
   query?: string;
-  action?: string;
   matched: boolean;
 }
 
-interface CommandPattern {
-  patterns: RegExp[];
-  result: Omit<VoiceCommandResult, 'matched'>;
+interface CommandRule {
+  keywords: string[];
+  path: string;
 }
 
-const commands: CommandPattern[] = [
-  // === CART ===
-  {
-    patterns: [
-      /\b(go\s*to\s*(the\s*)?cart|open\s*cart|show\s*cart|view\s*cart|my\s*cart)\b/i,
-      /\b(روح|اذهب|فتح|افتح|ورين[يى]|عرض)\b.*(سلة|كارت|عربة|السلة)/i,
-      /\b(السلة|سلة\s*(التسوق|المشتريات))\b/i,
-    ],
-    result: { type: 'navigate', path: '/cart' },
-  },
+// Simple keyword-based matching — if ANY keyword is found in the transcript, navigate
+const navigationCommands: CommandRule[] = [
+  // CART
+  { keywords: ['cart', 'سلة', 'كارت', 'عربة', 'السله', 'السلة', 'عربية'], path: '/cart' },
 
-  // === HOME ===
-  {
-    patterns: [
-      /\b(go\s*(to\s*)?(the\s*)?home|home\s*page|main\s*page|go\s*back\s*home)\b/i,
-      /\b(روح|اذهب|فتح|افتح)\b.*(الرئيسية|البيت|هوم|الصفحة\s*الرئيسية)/i,
-      /\b(الصفحة\s*الرئيسية|الرئيسية)\b/i,
-    ],
-    result: { type: 'navigate', path: '/' },
-  },
+  // HOME
+  { keywords: ['home', 'الرئيسية', 'البيت', 'هوم', 'الرئيسيه', 'main page'], path: '/' },
 
-  // === CHECKOUT ===
-  {
-    patterns: [
-      /\b(go\s*to\s*(the\s*)?checkout|checkout|proceed\s*to\s*checkout|pay|payment)\b/i,
-      /\b(روح|اذهب|فتح|افتح)\b.*(الدفع|الشراء|تشيك\s*اوت|checkout)/i,
-      /\b(ادفع|الدفع|اشتري|checkout)\b/i,
-    ],
-    result: { type: 'navigate', path: '/checkout' },
-  },
+  // CHECKOUT
+  { keywords: ['checkout', 'check out', 'الدفع', 'ادفع', 'الشراء', 'payment', 'pay now'], path: '/checkout' },
 
-  // === ORDERS ===
-  {
-    patterns: [
-      /\b(go\s*to\s*(my\s*)?orders|show\s*(my\s*)?orders|my\s*orders|view\s*orders)\b/i,
-      /\b(روح|اذهب|فتح|افتح|ورين[يى]|عرض)\b.*(طلبات|الطلبات|اوردر)/i,
-      /\b(طلباتي|الطلبات)\b/i,
-    ],
-    result: { type: 'navigate', path: '/orders' },
-  },
+  // ORDERS
+  { keywords: ['orders', 'order', 'طلبات', 'الطلبات', 'طلباتي', 'اوردر'], path: '/orders' },
 
-  // === ACCOUNT ===
-  {
-    patterns: [
-      /\b(go\s*to\s*(my\s*)?account|my\s*account|show\s*account|profile|my\s*profile)\b/i,
-      /\b(روح|اذهب|فتح|افتح)\b.*(حسابي|الحساب|البروفايل|اكاونت)/i,
-      /\b(حسابي|الحساب)\b/i,
-    ],
-    result: { type: 'navigate', path: '/account' },
-  },
+  // ACCOUNT
+  { keywords: ['account', 'حسابي', 'الحساب', 'بروفايل', 'profile', 'اكاونت'], path: '/account' },
 
-  // === LISTS / WISHLIST ===
-  {
-    patterns: [
-      /\b(go\s*to\s*(my\s*)?lists?|my\s*lists?|show\s*(my\s*)?lists?|wishlist|my\s*wishlist)\b/i,
-      /\b(روح|اذهب|فتح|افتح)\b.*(قوائم|القوائم|المفضلة|الأمنيات)/i,
-      /\b(قوائمي|المفضلة|قائمة\s*الأمنيات)\b/i,
-    ],
-    result: { type: 'navigate', path: '/lists' },
-  },
+  // LISTS / WISHLIST
+  { keywords: ['lists', 'list', 'wishlist', 'قوائم', 'المفضلة', 'الأمنيات', 'المفضله'], path: '/lists' },
 
-  // === CUSTOMER SERVICE ===
-  {
-    patterns: [
-      /\b(go\s*to\s*customer\s*service|customer\s*service|help|support|contact)\b/i,
-      /\b(روح|اذهب|فتح|افتح)\b.*(خدمة\s*العملاء|المساعدة|الدعم)/i,
-      /\b(خدمة\s*العملاء|المساعدة|الدعم)\b/i,
-    ],
-    result: { type: 'navigate', path: '/customer-service' },
-  },
+  // CUSTOMER SERVICE
+  { keywords: ['customer service', 'خدمة العملاء', 'help', 'support', 'المساعدة', 'الدعم', 'مساعده', 'مساعدة'], path: '/customer-service' },
 
-  // === GIFT CARDS ===
-  {
-    patterns: [
-      /\b(go\s*to\s*gift\s*cards?|gift\s*cards?|show\s*gift\s*cards?)\b/i,
-      /\b(روح|اذهب|فتح|افتح)\b.*(كروت\s*الهدايا|بطاقات\s*الهدايا|gift)/i,
-      /\b(كروت\s*الهدايا|بطاقات\s*الهدايا)\b/i,
-    ],
-    result: { type: 'navigate', path: '/gift-cards' },
-  },
+  // GIFT CARDS
+  { keywords: ['gift card', 'gift cards', 'كروت الهدايا', 'بطاقات', 'هدايا'], path: '/gift-cards' },
 
-  // === SELL ===
-  {
-    patterns: [
-      /\b(go\s*to\s*sell|i\s*want\s*to\s*sell|sell\s*page|start\s*selling)\b/i,
-      /\b(روح|اذهب|فتح|افتح)\b.*(البيع|بيع|أبيع)/i,
-      /\b(عايز\s*أبيع|أبيع)\b/i,
-    ],
-    result: { type: 'navigate', path: '/sell' },
-  },
+  // SELL
+  { keywords: ['sell', 'بيع', 'أبيع', 'ابيع'], path: '/sell' },
 
-  // === DEALS ===
-  {
-    patterns: [
-      /\b(go\s*to\s*(today'?s?\s*)?deals|today'?s?\s*deals|show\s*deals)\b/i,
-      /\b(روح|اذهب|فتح|افتح)\b.*(العروض|عروض|التخفيضات)/i,
-      /\b(العروض|عروض\s*اليوم|التخفيضات)\b/i,
-    ],
-    result: { type: 'navigate', path: '/search' },
-  },
+  // ABOUT
+  { keywords: ['about us', 'about', 'من نحن', 'عننا'], path: '/about-us' },
 
-  // === ABOUT US ===
-  {
-    patterns: [
-      /\b(go\s*to\s*about(\s*us)?|about\s*us|who\s*are\s*you)\b/i,
-      /\b(روح|اذهب|فتح|افتح)\b.*(من\s*نحن|عننا)/i,
-      /\b(من\s*نحن|عن\s*الشركة)\b/i,
-    ],
-    result: { type: 'navigate', path: '/about' },
-  },
-
-  // === CATEGORIES (specific) ===
-  {
-    patterns: [
-      /\b(show\s*(me\s*)?laptops?|go\s*to\s*laptops?|laptops?\s*page)\b/i,
-      /\b(ورين[يى]|عرض|افتح)\b.*(لابتوب|لاب\s*توب|اللابتوبات)/i,
-    ],
-    result: { type: 'navigate', path: '/search?q=laptops' },
-  },
-  {
-    patterns: [
-      /\b(show\s*(me\s*)?headphones?|go\s*to\s*headphones?)\b/i,
-      /\b(ورين[يى]|عرض|افتح)\b.*(هيدفون|سماعات|سماعة)/i,
-    ],
-    result: { type: 'navigate', path: '/search?q=headphones' },
-  },
-  {
-    patterns: [
-      /\b(show\s*(me\s*)?keyboards?|go\s*to\s*keyboards?)\b/i,
-      /\b(ورين[يى]|عرض|افتح)\b.*(كيبورد|لوحة\s*مفاتيح)/i,
-    ],
-    result: { type: 'navigate', path: '/search?q=keyboards' },
-  },
-  {
-    patterns: [
-      /\b(show\s*(me\s*)?mice|show\s*(me\s*)?mouse|go\s*to\s*mice)\b/i,
-      /\b(ورين[يى]|عرض|افتح)\b.*(ماوس|فأرة)/i,
-    ],
-    result: { type: 'navigate', path: '/search?q=mice' },
-  },
-
-  // === SEARCH (explicit) ===
-  {
-    patterns: [
-      /\b(search\s*(for)?|find|look\s*(for|up))\s+(.+)/i,
-      /\b(ابحث|دور)\s*(عن|على)\s+(.+)/i,
-    ],
-    result: { type: 'search' }, // query extracted dynamically
-  },
+  // REGISTRY
+  { keywords: ['registry', 'سجل'], path: '/registry' },
 ];
 
+// Category shortcuts — these navigate to search with a query
+const categoryCommands: CommandRule[] = [
+  { keywords: ['laptops', 'laptop', 'لابتوب', 'لاب توب', 'لابتوبات'], path: '/search?q=laptops' },
+  { keywords: ['headphones', 'headphone', 'هيدفون', 'سماعات', 'سماعة', 'سماعه'], path: '/search?q=headphones' },
+  { keywords: ['keyboards', 'keyboard', 'كيبورد', 'لوحة مفاتيح', 'كيبوردات'], path: '/search?q=keyboards' },
+  { keywords: ['mouse', 'mice', 'ماوس', 'فأرة', 'فاره'], path: '/search?q=mice' },
+  { keywords: ['cables', 'cable', 'كابل', 'كابلات', 'سلك'], path: '/search?q=cables' },
+  { keywords: ['hard drive', 'hard disk', 'هارد', 'هارد درايف', 'هارد ديسك'], path: '/search?q=hard+drives' },
+  { keywords: ['monitor', 'monitors', 'شاشة', 'شاشات', 'مونيتور'], path: '/search?q=monitors' },
+  { keywords: ['pc', 'pcs', 'computer', 'كمبيوتر', 'بي سي'], path: '/search?q=PCs' },
+];
+
+function normalize(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[.,!?؟،]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
 export function processVoiceCommand(transcript: string): VoiceCommandResult {
-  const text = transcript.trim();
+  const text = normalize(transcript);
 
-  for (const command of commands) {
-    for (const pattern of command.patterns) {
-      const match = text.match(pattern);
-      if (match) {
-        // Handle search commands — extract the search query
-        if (command.result.type === 'search') {
-          // Get the last capture group as the search query
-          const query = match[match.length - 1]?.trim();
-          if (query) {
-            return {
-              type: 'search',
-              query,
-              path: `/search?q=${encodeURIComponent(query)}`,
-              matched: true,
-            };
-          }
+  // Check explicit search commands first — "search for X" / "ابحث عن X"
+  const searchMatch = text.match(/(?:search\s*(?:for)?|find|look\s*(?:for|up))\s+(.+)/i)
+    || text.match(/(?:ابحث|دور)\s*(?:عن|على)\s+(.+)/i);
+
+  if (searchMatch) {
+    const query = searchMatch[1].trim();
+    return {
+      type: 'search',
+      query,
+      path: `/search?q=${encodeURIComponent(query)}`,
+      matched: true,
+    };
+  }
+
+  // Check navigation commands — look for "go to" prefix patterns first
+  const goToMatch = text.match(/(?:go\s*(?:to)?|open|show|navigate\s*to)\s+(.+)/i)
+    || text.match(/(?:روح|اذهب|فتح|افتح|ورينى|وريني)\s*(?:ل|لل|الى|إلى)?\s*(.+)/i);
+
+  if (goToMatch) {
+    const target = normalize(goToMatch[1]);
+
+    // Try navigation commands
+    for (const cmd of navigationCommands) {
+      for (const keyword of cmd.keywords) {
+        if (target.includes(keyword.toLowerCase())) {
+          return { type: 'navigate', path: cmd.path, matched: true };
         }
+      }
+    }
 
-        return { ...command.result, matched: true };
+    // Try category commands
+    for (const cmd of categoryCommands) {
+      for (const keyword of cmd.keywords) {
+        if (target.includes(keyword.toLowerCase())) {
+          return { type: 'navigate', path: cmd.path, matched: true };
+        }
       }
     }
   }
 
-  // If no command matched, treat it as a search query
+  // Direct keyword matching (without "go to" prefix)
+  for (const cmd of navigationCommands) {
+    for (const keyword of cmd.keywords) {
+      if (text.includes(keyword.toLowerCase())) {
+        return { type: 'navigate', path: cmd.path, matched: true };
+      }
+    }
+  }
+
+  // Category keyword matching
+  for (const cmd of categoryCommands) {
+    for (const keyword of cmd.keywords) {
+      if (text.includes(keyword.toLowerCase())) {
+        return { type: 'navigate', path: cmd.path, matched: true };
+      }
+    }
+  }
+
+  // Fallback — treat as product search
   return {
     type: 'search',
     query: text,
