@@ -261,10 +261,10 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                 {voiceSupported && (
                   <Button
                     onClick={handleVoiceClick}
-                    className={`h-10 px-3 rounded-none border-l border-gray-200 ${
+                    className={`h-10 px-3 rounded-none ${
                       isListening
                         ? 'bg-red-500 hover:bg-red-600 text-white'
-                        : 'bg-white hover:bg-gray-100 text-gray-600'
+                        : 'bg-[#718096] hover:bg-[#4A5568] text-white'
                     }`}
                     title={isListening ? (language === 'ar' ? 'إيقاف' : 'Stop') : (language === 'ar' ? 'بحث بالصوت' : 'Voice search')}
                   >
