@@ -41,8 +41,28 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
       const result = processVoiceCommand(transcript);
       console.log('[Voice] Result:', result);
 
-      if (result.type === 'navigate' && result.path) {
-        setVoiceMessage(`✅ "${transcript}" → navigating...`);
+      // Handle browser actions
+      if (result.action) {
+        switch (result.action) {
+          case 'scrollDown':
+            window.scrollBy({ top: 500, behavior: 'smooth' });
+            setVoiceMessage(`⬇️ Scrolling down`);
+            break;
+          case 'scrollUp':
+            window.scrollBy({ top: -500, behavior: 'smooth' });
+            setVoiceMessage(`⬆️ Scrolling up`);
+            break;
+          case 'goBack':
+            window.history.back();
+            setVoiceMessage(`⬅️ Going back`);
+            break;
+          case 'refresh':
+            setVoiceMessage(`🔄 Refreshing...`);
+            setTimeout(() => window.location.reload(), 500);
+            break;
+        }
+      } else if (result.type === 'navigate' && result.path) {
+        setVoiceMessage(`✅ "${transcript}" → ${result.label || result.path}`);
         navigate(result.path);
       } else if (result.type === 'search') {
         setSearchQuery(result.query || transcript);
