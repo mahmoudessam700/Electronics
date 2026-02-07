@@ -280,7 +280,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
               </div>
               {/* Voice error message */}
               {voiceError && (
-                <p className="text-xs text-red-400 mt-1 px-1">{voiceError}</p>
+                <p className="text-xs text-yellow-300 mt-1 px-1">{voiceError}</p>
               )}
             </div>
 
