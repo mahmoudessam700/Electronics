@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '../../components/ui/button';
-import { Pencil, Loader2, Search, ShieldCheck, ShieldAlert, Shield, Mail, ExternalLink, Plus } from 'lucide-react';
+import { Pencil, Loader2, Search, ShieldCheck, ShieldAlert, Shield, Mail, ExternalLink, Plus, Camera, Upload, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -38,9 +38,17 @@ export function AdminShopsPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [editingShop, setEditingShop] = useState<ShopData | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [statusFilter, setStatusFilter] = useState<string>('ALL');
+    const [isUploading, setIsUploading] = useState(false);
+    const [isAddUploading, setIsAddUploading] = useState(false);
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const cameraInputRef = useRef<HTMLInputElement>(null);
+    const addFileInputRef = useRef<HTMLInputElement>(null);
+    const addCameraInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -48,7 +56,20 @@ export function AdminShopsPage() {
         kycStatus: 'UNVERIFIED' as KycStatus,
         defaultCommissionRate: 0,
         email: '',
-        phone: ''
+        phone: '',
+        logo: '' as string | null,
+    });
+
+    const [addFormData, setAddFormData] = useState({
+        name: '',
+        description: '',
+        email: '',
+        phone: '',
+        address: '',
+        status: 'ACTIVE' as ShopStatus,
+        kycStatus: 'UNVERIFIED' as KycStatus,
+        defaultCommissionRate: 0.1,
+        logo: '' as string | null,
     });
 
     useEffect(() => {
@@ -84,7 +105,8 @@ export function AdminShopsPage() {
             kycStatus: shop.kycStatus,
             defaultCommissionRate: shop.defaultCommissionRate,
             email: shop.email || '',
-            phone: shop.phone || ''
+            phone: shop.phone || '',
+            logo: shop.logo || '',
         });
         setIsDialogOpen(true);
     };
@@ -120,6 +142,115 @@ export function AdminShopsPage() {
         }
     };
 
+    // Upload image helper
+    const uploadImage = async (file: File): Promise<string | null> => {
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', file);
+
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: uploadFormData,
+            });
+            if (!res.ok) throw new Error('Upload failed');
+            const data = await res.json();
+            if (data.success && data.files?.[0]?.url) {
+                return data.files[0].url;
+            }
+        } catch (err) {
+            console.error('Image upload failed', err);
+            toast.error(t('admin.imageUploadFailed') || 'Image upload failed');
+        }
+        return null;
+    };
+
+    // Handle image for Edit dialog
+    const handleEditImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIsUploading(true);
+        const url = await uploadImage(file);
+        if (url) {
+            setFormData(prev => ({ ...prev, logo: url }));
+        }
+        setIsUploading(false);
+        e.target.value = '';
+    };
+
+    // Handle image for Add dialog
+    const handleAddImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIsAddUploading(true);
+        const url = await uploadImage(file);
+        if (url) {
+            setAddFormData(prev => ({ ...prev, logo: url }));
+        }
+        setIsAddUploading(false);
+        e.target.value = '';
+    };
+
+    // Open Add Dialog
+    const handleOpenAdd = () => {
+        setAddFormData({
+            name: '',
+            description: '',
+            email: '',
+            phone: '',
+            address: '',
+            status: 'ACTIVE',
+            kycStatus: 'UNVERIFIED',
+            defaultCommissionRate: 0.1,
+            logo: null,
+        });
+        setIsAddDialogOpen(true);
+    };
+
+    // Submit Add Shop
+    const handleAddShop = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!addFormData.name.trim()) {
+            toast.error(t('admin.shopNameRequired') || 'Shop name is required');
+            return;
+        }
+        setIsSaving(true);
+
+        try {
+            const res = await fetch('/api/shops', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: addFormData.name.trim(),
+                    description: addFormData.description.trim() || null,
+                    email: addFormData.email.trim() || null,
+                    phone: addFormData.phone.trim() || null,
+                    address: addFormData.address.trim() || null,
+                    status: addFormData.status,
+                    kycStatus: addFormData.kycStatus,
+                    defaultCommissionRate: addFormData.defaultCommissionRate,
+                    logo: addFormData.logo || null,
+                }),
+            });
+
+            if (res.ok) {
+                toast.success(t('admin.shopCreatedSuccess') || 'Shop created successfully');
+                fetchShops();
+                setIsAddDialogOpen(false);
+            } else {
+                const data = await res.json();
+                toast.error(data.error || t('admin.failedToCreateShop') || 'Failed to create shop');
+            }
+        } catch (error) {
+            console.error('Failed to create shop', error);
+            toast.error(t('admin.failedToCreateShop') || 'Failed to create shop');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const filteredShops = shops.filter(shop => {
         const matchesSearch = shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             shop.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -137,6 +268,91 @@ export function AdminShopsPage() {
         );
     }
 
+    // Reusable image upload widget
+    const ImageUploadWidget = ({
+        imageUrl,
+        isUploadingState,
+        onFileUpload,
+        onRemove,
+        fileRef,
+        camRef,
+    }: {
+        imageUrl: string | null;
+        isUploadingState: boolean;
+        onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+        onRemove: () => void;
+        fileRef: React.RefObject<HTMLInputElement>;
+        camRef: React.RefObject<HTMLInputElement>;
+    }) => (
+        <div className="space-y-2">
+            <Label className="text-sm font-medium">{t('admin.shopLogo') || 'Shop Logo'}</Label>
+            <div className="flex items-center gap-4">
+                {/* Preview */}
+                <div className="relative w-20 h-20 rounded-xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                    {isUploadingState ? (
+                        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    ) : imageUrl ? (
+                        <>
+                            <img src={imageUrl} alt="Logo" className="w-full h-full object-cover" />
+                            <button
+                                type="button"
+                                onClick={onRemove}
+                                className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                        </>
+                    ) : (
+                        <Upload className="h-6 w-6 text-gray-300" />
+                    )}
+                </div>
+
+                {/* Buttons */}
+                <div className="flex flex-col gap-2">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => fileRef.current?.click()}
+                        disabled={isUploadingState}
+                    >
+                        <Upload className="h-3 w-3 mr-1" />
+                        {t('admin.uploadImage') || 'Upload Image'}
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => camRef.current?.click()}
+                        disabled={isUploadingState}
+                    >
+                        <Camera className="h-3 w-3 mr-1" />
+                        {t('admin.takePhoto') || 'Take Photo'}
+                    </Button>
+                </div>
+
+                {/* Hidden inputs */}
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileRef}
+                    onChange={onFileUpload}
+                    className="hidden"
+                />
+                <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    ref={camRef}
+                    onChange={onFileUpload}
+                    className="hidden"
+                />
+            </div>
+        </div>
+    );
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -146,7 +362,10 @@ export function AdminShopsPage() {
                     </h1>
                     <p className="text-gray-500 mt-1 text-sm">{t('admin.shopsSubtitle')}</p>
                 </div>
-                <Button className="bg-[#4A5568] hover:bg-[#2D3748] text-white">
+                <Button
+                    className="bg-[#4A5568] hover:bg-[#2D3748] text-white"
+                    onClick={handleOpenAdd}
+                >
                     <Plus className="h-4 w-4 mr-2" /> {t('admin.addShop')}
                 </Button>
             </div>
@@ -268,12 +487,33 @@ export function AdminShopsPage() {
                 </div>
             </div>
 
+            {/* Edit Shop Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-xl">{t('admin.editShop')}: {editingShop?.name}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSave} className="space-y-4 py-4">
+                        {/* Logo upload for edit */}
+                        <ImageUploadWidget
+                            imageUrl={formData.logo}
+                            isUploadingState={isUploading}
+                            onFileUpload={handleEditImageUpload}
+                            onRemove={() => setFormData(prev => ({ ...prev, logo: null }))}
+                            fileRef={fileInputRef as React.RefObject<HTMLInputElement>}
+                            camRef={cameraInputRef as React.RefObject<HTMLInputElement>}
+                        />
+
+                        <div className="space-y-2">
+                            <Label htmlFor="edit-name" className="text-sm font-medium">{t('admin.shopName') || 'Shop Name'}</Label>
+                            <Input
+                                id="edit-name"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                className="rounded-lg"
+                            />
+                        </div>
+
                         <div className="space-y-2">
                             <Label htmlFor="shop-status" className="text-sm font-medium">{t('admin.shopStatus')}</Label>
                             <select
@@ -333,6 +573,131 @@ export function AdminShopsPage() {
                             >
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {t('admin.saveChanges')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Add Shop Dialog */}
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl">{t('admin.addShop')}</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleAddShop} className="space-y-4 py-4">
+                        {/* Logo upload */}
+                        <ImageUploadWidget
+                            imageUrl={addFormData.logo}
+                            isUploadingState={isAddUploading}
+                            onFileUpload={handleAddImageUpload}
+                            onRemove={() => setAddFormData(prev => ({ ...prev, logo: null }))}
+                            fileRef={addFileInputRef as React.RefObject<HTMLInputElement>}
+                            camRef={addCameraInputRef as React.RefObject<HTMLInputElement>}
+                        />
+
+                        <div className="space-y-2">
+                            <Label htmlFor="add-name" className="text-sm font-medium">
+                                {t('admin.shopName') || 'Shop Name'} <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="add-name"
+                                value={addFormData.name}
+                                onChange={(e) => setAddFormData({ ...addFormData, name: e.target.value })}
+                                placeholder={t('admin.shopNamePlaceholder') || 'Enter shop name'}
+                                className="rounded-lg"
+                                required
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="add-desc" className="text-sm font-medium">{t('admin.description') || 'Description'}</Label>
+                            <textarea
+                                id="add-desc"
+                                value={addFormData.description}
+                                onChange={(e) => setAddFormData({ ...addFormData, description: e.target.value })}
+                                placeholder={t('admin.shopDescPlaceholder') || 'Describe the shop...'}
+                                rows={3}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none outline-none focus:ring-2 focus:ring-[#4A5568]/20 focus:border-[#4A5568]"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="add-email" className="text-sm font-medium">{t('admin.contactEmail')}</Label>
+                                <Input
+                                    id="add-email"
+                                    type="email"
+                                    value={addFormData.email}
+                                    onChange={(e) => setAddFormData({ ...addFormData, email: e.target.value })}
+                                    placeholder="shop@example.com"
+                                    className="rounded-lg"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="add-phone" className="text-sm font-medium">{t('admin.contactPhone')}</Label>
+                                <Input
+                                    id="add-phone"
+                                    type="tel"
+                                    value={addFormData.phone}
+                                    onChange={(e) => setAddFormData({ ...addFormData, phone: e.target.value })}
+                                    placeholder="+20 1xx xxxx xxx"
+                                    className="rounded-lg"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="add-address" className="text-sm font-medium">{t('admin.address') || 'Address'}</Label>
+                            <Input
+                                id="add-address"
+                                value={addFormData.address}
+                                onChange={(e) => setAddFormData({ ...addFormData, address: e.target.value })}
+                                placeholder={t('admin.addressPlaceholder') || 'Shop address'}
+                                className="rounded-lg"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="add-status" className="text-sm font-medium">{t('admin.shopStatus')}</Label>
+                                <select
+                                    id="add-status"
+                                    className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"
+                                    value={addFormData.status}
+                                    onChange={(e) => setAddFormData({ ...addFormData, status: e.target.value as ShopStatus })}
+                                >
+                                    <option value="PENDING">{t('admin.pendingApproval')}</option>
+                                    <option value="ACTIVE">{t('admin.activeLive')}</option>
+                                    <option value="SUSPENDED">{t('admin.suspendedHidden')}</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="add-commission" className="text-sm font-medium">{t('admin.commissionRateLabel')}</Label>
+                                <Input
+                                    id="add-commission"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    max="1"
+                                    value={addFormData.defaultCommissionRate}
+                                    onChange={(e) => setAddFormData({ ...addFormData, defaultCommissionRate: parseFloat(e.target.value) || 0 })}
+                                    className="rounded-lg"
+                                />
+                            </div>
+                        </div>
+
+                        <DialogFooter className="pt-4">
+                            <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                                {t('admin.cancel')}
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={isSaving || isAddUploading}
+                                className="bg-[#4A5568] hover:bg-[#2D3748] text-white"
+                            >
+                                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {t('admin.addShop')}
                             </Button>
                         </DialogFooter>
                     </form>
