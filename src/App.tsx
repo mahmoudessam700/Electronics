@@ -44,6 +44,7 @@ import { AdminPageContentSettings } from './pages/admin/AdminPageContentSettings
 import { AdminShopPayoutsPage } from './pages/admin/AdminShopPayoutsPage';
 import { ShopDashboard } from './pages/shop/ShopDashboard';
 import { ShopProductsPage } from './pages/shop/ShopProductsPage';
+import { ShopCategoriesPage } from './pages/shop/ShopCategoriesPage';
 import { ShopOrdersPage } from './pages/shop/ShopOrdersPage';
 import { ShopTeamPage } from './pages/shop/ShopTeamPage';
 import { ShopPayoutsPage } from './pages/shop/ShopPayoutsPage';
@@ -114,9 +115,9 @@ function AppContent() {
 
   const handleAddToCart = async (product: Product, quantity: number) => {
     const existingItem = cartItems.find(item => item.product.id === product.id);
-    
+
     await addToCart(product, quantity);
-    
+
     if (existingItem) {
       toast.success(`Updated ${product.name} quantity in cart`, {
         duration: 3000,
@@ -256,6 +257,7 @@ function AppContent() {
         {/* Shop Owner Routes */}
         <Route path="/shop" element={<ShopLayout />}>
           <Route index element={<ShopDashboard />} />
+          <Route path="categories" element={<ShopCategoriesPage />} />
           <Route path="products" element={<ShopProductsPage />} />
           <Route path="orders" element={<ShopOrdersPage />} />
           <Route path="team" element={<ShopTeamPage />} />
@@ -373,9 +375,9 @@ function AppContent() {
 
             <div className="border-t border-[#4A5568] pt-8 text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <a 
-                  href="https://adsolutions-eg.com" 
-                  target="_blank" 
+                <a
+                  href="https://adsolutions-eg.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-2xl font-bold hover:opacity-80 transition-opacity"
                 >

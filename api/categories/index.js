@@ -3,6 +3,24 @@ const { getPool, withTransaction } = require('../_utils/db');
 
 const pool = getPool();
 
+// Auto-migration: add shopId column if missing
+let migrationRan = false;
+const ensureShopIdColumn = async () => {
+    if (migrationRan) return;
+    migrationRan = true;
+    try {
+        const [cols] = await pool.execute(
+            `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Category' AND COLUMN_NAME = 'shopId'`
+        );
+        if (cols.length === 0) {
+            await pool.execute(`ALTER TABLE Category ADD COLUMN shopId VARCHAR(191) NULL`);
+            console.log('Migration: Added shopId column to Category table');
+        }
+    } catch (err) {
+        console.error('Migration check failed:', err.message);
+    }
+};
+
 module.exports = async (req, res) => {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,9 +29,11 @@ module.exports = async (req, res) => {
 
     if (req.method === 'OPTIONS') return res.status(200).end();
 
+    await ensureShopIdColumn();
+
     try {
         if (req.method === 'GET') {
-            const { id, parentId } = req.query;
+            const { id, parentId, shopId } = req.query;
 
             // Single category detail
             if (id) {
@@ -30,6 +50,22 @@ module.exports = async (req, res) => {
                 rows[0].products = products;
 
                 return res.json(rows[0]);
+            }
+
+            // If shopId is provided, return categories for that shop
+            if (shopId) {
+                const [rows] = await pool.execute(`
+                    SELECT c.*, 
+                           (SELECT COUNT(*) FROM Product p WHERE p.categoryId = c.id) as product_count
+                    FROM Category c
+                    WHERE c.shopId = ?
+                    ORDER BY c.sortOrder ASC
+                `, [shopId]);
+
+                return res.json(rows.map(c => ({
+                    ...c,
+                    _count: { products: Number(c.product_count) }
+                })));
             }
 
             // List categories with tree support
@@ -72,16 +108,16 @@ module.exports = async (req, res) => {
         }
 
         if (req.method === 'POST') {
-            const { name, nameEn, nameAr, description, image, parentId, sortOrder } = req.body;
+            const { name, nameEn, nameAr, description, image, parentId, sortOrder, shopId } = req.body;
             if (!name) return res.status(400).json({ error: 'Name is required' });
 
             const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             const id = `cat_${Date.now()}`;
 
             await pool.execute(`
-                INSERT INTO Category (id, name, nameEn, nameAr, slug, description, image, parentId, sortOrder, updatedAt)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
-            `, [id, name, nameEn || name, nameAr || null, slug, description || null, image || null, parentId || null, sortOrder || 0]);
+                INSERT INTO Category (id, name, nameEn, nameAr, slug, description, image, parentId, sortOrder, shopId, updatedAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            `, [id, name, nameEn || name, nameAr || null, slug, description || null, image || null, parentId || null, sortOrder || 0, shopId || null]);
 
             const [rows] = await pool.execute('SELECT * FROM Category WHERE id = ?', [id]);
             return res.status(201).json(rows[0]);
@@ -89,7 +125,7 @@ module.exports = async (req, res) => {
 
         if (req.method === 'PUT') {
             const { id } = req.query;
-            const { name, nameEn, nameAr, description, image, parentId, sortOrder, categories: batchUpdates } = req.body;
+            const { name, nameEn, nameAr, description, image, parentId, sortOrder, shopId, categories: batchUpdates } = req.body;
 
             // Batch update for reordering
             if (batchUpdates && Array.isArray(batchUpdates)) {

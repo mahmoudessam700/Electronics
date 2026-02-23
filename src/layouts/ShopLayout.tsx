@@ -2,7 +2,7 @@ import { Outlet, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMemo } from 'react';
-import { Store, Package, LogOut, Home, ChevronDown, CreditCard, Wallet, Settings } from 'lucide-react';
+import { Store, Package, LogOut, Home, ChevronDown, CreditCard, Wallet, Settings, Users, FolderOpen } from 'lucide-react';
 
 export function ShopLayout() {
     const { user, loading, shopMemberships, activeShopId, selectActiveShop, activeShop, logout } = useAuth();
@@ -12,6 +12,7 @@ export function ShopLayout() {
 
     const navItems = useMemo(() => ([
         { name: 'Overview', path: '/shop', icon: Store },
+        { name: 'Categories', path: '/shop/categories', icon: FolderOpen },
         { name: 'Products', path: '/shop/products', icon: Package },
         { name: 'Orders', path: '/shop/orders', icon: CreditCard },
         { name: 'Team', path: '/shop/team', icon: Users },
@@ -95,9 +96,8 @@ export function ShopLayout() {
                                 <button
                                     key={item.path}
                                     onClick={() => navigate(item.path)}
-                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                                        isActive ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600 hover:bg-slate-50'
-                                    }`}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600 hover:bg-slate-50'
+                                        }`}
                                 >
                                     <Icon className="h-4 w-4" />
                                     <span>{item.name}</span>

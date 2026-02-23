@@ -29,6 +29,7 @@ export function ShopProductsPage() {
     const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
     const [selectedProduct, setSelectedProduct] = useState<ShopProduct | null>(null);
     const [saving, setSaving] = useState(false);
+    const [shopCategories, setShopCategories] = useState<{ id: string; name: string }[]>([]);
 
     const fetchProducts = async () => {
         if (!activeShop) return;
@@ -52,8 +53,22 @@ export function ShopProductsPage() {
 
     useEffect(() => {
         fetchProducts();
+        fetchShopCategories();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeShop?.id]);
+
+    const fetchShopCategories = async () => {
+        if (!activeShop) return;
+        try {
+            const res = await fetch(`/api/categories?shopId=${activeShop.id}`);
+            if (res.ok) {
+                const data = await res.json();
+                setShopCategories(data.map((c: any) => ({ id: c.id, name: c.name })));
+            }
+        } catch (err) {
+            console.error('Failed to fetch shop categories', err);
+        }
+    };
 
     const handleCreate = () => {
         setSelectedProduct(null);
@@ -102,6 +117,7 @@ export function ShopProductsPage() {
             : '',
         tracksInventory: selectedProduct?.tracksInventory ?? false,
         inventoryQuantity: selectedProduct?.inventoryQuantity?.toString() || '0',
+        categoryId: (selectedProduct as any)?.categoryId || '',
     }), [selectedProduct]);
 
     const handleSubmit = async (values: ShopProductFormValues) => {
@@ -135,6 +151,7 @@ export function ShopProductsPage() {
             shopId: activeShop.id,
             tracksInventory: values.tracksInventory,
             inventoryQuantity: Number(values.inventoryQuantity) || 0,
+            categoryId: values.categoryId || null,
         };
 
         const url = formMode === 'edit' && selectedProduct ? `/api/products?id=${selectedProduct.id}` : '/api/products';
@@ -178,126 +195,125 @@ export function ShopProductsPage() {
     return (
         <>
             <div className="space-y-6">
-            <div className="flex flex-wrap items-center gap-4 justify-between">
-                <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-emerald-500 font-semibold">Catalog</p>
-                    <h1 className="text-2xl font-bold text-slate-900">Products for {activeShop.name}</h1>
+                <div className="flex flex-wrap items-center gap-4 justify-between">
+                    <div>
+                        <p className="text-xs uppercase tracking-[0.2em] text-emerald-500 font-semibold">Catalog</p>
+                        <h1 className="text-2xl font-bold text-slate-900">Products for {activeShop.name}</h1>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="outline"
+                            onClick={fetchProducts}
+                            className="border-slate-200 text-slate-600 hover:bg-slate-50"
+                        >
+                            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                            Refresh
+                        </Button>
+                        <Button onClick={handleCreate} className="bg-emerald-600 hover:bg-emerald-500 text-white">
+                            <Plus className="h-4 w-4" />
+                            Add Product
+                        </Button>
+                    </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="outline"
-                        onClick={fetchProducts}
-                        className="border-slate-200 text-slate-600 hover:bg-slate-50"
-                    >
-                        <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                        Refresh
-                    </Button>
-                    <Button onClick={handleCreate} className="bg-emerald-600 hover:bg-emerald-500 text-white">
-                        <Plus className="h-4 w-4" />
-                        Add Product
-                    </Button>
-                </div>
-            </div>
 
-            {error && (
-                <div className="rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm px-4 py-3">
-                    {error}
-                </div>
-            )}
+                {error && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm px-4 py-3">
+                        {error}
+                    </div>
+                )}
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-100 text-sm">
-                    <thead>
-                        <tr className="text-left text-slate-500 uppercase text-xs tracking-widest">
-                            <th className="px-4 py-3">Product</th>
-                            <th className="px-4 py-3">Base Price</th>
-                            <th className="px-4 py-3">Commission</th>
-                            <th className="px-4 py-3">Display Price</th>
-                            <th className="px-4 py-3">Stock</th>
-                            <th className="px-4 py-3 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        {products.map((product) => {
-                            const basePrice = product.price ?? 0;
-                            const commissionRate = product.commissionRateApplied ?? 0;
-                            const commissionValue = product.commissionAmount ?? 0;
-                            const displayPrice = product.displayPrice ?? basePrice;
-                            return (
-                                <tr key={product.id} className="hover:bg-slate-50">
-                                <td className="px-4 py-4">
-                                    <div className="flex items-center gap-3">
-                                        {product.image && (
-                                            <img
-                                                src={product.image}
-                                                alt={product.name}
-                                                className="w-12 h-12 rounded-lg object-cover border"
-                                            />
-                                        )}
-                                        <div>
-                                            <p className="font-semibold text-slate-900">{product.name}</p>
-                                            <p className="text-xs text-slate-400">#{product.id.slice(-6)}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-4 py-4">E£ {basePrice.toFixed(2)}</td>
-                                <td className="px-4 py-4">
-                                    {commissionRate.toFixed(2)}%
-                                    <span className="text-xs text-slate-400 block">
-                                        E£ {commissionValue.toFixed(2)}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-4 font-semibold text-emerald-600">
-                                    E£ {displayPrice.toFixed(2)}
-                                </td>
-                                <td className="px-4 py-4">
-                                    <div className="flex flex-col gap-1">
-                                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold w-fit ${
-                                            product.inStock ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
-                                        }`}>
-                                            {product.inStock ? 'In Stock' : 'Out of Stock'}
-                                        </span>
-                                        {product.tracksInventory && (
-                                            <span className="text-xs text-slate-500 ml-1">
-                                                Qty: <span className="font-bold text-slate-700">{product.inventoryQuantity}</span>
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-100 text-sm">
+                        <thead>
+                            <tr className="text-left text-slate-500 uppercase text-xs tracking-widest">
+                                <th className="px-4 py-3">Product</th>
+                                <th className="px-4 py-3">Base Price</th>
+                                <th className="px-4 py-3">Commission</th>
+                                <th className="px-4 py-3">Display Price</th>
+                                <th className="px-4 py-3">Stock</th>
+                                <th className="px-4 py-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {products.map((product) => {
+                                const basePrice = product.price ?? 0;
+                                const commissionRate = product.commissionRateApplied ?? 0;
+                                const commissionValue = product.commissionAmount ?? 0;
+                                const displayPrice = product.displayPrice ?? basePrice;
+                                return (
+                                    <tr key={product.id} className="hover:bg-slate-50">
+                                        <td className="px-4 py-4">
+                                            <div className="flex items-center gap-3">
+                                                {product.image && (
+                                                    <img
+                                                        src={product.image}
+                                                        alt={product.name}
+                                                        className="w-12 h-12 rounded-lg object-cover border"
+                                                    />
+                                                )}
+                                                <div>
+                                                    <p className="font-semibold text-slate-900">{product.name}</p>
+                                                    <p className="text-xs text-slate-400">#{product.id.slice(-6)}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4">E£ {basePrice.toFixed(2)}</td>
+                                        <td className="px-4 py-4">
+                                            {commissionRate.toFixed(2)}%
+                                            <span className="text-xs text-slate-400 block">
+                                                E£ {commissionValue.toFixed(2)}
                                             </span>
-                                        )}
-                                    </div>
-                                </td>
-                                <td className="px-4 py-4">
-                                    <div className="flex justify-end gap-1">
-                                        <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            className="h-8 w-8 rounded-lg text-slate-500 hover:text-slate-800"
-                                            onClick={() => handleEdit(product)}
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            className="h-8 w-8 rounded-lg text-red-500 hover:text-red-700"
-                                            onClick={() => handleDelete(product)}
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </td>
-                            </tr>
-                            );
-                        })}
-                        {products.length === 0 && !loading && (
-                            <tr>
-                                <td colSpan={6} className="text-center py-10 text-slate-500">
-                                    No products found for this shop yet.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                                        </td>
+                                        <td className="px-4 py-4 font-semibold text-emerald-600">
+                                            E£ {displayPrice.toFixed(2)}
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="flex flex-col gap-1">
+                                                <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold w-fit ${product.inStock ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+                                                    }`}>
+                                                    {product.inStock ? 'In Stock' : 'Out of Stock'}
+                                                </span>
+                                                {product.tracksInventory && (
+                                                    <span className="text-xs text-slate-500 ml-1">
+                                                        Qty: <span className="font-bold text-slate-700">{product.inventoryQuantity}</span>
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="flex justify-end gap-1">
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="h-8 w-8 rounded-lg text-slate-500 hover:text-slate-800"
+                                                    onClick={() => handleEdit(product)}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="h-8 w-8 rounded-lg text-red-500 hover:text-red-700"
+                                                    onClick={() => handleDelete(product)}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                            {products.length === 0 && !loading && (
+                                <tr>
+                                    <td colSpan={6} className="text-center py-10 text-slate-500">
+                                        No products found for this shop yet.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
             <ShopProductFormModal
                 open={formOpen}
@@ -311,6 +327,7 @@ export function ShopProductsPage() {
                 initialValues={initialFormValues}
                 onSubmit={handleSubmit}
                 loading={saving}
+                categories={shopCategories}
             />
         </>
     );

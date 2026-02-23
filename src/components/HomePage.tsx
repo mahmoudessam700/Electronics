@@ -12,11 +12,14 @@ interface Shop {
   productCount: number;
 }
 
-interface CategoryGroup {
+interface ShopCategory {
+  id: string;
   name: string;
-  categoryId: string | null;
-  image: string | null;
-  productCount: number;
+  nameEn?: string;
+  nameAr?: string;
+  description?: string | null;
+  image?: string | null;
+  _count?: { products: number };
 }
 
 interface HomePageProps {
@@ -26,14 +29,14 @@ interface HomePageProps {
 type ViewState =
   | { type: 'shops' }
   | { type: 'categories'; shop: Shop }
-  | { type: 'products'; shop: Shop; category: CategoryGroup };
+  | { type: 'products'; shop: Shop; category: ShopCategory };
 
 export function HomePage({ onNavigate }: HomePageProps) {
   const { t, isRTL } = useLanguage();
 
   const [viewState, setViewState] = useState<ViewState>({ type: 'shops' });
   const [shops, setShops] = useState<Shop[]>([]);
-  const [categories, setCategories] = useState<CategoryGroup[]>([]);
+  const [categories, setCategories] = useState<ShopCategory[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,51 +63,28 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const handleShopClick = async (shop: Shop) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/products?shopId=${shop.id}`);
+      // Fetch real categories for this shop
+      const res = await fetch(`/api/categories?shopId=${shop.id}`);
       if (res.ok) {
-        const allProducts: any[] = await res.json();
-
-        // Group products by category
-        const catMap = new Map<string, CategoryGroup>();
-        for (const product of allProducts) {
-          const catName = product.category || 'Other';
-          const catId = product.categoryId || null;
-          if (!catMap.has(catName)) {
-            catMap.set(catName, {
-              name: catName,
-              categoryId: catId,
-              image: product.image || null,
-              productCount: 0,
-            });
-          }
-          const group = catMap.get(catName)!;
-          group.productCount++;
-          // Use first product image as category image
-          if (!group.image && product.image) {
-            group.image = product.image;
-          }
-        }
-
-        setCategories(Array.from(catMap.values()));
+        const data: ShopCategory[] = await res.json();
+        setCategories(data);
         setViewState({ type: 'categories', shop });
       }
     } catch (err) {
-      console.error('Failed to fetch shop products:', err);
+      console.error('Failed to fetch shop categories:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCategoryClick = async (shop: Shop, category: CategoryGroup) => {
+  const handleCategoryClick = async (shop: Shop, category: ShopCategory) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/products?shopId=${shop.id}`);
+      // Fetch products for this shop filtered by category
+      const res = await fetch(`/api/products?shopId=${shop.id}&categoryId=${category.id}`);
       if (res.ok) {
-        const allProducts: Product[] = await res.json();
-        const filtered = allProducts.filter(
-          (p: any) => (p.category || 'Other') === category.name
-        );
-        setProducts(filtered);
+        const data: Product[] = await res.json();
+        setProducts(data);
         setViewState({ type: 'products', shop, category });
       }
     } catch (err) {
@@ -348,7 +328,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
               }}>
                 {categories.map((cat) => (
                   <div
-                    key={cat.name}
+                    key={cat.id}
                     onClick={() => handleCategoryClick(viewState.shop, cat)}
                     style={{
                       backgroundColor: '#ffffff',
@@ -390,7 +370,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                         {cat.name}
                       </h4>
                       <p style={{ fontSize: 13, color: '#6b7280', marginTop: 6, margin: '6px 0 0' }}>
-                        {cat.productCount} {t('home.products')}
+                        {cat._count?.products || 0} {t('home.products')}
                       </p>
                     </div>
                   </div>

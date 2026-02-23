@@ -14,6 +14,12 @@ export interface ShopProductFormValues {
     commissionRate: string;
     tracksInventory: boolean;
     inventoryQuantity: string;
+    categoryId: string;
+}
+
+interface CategoryOption {
+    id: string;
+    name: string;
 }
 
 interface ShopProductFormModalProps {
@@ -23,6 +29,7 @@ interface ShopProductFormModalProps {
     onSubmit: (values: ShopProductFormValues) => Promise<void>;
     initialValues?: Partial<ShopProductFormValues>;
     loading?: boolean;
+    categories?: CategoryOption[];
 }
 
 const defaultValues: ShopProductFormValues = {
@@ -34,6 +41,7 @@ const defaultValues: ShopProductFormValues = {
     commissionRate: '',
     tracksInventory: false,
     inventoryQuantity: '0',
+    categoryId: '',
 };
 
 export function ShopProductFormModal({
@@ -43,6 +51,7 @@ export function ShopProductFormModal({
     onSubmit,
     initialValues,
     loading = false,
+    categories = [],
 }: ShopProductFormModalProps) {
     const mergedDefaults = useMemo(() => ({
         ...defaultValues,
@@ -117,6 +126,24 @@ export function ShopProductFormModal({
                             />
                         </div>
                     </div>
+
+                    {/* Category Selector */}
+                    {categories.length > 0 && (
+                        <div className="space-y-2">
+                            <Label htmlFor="product-category">{t('home.categories') || 'Category'}</Label>
+                            <select
+                                id="product-category"
+                                className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200"
+                                value={formValues.categoryId}
+                                onChange={(event) => handleChange('categoryId', event.target.value)}
+                            >
+                                <option value="">{t('admin.selectCategory') || 'Select a category...'}</option>
+                                {categories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
                     <div className="space-y-2">
                         <Label htmlFor="product-image">{t('admin.productImage')} *</Label>
