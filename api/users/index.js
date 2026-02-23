@@ -112,7 +112,7 @@ module.exports = async (req, res) => {
             }
 
             const [newUser] = await pool.execute('SELECT id, email, name, phone, address, role, createdAt FROM User WHERE id = ?', [userId]);
-            
+
             return res.status(201).json({
                 user: newUser[0],
                 shop: shopId ? { id: shopId, name: shopName, slug: shopSlug } : null
@@ -141,7 +141,15 @@ module.exports = async (req, res) => {
                     longitude = COALESCE(?, longitude),
                     updatedAt = NOW()
                 WHERE id = ?
-            `, [name, phone, address, role, latitude, longitude, id]);
+            `, [
+                name || null,
+                phone || null,
+                address || null,
+                role || null,
+                latitude != null ? latitude : null,
+                longitude != null ? longitude : null,
+                id
+            ]);
 
             const [rows] = await pool.execute('SELECT id, email, name, phone, address, latitude, longitude, role FROM User WHERE id = ?', [id]);
             if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
@@ -166,6 +174,17 @@ module.exports = async (req, res) => {
             const { id } = req.query;
             if (!id) return res.status(400).json({ error: 'User ID is required' });
 
+            // Remove foreign key references before deleting
+            await pool.execute('DELETE FROM ReviewLog WHERE adminId = ?', [id]);
+            await pool.execute('DELETE FROM ReviewLog WHERE reviewId IN (SELECT id FROM Review WHERE userId = ?)', [id]);
+            await pool.execute('DELETE FROM Review WHERE userId = ?', [id]);
+            await pool.execute('DELETE FROM Wishlist WHERE userId = ?', [id]);
+            await pool.execute('DELETE FROM CartItem WHERE userId = ?', [id]);
+            await pool.execute('DELETE FROM OrderLog WHERE userId = ?', [id]);
+            await pool.execute('UPDATE `Order` SET userId = NULL WHERE userId = ?', [id]);
+            await pool.execute('DELETE FROM ShopMember WHERE userId = ?', [id]);
+            await pool.execute('UPDATE Shop SET ownerId = NULL WHERE ownerId = ?', [id]);
+            await pool.execute('UPDATE ShopInvitation SET invitedById = NULL WHERE invitedById = ?', [id]);
             await pool.execute('DELETE FROM User WHERE id = ?', [id]);
             return res.status(204).end();
         }

@@ -45,7 +45,7 @@ const handleReviews = async (req, res) => {
         `;
         const params = [];
         const conditions = [];
-        
+
         if (productId) {
             conditions.push(`r.productId = ?`);
             params.push(productId);
@@ -54,11 +54,11 @@ const handleReviews = async (req, res) => {
             conditions.push(`r.status = ?`);
             params.push(status);
         }
-        
+
         if (conditions.length) {
             query += ' WHERE ' + conditions.join(' AND ');
         }
-        
+
         query += ' ORDER BY r.createdAt DESC';
         const [rows] = await pool.execute(query, params);
         return res.json(rows);
@@ -67,7 +67,7 @@ const handleReviews = async (req, res) => {
     if (req.method === 'POST') {
         const user = await requireAuth(req);
         const { rating, comment, productId } = req.body || {};
-        
+
         if (!rating || !productId) {
             throw createError(400, 'Rating and Product ID are required');
         }
@@ -91,7 +91,7 @@ const handleReviews = async (req, res) => {
 
         const { id } = req.query;
         const { status, reason } = req.body || {};
-        
+
         if (!id || !status) {
             throw createError(400, 'Review ID and status are required');
         }
@@ -123,14 +123,15 @@ const handleReviews = async (req, res) => {
     if (req.method === 'DELETE') {
         const user = await requireAuth(req);
         const { id } = req.query;
-        
+
         const [existing] = await pool.execute('SELECT userId FROM Review WHERE id = ?', [id]);
         if (!existing.length) throw createError(404, 'Review not found');
-        
+
         if (user.role !== 'ADMIN' && existing[0].userId !== user.id) {
             throw createError(403, 'Unauthorized');
         }
 
+        await pool.execute('DELETE FROM ReviewLog WHERE reviewId = ?', [id]);
         await pool.execute('DELETE FROM Review WHERE id = ?', [id]);
         return res.status(204).end();
     }
@@ -369,23 +370,23 @@ module.exports = async (req, res) => {
                     updatedAt = NOW()
                 WHERE id = ?
             `, [
-                name,
-                nameEn,
-                nameAr,
-                price,
-                costPrice,
-                originalPrice,
-                description,
-                descriptionAr,
-                category,
-                categoryId,
-                supplierId,
-                image,
-                inStock,
-                hasCommissionRate,
+                name || null,
+                nameEn || null,
+                nameAr || null,
+                price != null ? price : null,
+                costPrice != null ? costPrice : null,
+                originalPrice != null ? originalPrice : null,
+                description || null,
+                descriptionAr || null,
+                category || null,
+                categoryId || null,
+                supplierId || null,
+                image || null,
+                inStock != null ? inStock : null,
+                hasCommissionRate ? true : false,
                 commissionRateValue,
-                tracksInventory,
-                inventoryQuantity,
+                tracksInventory != null ? tracksInventory : null,
+                inventoryQuantity != null ? inventoryQuantity : null,
                 id,
             ]);
 
@@ -407,6 +408,13 @@ module.exports = async (req, res) => {
                 throw createError(403, 'Only admins can delete unassigned products');
             }
 
+            // Remove foreign key references before deleting
+            await pool.execute('DELETE FROM ReviewLog WHERE reviewId IN (SELECT id FROM Review WHERE productId = ?)', [id]);
+            await pool.execute('DELETE FROM Review WHERE productId = ?', [id]);
+            await pool.execute('DELETE FROM Wishlist WHERE productId = ?', [id]);
+            await pool.execute('DELETE FROM CartItem WHERE productId = ?', [id]);
+            await pool.execute('UPDATE ShopCommissionLedger SET productId = NULL WHERE productId = ?', [id]);
+            await pool.execute('DELETE FROM OrderItem WHERE productId = ?', [id]);
             await pool.execute('DELETE FROM Product WHERE id = ?', [id]);
             return res.status(204).end();
         }
