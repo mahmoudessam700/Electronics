@@ -143,6 +143,9 @@ module.exports = async (req, res) => {
             const { id } = req.query;
             if (!id) return res.status(400).json({ error: 'ID is required' });
 
+            // Remove foreign key references before deleting
+            await pool.execute('UPDATE Product SET categoryId = NULL WHERE categoryId = ?', [id]);
+            await pool.execute('UPDATE Category SET parentId = NULL WHERE parentId = ?', [id]);
             await pool.execute('DELETE FROM Category WHERE id = ?', [id]);
             return res.status(204).end();
         }
