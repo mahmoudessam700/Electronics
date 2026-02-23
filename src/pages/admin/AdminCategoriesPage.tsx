@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, Folder, Loader2, Layers, Search, Image as ImageIcon, Camera } from 'lucide-react';
+import { Plus, Pencil, Trash2, Folder, Loader2, Search, Image as ImageIcon, Camera } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -36,17 +36,7 @@ interface Category {
     _count?: { products: number };
 }
 
-// Allowed categories - only these can be created
-const ALLOWED_CATEGORIES = [
-    'PCs',
-    'Laptops',
-    'Mice',
-    'Keyboards',
-    'Headphones',
-    'Cables',
-    'Mouse Pads',
-    'Hard Drives'
-];
+
 
 // Map category names to translation keys
 const CATEGORY_TRANSLATION_KEYS: Record<string, string> = {
@@ -70,7 +60,7 @@ const CATEGORY_TRANSLATION_KEYS: Record<string, string> = {
 
 export function AdminCategoriesPage() {
     const { t, isRTL, language } = useLanguage();
-    
+
     // Helper to get translated category name - uses database values if available, falls back to translation keys
     const getCategoryName = (category: Category | string): string => {
         if (typeof category === 'string') {
@@ -89,7 +79,7 @@ export function AdminCategoriesPage() {
         const key = CATEGORY_TRANSLATION_KEYS[category.name] || CATEGORY_TRANSLATION_KEYS[category.name.toLowerCase()];
         return key ? t(key) : category.name;
     };
-    
+
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -195,11 +185,7 @@ export function AdminCategoriesPage() {
             return;
         }
 
-        // Check if the category name is allowed
-        if (!editingCategory && !ALLOWED_CATEGORIES.some(c => c.toLowerCase() === formData.name.trim().toLowerCase())) {
-            toast.error(`Only these categories are allowed: ${ALLOWED_CATEGORIES.join(', ')}`);
-            return;
-        }
+
 
         setSaving(true);
         try {
@@ -273,7 +259,7 @@ export function AdminCategoriesPage() {
                     </h1>
                     <p className="text-gray-500 mt-1 text-sm">{t('admin.totalProducts')}: {categories.length}</p>
                 </div>
-                <Button 
+                <Button
                     onClick={() => openAddForm()}
                     className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                 >
@@ -295,20 +281,7 @@ export function AdminCategoriesPage() {
                 </div>
             </div>
 
-            {/* Allowed Categories Info */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                    <div className="p-2 bg-amber-100 rounded-lg">
-                        <Layers className="h-5 w-5 text-amber-600" />
-                    </div>
-                    <div>
-                        <p className="font-medium text-gray-900">{t('admin.availableCategories')}</p>
-                        <p className="text-sm text-gray-600 mt-1">
-                            {ALLOWED_CATEGORIES.map(cat => getCategoryName(cat)).join(' • ')}
-                        </p>
-                    </div>
-                </div>
-            </div>
+
 
             {/* Categories Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -355,10 +328,10 @@ export function AdminCategoriesPage() {
                                         <div className="flex items-center gap-3">
                                             <div className="relative">
                                                 {category.image ? (
-                                                    <img 
-                                                        src={category.image} 
-                                                        alt={getCategoryName(category)} 
-                                                        className="h-10 w-10 md:h-12 md:w-12 object-cover rounded-lg border border-gray-200" 
+                                                    <img
+                                                        src={category.image}
+                                                        alt={getCategoryName(category)}
+                                                        className="h-10 w-10 md:h-12 md:w-12 object-cover rounded-lg border border-gray-200"
                                                     />
                                                 ) : (
                                                     <div className="h-10 w-10 md:h-12 md:w-12 rounded-lg bg-[#4A5568] flex items-center justify-center">
@@ -378,28 +351,27 @@ export function AdminCategoriesPage() {
                                         </span>
                                     </td>
                                     <td className="py-3 px-4">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                                            (category._count?.products || 0) > 0 
-                                                ? 'bg-emerald-100 text-emerald-700'
-                                                : 'bg-gray-100 text-gray-500'
-                                        }`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${(category._count?.products || 0) > 0
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-gray-100 text-gray-500'
+                                            }`}>
                                             {category._count?.products || 0} {t('admin.products')}
                                         </span>
                                     </td>
                                     <td className="py-3 px-4">
                                         <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} gap-1`}>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 className="h-8 w-8 rounded-lg hover:bg-gray-100"
                                                 onClick={() => openEditForm(category)}
                                             >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
-                                                className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-50" 
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-50"
                                                 onClick={() => openDeleteConfirm(category)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -422,7 +394,7 @@ export function AdminCategoriesPage() {
                             {searchQuery ? t('admin.tryAdjustingSearch') : t('admin.getStartedCategories')}
                         </p>
                         {!searchQuery && (
-                            <Button 
+                            <Button
                                 onClick={() => openAddForm()}
                                 className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
                             >
@@ -445,27 +417,13 @@ export function AdminCategoriesPage() {
                     <div className="space-y-5 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="name" className="text-sm font-medium">{t('admin.categoryNameRequired')}</Label>
-                            {editingCategory ? (
-                                <Input
-                                    id="name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder={t('admin.category')}
-                                    className="rounded-xl"
-                                />
-                            ) : (
-                                <select
-                                    id="name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className={`w-full h-11 px-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors ${isRTL ? 'text-right' : 'text-left'}`}
-                                >
-                                    <option value="">{t('admin.selectCategory')}</option>
-                                    {ALLOWED_CATEGORIES.map(cat => (
-                                        <option key={cat} value={cat}>{getCategoryName(cat)}</option>
-                                    ))}
-                                </select>
-                            )}
+                            <Input
+                                id="name"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                placeholder={t('admin.category')}
+                                className="rounded-xl"
+                            />
                         </div>
 
                         <div className="space-y-2">
@@ -533,12 +491,12 @@ export function AdminCategoriesPage() {
                                         {t('admin.chooseFile')}
                                     </Button>
 
-                                    <CameraCapture 
+                                    <CameraCapture
                                         onCapture={(file) => handleImageUpload(file)}
                                         trigger={
-                                            <Button 
-                                                type="button" 
-                                                variant="outline" 
+                                            <Button
+                                                type="button"
+                                                variant="outline"
                                                 className="w-full gap-2 rounded-lg"
                                                 disabled={saving}
                                             >
@@ -570,8 +528,8 @@ export function AdminCategoriesPage() {
                         <Button variant="outline" onClick={() => setIsFormOpen(false)} className="rounded-lg">
                             {t('common.cancel')}
                         </Button>
-                        <Button 
-                            onClick={handleSave} 
+                        <Button
+                            onClick={handleSave}
                             disabled={saving}
                             className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
                         >
@@ -593,8 +551,8 @@ export function AdminCategoriesPage() {
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-2">
                         <AlertDialogCancel className="rounded-xl">{t('common.cancel')}</AlertDialogCancel>
-                        <AlertDialogAction 
-                            onClick={handleDelete} 
+                        <AlertDialogAction
+                            onClick={handleDelete}
                             className="bg-red-600 hover:bg-red-700 rounded-xl"
                         >
                             {t('common.delete')}
