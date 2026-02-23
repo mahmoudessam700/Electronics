@@ -783,7 +783,7 @@ const en: Record<string, string> = {
     'admin.exit': 'Exit',
     'admin.loading': 'Loading admin panel...',
     'admin.liveUpdate': 'Live Update Applied',
-    
+
     // Admin Dashboard
     'admin.totalOrders': 'Total Orders',
     'admin.totalRevenue': 'Total Revenue',
@@ -796,7 +796,7 @@ const en: Record<string, string> = {
     'admin.newOrder': 'New order',
     'admin.noRecentOrders': 'No recent orders',
     'admin.noRecentActivity': 'No recent activity',
-    
+
     // Admin Products
     'admin.addProduct': 'Add Product',
     'admin.editProduct': 'Edit Product',
@@ -811,7 +811,7 @@ const en: Record<string, string> = {
     'admin.costPrice': 'Cost Price',
     'admin.deleteProduct': 'Delete Product',
     'admin.confirmDelete': 'Are you sure you want to delete this?',
-    
+
     // Admin Categories
     'admin.addCategory': 'Add Category',
     'admin.editCategory': 'Edit Category',
@@ -819,7 +819,7 @@ const en: Record<string, string> = {
     'admin.categoryImage': 'Category Image',
     'admin.parentCategory': 'Parent Category',
     'admin.noParent': 'No Parent (Top Level)',
-    
+
     // Admin Orders
     'admin.orderId': 'Order ID',
     'admin.customer': 'Customer',
@@ -833,7 +833,7 @@ const en: Record<string, string> = {
     'admin.cancelled': 'Cancelled',
     'admin.orderDetails': 'Order Details',
     'admin.updateStatus': 'Update Status',
-    
+
     // Admin Suppliers
     'admin.addSupplier': 'Add Supplier',
     'admin.editSupplier': 'Edit Supplier',
@@ -841,14 +841,14 @@ const en: Record<string, string> = {
     'admin.contactName': 'Contact Name',
     'admin.phone': 'Phone',
     'admin.addressLine': 'Address',
-    
+
     // Admin Users/Customers
     'admin.userId': 'User ID',
     'admin.userName': 'Name',
     'admin.userEmail': 'Email',
     'admin.role': 'Role',
     'admin.joinedDate': 'Joined',
-    
+
     // Admin Financial
     'admin.revenue': 'Revenue',
     'admin.expenses': 'Expenses',
@@ -858,7 +858,7 @@ const en: Record<string, string> = {
     'admin.pastCycles': 'Past Cycles',
     'admin.addExpense': 'Add Expense',
     'admin.closeCycle': 'Close Cycle',
-    
+
     // Admin Home Layout
     'admin.homeLayoutTitle': 'Home Layout Settings',
     'admin.sectionEnabled': 'Enabled',
@@ -870,7 +870,7 @@ const en: Record<string, string> = {
     'admin.selectProducts': 'Select Products',
     'admin.saveChanges': 'Save Changes',
     'admin.resetToDefault': 'Reset to Default',
-    
+
     // Admin Files
     'admin.uploadFile': 'Upload File',
     'admin.fileName': 'File Name',
@@ -879,7 +879,7 @@ const en: Record<string, string> = {
     'admin.uploadDate': 'Upload Date',
     'admin.copyUrl': 'Copy URL',
     'admin.deleteFile': 'Delete',
-    
+
     // Common Admin
     'admin.actions': 'Actions',
     'admin.noResults': 'No results found',
@@ -895,7 +895,7 @@ const en: Record<string, string> = {
     'admin.edit': 'Edit',
     'admin.view': 'View',
     'admin.back': 'Back',
-    
+
     // Admin Suppliers (extended)
     'admin.suppliersTitle': 'Suppliers',
     'admin.suppliersSubtitle': 'Manage your product suppliers and vendors',
@@ -911,7 +911,7 @@ const en: Record<string, string> = {
     'admin.contactPerson': 'Contact Person',
     'admin.loadingSuppliers': 'Loading suppliers...',
     'admin.noContactInfo': 'No contact information',
-    
+
     // Admin Users (extended)
     'admin.userManagement': 'User Management',
     'admin.userManagementSubtitle': 'Manage customers and administrators',
@@ -953,7 +953,7 @@ const en: Record<string, string> = {
     'admin.enterTempPassword': 'Enter temporary password',
     'admin.loadingUsers': 'Loading users...',
     'admin.unnamedUser': 'Unnamed User',
-    
+
     // Admin Financial (extended)
     'admin.financialManagement': 'Financial Management',
     'admin.financialSubtitle': 'Manage cycles, expenses, and track your profitability.',
@@ -986,7 +986,7 @@ const en: Record<string, string> = {
     'admin.manageTaxSlabs': 'Manage Tax Slabs',
     'admin.loadingFinancial': 'Loading financial records...',
     'admin.margin': 'Margin',
-    
+
     // Admin Categories Page
     'admin.availableCategories': 'Available Categories',
     'admin.totalCategories': 'Total Categories',
@@ -1010,7 +1010,7 @@ const en: Record<string, string> = {
     'admin.chooseFile': 'Choose File',
     'admin.takePhoto': 'Take Photo',
     'admin.pasteImageUrl': 'Or paste an image URL:',
-    
+
     // Admin Home Layout (extended)
     'admin.visibilityControl': 'Visibility Control',
     'admin.visibilityControlDesc': 'Use the toggles below to hide or show specific sections on your main page. This is useful for clearing space during specific sales or removing sections if they have no products yet.',
@@ -1955,7 +1955,7 @@ const ar: Record<string, string> = {
     'admin.exit': 'خروج',
     'admin.loading': 'جاري تحميل لوحة التحكم...',
     'admin.liveUpdate': 'التحديث فعال',
-    
+
     // Admin Dashboard
     'admin.totalOrders': 'إجمالي الطلبات',
     'admin.totalRevenue': 'إجمالي الإيرادات',
@@ -1968,7 +1968,7 @@ const ar: Record<string, string> = {
     'admin.newOrder': 'طلب جديد',
     'admin.noRecentOrders': 'لا توجد طلبات حديثة',
     'admin.noRecentActivity': 'لا يوجد نشاط حديث',
-    
+
     // Admin Products
     'admin.addProduct': 'إضافة منتج',
     'admin.editProduct': 'تعديل المنتج',
@@ -1983,7 +1983,7 @@ const ar: Record<string, string> = {
     'admin.costPrice': 'سعر التكلفة',
     'admin.deleteProduct': 'حذف المنتج',
     'admin.confirmDelete': 'هل أنت متأكد من حذف هذا؟',
-    
+
     // Admin Categories
     'admin.addCategory': 'إضافة فئة',
     'admin.editCategory': 'تعديل الفئة',
@@ -1991,7 +1991,7 @@ const ar: Record<string, string> = {
     'admin.categoryImage': 'صورة الفئة',
     'admin.parentCategory': 'الفئة الأم',
     'admin.noParent': 'بدون أب (مستوى أعلى)',
-    
+
     // Admin Orders
     'admin.orderId': 'رقم الطلب',
     'admin.customer': 'العميل',
@@ -2005,7 +2005,7 @@ const ar: Record<string, string> = {
     'admin.cancelled': 'ملغي',
     'admin.orderDetails': 'تفاصيل الطلب',
     'admin.updateStatus': 'تحديث الحالة',
-    
+
     // Admin Suppliers
     'admin.addSupplier': 'إضافة مورد',
     'admin.editSupplier': 'تعديل المورد',
@@ -2013,14 +2013,14 @@ const ar: Record<string, string> = {
     'admin.contactName': 'اسم جهة الاتصال',
     'admin.phone': 'الهاتف',
     'admin.addressLine': 'العنوان',
-    
+
     // Admin Users/Customers
     'admin.userId': 'رقم المستخدم',
     'admin.userName': 'الاسم',
     'admin.userEmail': 'البريد الإلكتروني',
     'admin.role': 'الدور',
     'admin.joinedDate': 'تاريخ الانضمام',
-    
+
     // Admin Financial
     'admin.revenue': 'الإيرادات',
     'admin.expenses': 'المصروفات',
@@ -2030,7 +2030,7 @@ const ar: Record<string, string> = {
     'admin.pastCycles': 'الدورات السابقة',
     'admin.addExpense': 'إضافة مصروف',
     'admin.closeCycle': 'إغلاق الدورة',
-    
+
     // Admin Home Layout
     'admin.homeLayoutTitle': 'إعدادات تخطيط الصفحة الرئيسية',
     'admin.sectionEnabled': 'مفعل',
@@ -2042,7 +2042,7 @@ const ar: Record<string, string> = {
     'admin.selectProducts': 'اختر المنتجات',
     'admin.saveChanges': 'حفظ التغييرات',
     'admin.resetToDefault': 'إعادة للافتراضي',
-    
+
     // Admin Files
     'admin.uploadFile': 'رفع ملف',
     'admin.fileName': 'اسم الملف',
@@ -2051,7 +2051,7 @@ const ar: Record<string, string> = {
     'admin.uploadDate': 'تاريخ الرفع',
     'admin.copyUrl': 'نسخ الرابط',
     'admin.deleteFile': 'حذف',
-    
+
     // Common Admin
     'admin.actions': 'الإجراءات',
     'admin.noResults': 'لا توجد نتائج',
@@ -2067,7 +2067,7 @@ const ar: Record<string, string> = {
     'admin.edit': 'تعديل',
     'admin.view': 'عرض',
     'admin.back': 'رجوع',
-    
+
     // Admin Suppliers (extended)
     'admin.suppliersTitle': 'الموردين',
     'admin.suppliersSubtitle': 'إدارة موردي المنتجات والبائعين',
@@ -2083,7 +2083,7 @@ const ar: Record<string, string> = {
     'admin.contactPerson': 'الشخص المسؤول',
     'admin.loadingSuppliers': 'جاري تحميل الموردين...',
     'admin.noContactInfo': 'لا توجد معلومات اتصال',
-    
+
     // Admin Users (extended)
     'admin.userManagement': 'إدارة المستخدمين',
     'admin.userManagementSubtitle': 'إدارة العملاء والمسؤولين',
@@ -2125,7 +2125,7 @@ const ar: Record<string, string> = {
     'admin.enterTempPassword': 'أدخل كلمة المرور المؤقتة',
     'admin.loadingUsers': 'جاري تحميل المستخدمين...',
     'admin.unnamedUser': 'مستخدم بدون اسم',
-    
+
     // Admin Financial (extended)
     'admin.financialManagement': 'الإدارة المالية',
     'admin.financialSubtitle': 'إدارة الدورات والمصروفات وتتبع الأرباح.',
@@ -2158,7 +2158,7 @@ const ar: Record<string, string> = {
     'admin.manageTaxSlabs': 'إدارة شرائح الضرائب',
     'admin.loadingFinancial': 'جاري تحميل السجلات المالية...',
     'admin.margin': 'الهامش',
-    
+
     // Admin Categories Page
     'admin.availableCategories': 'الفئات المتاحة',
     'admin.totalCategories': 'إجمالي الفئات',
@@ -2182,7 +2182,7 @@ const ar: Record<string, string> = {
     'admin.chooseFile': 'اختر ملف',
     'admin.takePhoto': 'التقط صورة',
     'admin.pasteImageUrl': 'أو الصق رابط الصورة:',
-    
+
     // Admin Home Layout (extended)
     'admin.visibilityControl': 'التحكم في الظهور',
     'admin.visibilityControlDesc': 'استخدم المفاتيح أدناه لإخفاء أو إظهار أقسام معينة في صفحتك الرئيسية. هذا مفيد لإفساح المجال خلال فترات العروض أو إزالة الأقسام التي لا تحتوي على منتجات بعد.',
@@ -2361,7 +2361,7 @@ const translations: Record<Language, Record<string, string>> = { en, ar };
 export function LanguageProvider({ children }: { children: ReactNode }) {
     const [language, setLanguageState] = useState<Language>(() => {
         const saved = localStorage.getItem('language');
-        return (saved === 'ar' || saved === 'en') ? saved : 'en';
+        return (saved === 'ar' || saved === 'en') ? saved : 'ar';
     });
 
     const setLanguage = (lang: Language) => {
