@@ -59,13 +59,17 @@ export function AdminShopsPage() {
     const addFileInputRef = useRef<HTMLInputElement>(null);
     const addCameraInputRef = useRef<HTMLInputElement>(null);
 
+    const [editCreateNewOwner, setEditCreateNewOwner] = useState(false);
+
     const [formData, setFormData] = useState({
         name: '',
+        description: '',
+        email: '',
+        phone: '',
+        address: '',
         status: 'PENDING' as ShopStatus,
         kycStatus: 'UNVERIFIED' as KycStatus,
         defaultCommissionRate: 0,
-        email: '',
-        phone: '',
         logo: '' as string | null,
         ownerId: '' as string,
     });
@@ -127,14 +131,18 @@ export function AdminShopsPage() {
         setEditingShop(shop);
         setFormData({
             name: shop.name,
+            description: shop.description || '',
+            email: shop.email || '',
+            phone: shop.phone || '',
+            address: shop.address || '',
             status: shop.status,
             kycStatus: shop.kycStatus,
             defaultCommissionRate: shop.defaultCommissionRate,
-            email: shop.email || '',
-            phone: shop.phone || '',
             logo: shop.logo || '',
             ownerId: shop.ownerId || '',
         });
+        setEditCreateNewOwner(false);
+        setNewOwnerData({ name: '', email: '', password: '' });
         setIsDialogOpen(true);
     };
 
@@ -144,6 +152,14 @@ export function AdminShopsPage() {
         setIsSaving(true);
 
         try {
+            let ownerId = formData.ownerId || null;
+            // If creating new owner in edit, create user first
+            if (editCreateNewOwner) {
+                const newUserId = await createOwnerUser();
+                if (!newUserId) { setIsSaving(false); return; }
+                ownerId = newUserId;
+            }
+
             const res = await fetch(`/api/shops?id=${editingShop.id}`, {
                 method: 'PUT',
                 headers: {
@@ -151,8 +167,16 @@ export function AdminShopsPage() {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    ...formData,
-                    ownerId: formData.ownerId || null,
+                    name: formData.name,
+                    description: formData.description || null,
+                    email: formData.email || null,
+                    phone: formData.phone || null,
+                    address: formData.address || null,
+                    status: formData.status,
+                    kycStatus: formData.kycStatus,
+                    defaultCommissionRate: formData.defaultCommissionRate,
+                    logo: formData.logo || null,
+                    ownerId,
                 }),
             });
 
@@ -530,55 +554,72 @@ export function AdminShopsPage() {
 
             {/* Edit Shop Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-lg" style={{ maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
                     <DialogHeader>
                         <DialogTitle className="text-xl">{t('admin.editShop')}: {editingShop?.name}</DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleSave} className="space-y-4 py-4">
+                    <form onSubmit={handleSave} className="space-y-4 py-2 overflow-y-auto flex-1 px-1" style={{ maxHeight: '65vh' }}>
                         <ImageUploadWidget imageUrl={formData.logo} isUploadingState={isUploading} onFileUpload={handleEditImageUpload}
                             onRemove={() => setFormData(p => ({ ...p, logo: null }))} fileRef={fileInputRef as React.RefObject<HTMLInputElement>} camRef={cameraInputRef as React.RefObject<HTMLInputElement>} />
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.shopName') || 'Shop Name'}</Label>
-                            <Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="rounded-lg" />
-                        </div>
-
-                        {/* Owner selector for edit */}
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.shopOwner') || 'Shop Owner'}</Label>
-                            <select className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"
-                                value={formData.ownerId} onChange={e => setFormData({ ...formData, ownerId: e.target.value })}>
-                                <option value="">{t('admin.noOwnerAssigned') || '-- No owner --'}</option>
-                                {users.map(user => (
-                                    <option key={user.id} value={user.id}>{user.name} ({user.email})</option>
-                                ))}
-                            </select>
+                            <Label className="text-sm font-medium">{t('admin.shopName') || 'Shop Name'} <span className="text-red-500">*</span></Label>
+                            <Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="rounded-lg" required />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.shopStatus')}</Label>
-                            <select className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value as ShopStatus })}>
-                                <option value="PENDING">{t('admin.pendingApproval')}</option>
-                                <option value="ACTIVE">{t('admin.activeLive')}</option>
-                                <option value="SUSPENDED">{t('admin.suspendedHidden')}</option>
-                            </select>
+                            <Label className="text-sm font-medium">{t('admin.description') || 'Description'}</Label>
+                            <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder={t('admin.shopDescPlaceholder') || 'Describe the shop...'} rows={2}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none outline-none focus:ring-2 focus:ring-[#4A5568]/20 focus:border-[#4A5568]" />
                         </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium">{t('admin.contactEmail')}</Label>
+                                <Input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="shop@example.com" className="rounded-lg" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium">{t('admin.contactPhone')}</Label>
+                                <Input type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="+20 1xx xxxx xxx" className="rounded-lg" />
+                            </div>
+                        </div>
+
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.verificationKyc')}</Label>
-                            <select className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm" value={formData.kycStatus} onChange={e => setFormData({ ...formData, kycStatus: e.target.value as KycStatus })}>
-                                <option value="UNVERIFIED">{t('admin.unverified')}</option>
-                                <option value="SUBMITTED">{t('admin.submitted')}</option>
-                                <option value="VERIFIED">{t('admin.verified')}</option>
-                                <option value="REJECTED">{t('admin.rejected')}</option>
-                            </select>
+                            <Label className="text-sm font-medium">{t('admin.address') || 'Address'}</Label>
+                            <Input value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} placeholder={t('admin.addressPlaceholder') || 'Shop address'} className="rounded-lg" />
                         </div>
+
+                        {/* Owner Assignment Section */}
+                        <OwnerSelector value={formData.ownerId} onChange={v => setFormData({ ...formData, ownerId: v })} showCreate={editCreateNewOwner} onToggleCreate={setEditCreateNewOwner} />
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium">{t('admin.shopStatus')}</Label>
+                                <select className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value as ShopStatus })}>
+                                    <option value="PENDING">{t('admin.pendingApproval')}</option>
+                                    <option value="ACTIVE">{t('admin.activeLive')}</option>
+                                    <option value="SUSPENDED">{t('admin.suspendedHidden')}</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium">{t('admin.verificationKyc')}</Label>
+                                <select className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm" value={formData.kycStatus} onChange={e => setFormData({ ...formData, kycStatus: e.target.value as KycStatus })}>
+                                    <option value="UNVERIFIED">{t('admin.unverified')}</option>
+                                    <option value="SUBMITTED">{t('admin.submitted')}</option>
+                                    <option value="VERIFIED">{t('admin.verified')}</option>
+                                    <option value="REJECTED">{t('admin.rejected')}</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div className="space-y-2">
                             <Label className="text-sm font-medium">{t('admin.commissionRateLabel')}</Label>
-                            <Input type="number" step="0.01" value={formData.defaultCommissionRate} onChange={e => setFormData({ ...formData, defaultCommissionRate: parseFloat(e.target.value) })} className="rounded-lg" />
+                            <Input type="number" step="0.01" min="0" max="1" value={formData.defaultCommissionRate} onChange={e => setFormData({ ...formData, defaultCommissionRate: parseFloat(e.target.value) || 0 })} className="rounded-lg" />
                         </div>
-                        <DialogFooter className="pt-4">
+
+                        <DialogFooter className="pt-4 sticky bottom-0 bg-white pb-2">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>{t('admin.cancel')}</Button>
-                            <Button type="submit" disabled={isSaving} className="bg-[#4A5568] hover:bg-[#2D3748] text-white">
+                            <Button type="submit" disabled={isSaving || isUploading} className="bg-[#4A5568] hover:bg-[#2D3748] text-white">
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {t('admin.saveChanges')}
                             </Button>
@@ -589,22 +630,22 @@ export function AdminShopsPage() {
 
             {/* Add Shop Dialog */}
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-lg" style={{ maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
                     <DialogHeader>
                         <DialogTitle className="text-xl">{t('admin.addShop')}</DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleAddShop} className="space-y-4 py-4">
+                    <form onSubmit={handleAddShop} className="space-y-4 py-2 overflow-y-auto flex-1 px-1" style={{ maxHeight: '65vh' }}>
                         <ImageUploadWidget imageUrl={addFormData.logo} isUploadingState={isAddUploading} onFileUpload={handleAddImageUpload}
                             onRemove={() => setAddFormData(p => ({ ...p, logo: null }))} fileRef={addFileInputRef as React.RefObject<HTMLInputElement>} camRef={addCameraInputRef as React.RefObject<HTMLInputElement>} />
 
                         <div className="space-y-2">
                             <Label className="text-sm font-medium">{t('admin.shopName') || 'Shop Name'} <span className="text-red-500">*</span></Label>
-                            <Input value={addFormData.name} onChange={e => setAddFormData({ ...addFormData, name: e.target.value })} placeholder="Enter shop name" className="rounded-lg" required />
+                            <Input value={addFormData.name} onChange={e => setAddFormData({ ...addFormData, name: e.target.value })} placeholder={t('admin.shopNamePlaceholder') || 'Enter shop name'} className="rounded-lg" required />
                         </div>
 
                         <div className="space-y-2">
                             <Label className="text-sm font-medium">{t('admin.description') || 'Description'}</Label>
-                            <textarea value={addFormData.description} onChange={e => setAddFormData({ ...addFormData, description: e.target.value })} placeholder="Describe the shop..." rows={2}
+                            <textarea value={addFormData.description} onChange={e => setAddFormData({ ...addFormData, description: e.target.value })} placeholder={t('admin.shopDescPlaceholder') || 'Describe the shop...'} rows={2}
                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none outline-none focus:ring-2 focus:ring-[#4A5568]/20 focus:border-[#4A5568]" />
                         </div>
 
@@ -617,6 +658,11 @@ export function AdminShopsPage() {
                                 <Label className="text-sm font-medium">{t('admin.contactPhone')}</Label>
                                 <Input type="tel" value={addFormData.phone} onChange={e => setAddFormData({ ...addFormData, phone: e.target.value })} placeholder="+20 1xx xxxx xxx" className="rounded-lg" />
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm font-medium">{t('admin.address') || 'Address'}</Label>
+                            <Input value={addFormData.address} onChange={e => setAddFormData({ ...addFormData, address: e.target.value })} placeholder={t('admin.addressPlaceholder') || 'Shop address'} className="rounded-lg" />
                         </div>
 
                         {/* Owner Assignment Section */}
@@ -637,7 +683,7 @@ export function AdminShopsPage() {
                             </div>
                         </div>
 
-                        <DialogFooter className="pt-4">
+                        <DialogFooter className="pt-4 sticky bottom-0 bg-white pb-2">
                             <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>{t('admin.cancel')}</Button>
                             <Button type="submit" disabled={isSaving || isAddUploading} className="bg-[#4A5568] hover:bg-[#2D3748] text-white">
                                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
