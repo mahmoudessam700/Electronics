@@ -64,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // POST - Create new category
         if (req.method === 'POST') {
-            const { name, description, image, sortOrder } = req.body;
+            const { name, nameEn, nameAr, description, image, sortOrder } = req.body;
 
             if (!name) {
                 return res.status(400).json({ error: 'Category name is required' });
@@ -86,6 +86,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const category = await db.category.create({
                 data: {
                     name,
+                    nameEn: nameEn || name,
+                    nameAr: nameAr || '',
                     slug,
                     description,
                     image,
@@ -119,7 +121,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
             // Single category update
             const { id } = req.query;
-            const { name, description, image } = req.body;
+            const { name, nameEn, nameAr, description, image } = req.body;
 
             if (!id) {
                 return res.status(400).json({ error: 'Category ID required' });
@@ -129,6 +131,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 where: { id: String(id) },
                 data: {
                     name,
+                    nameEn,
+                    nameAr,
                     description,
                     image,
                     slug: generateSlug(name)
