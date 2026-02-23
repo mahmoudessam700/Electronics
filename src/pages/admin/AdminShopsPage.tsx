@@ -563,13 +563,13 @@ export function AdminShopsPage() {
                             onRemove={() => setFormData(p => ({ ...p, logo: null }))} fileRef={fileInputRef as React.RefObject<HTMLInputElement>} camRef={cameraInputRef as React.RefObject<HTMLInputElement>} />
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.shopName') || 'Shop Name'} <span className="text-red-500">*</span></Label>
+                            <Label className="text-sm font-medium">{t('admin.shopName')} <span className="text-red-500">*</span></Label>
                             <Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="rounded-lg" required />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.description') || 'Description'}</Label>
-                            <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder={t('admin.shopDescPlaceholder') || 'Describe the shop...'} rows={2}
+                            <Label className="text-sm font-medium">{t('admin.description')}</Label>
+                            <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder={t('admin.shopDescPlaceholder')} rows={2}
                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none outline-none focus:ring-2 focus:ring-[#4A5568]/20 focus:border-[#4A5568]" />
                         </div>
 
@@ -585,8 +585,8 @@ export function AdminShopsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.address') || 'Address'}</Label>
-                            <Input value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} placeholder={t('admin.addressPlaceholder') || 'Shop address'} className="rounded-lg" />
+                            <Label className="text-sm font-medium">{t('admin.address')}</Label>
+                            <Input value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} placeholder={t('admin.addressPlaceholder')} className="rounded-lg" />
                         </div>
 
                         {/* Owner Assignment Section */}
@@ -639,13 +639,13 @@ export function AdminShopsPage() {
                             onRemove={() => setAddFormData(p => ({ ...p, logo: null }))} fileRef={addFileInputRef as React.RefObject<HTMLInputElement>} camRef={addCameraInputRef as React.RefObject<HTMLInputElement>} />
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.shopName') || 'Shop Name'} <span className="text-red-500">*</span></Label>
-                            <Input value={addFormData.name} onChange={e => setAddFormData({ ...addFormData, name: e.target.value })} placeholder={t('admin.shopNamePlaceholder') || 'Enter shop name'} className="rounded-lg" required />
+                            <Label className="text-sm font-medium">{t('admin.shopName')} <span className="text-red-500">*</span></Label>
+                            <Input value={addFormData.name} onChange={e => setAddFormData({ ...addFormData, name: e.target.value })} placeholder={t('admin.shopNamePlaceholder')} className="rounded-lg" required />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.description') || 'Description'}</Label>
-                            <textarea value={addFormData.description} onChange={e => setAddFormData({ ...addFormData, description: e.target.value })} placeholder={t('admin.shopDescPlaceholder') || 'Describe the shop...'} rows={2}
+                            <Label className="text-sm font-medium">{t('admin.description')}</Label>
+                            <textarea value={addFormData.description} onChange={e => setAddFormData({ ...addFormData, description: e.target.value })} placeholder={t('admin.shopDescPlaceholder')} rows={2}
                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none outline-none focus:ring-2 focus:ring-[#4A5568]/20 focus:border-[#4A5568]" />
                         </div>
 
@@ -661,8 +661,8 @@ export function AdminShopsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">{t('admin.address') || 'Address'}</Label>
-                            <Input value={addFormData.address} onChange={e => setAddFormData({ ...addFormData, address: e.target.value })} placeholder={t('admin.addressPlaceholder') || 'Shop address'} className="rounded-lg" />
+                            <Label className="text-sm font-medium">{t('admin.address')}</Label>
+                            <Input value={addFormData.address} onChange={e => setAddFormData({ ...addFormData, address: e.target.value })} placeholder={t('admin.addressPlaceholder')} className="rounded-lg" />
                         </div>
 
                         {/* Owner Assignment Section */}

@@ -1348,6 +1348,16 @@ const en: Record<string, string> = {
     'admin.na': 'N/A',
     'admin.active': 'Active',
     'admin.suspended': 'Suspended',
+    'admin.shopLogo': 'Shop Logo',
+    'admin.uploadImage': 'Upload Image',
+    'admin.shopOwnerDesc': 'The user who will manage this shop',
+    'admin.selectExisting': 'Select Existing User',
+    'admin.createNewOwner': 'Create New Owner',
+    'admin.noOwnerAssigned': '-- No owner assigned --',
+    'admin.ownerName': 'Owner full name',
+    'admin.noOwner': 'No owner',
+    'admin.shopNamePlaceholder': 'Enter shop name',
+    'admin.shopDescPlaceholder': 'Describe the shop...',
 
     // Admin Reviews Page
     'admin.reviewModeration': 'Review Moderation',
@@ -2781,6 +2791,16 @@ const ar: Record<string, string> = {
     'admin.na': 'غير متوفر',
     'admin.active': 'نشط',
     'admin.suspended': 'موقوف',
+    'admin.shopLogo': 'شعار المتجر',
+    'admin.uploadImage': 'رفع صورة',
+    'admin.shopOwnerDesc': 'المستخدم الذي سيدير هذا المتجر',
+    'admin.selectExisting': 'اختر مستخدم موجود',
+    'admin.createNewOwner': 'إنشاء صاحب متجر جديد',
+    'admin.noOwnerAssigned': '-- لم يتم تعيين صاحب متجر --',
+    'admin.ownerName': 'اسم صاحب المتجر بالكامل',
+    'admin.noOwner': 'لا يوجد',
+    'admin.shopNamePlaceholder': 'أدخل اسم المتجر',
+    'admin.shopDescPlaceholder': 'صف المتجر...',
 
     // Admin Reviews Page
     'admin.reviewModeration': 'إدارة المراجعات',
