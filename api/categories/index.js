@@ -24,11 +24,11 @@ module.exports = async (req, res) => {
                 `, [id]);
 
                 if (rows.length === 0) return res.status(404).json({ error: 'Category not found' });
-                
+
                 // Get products for this category
                 const [products] = await pool.execute('SELECT * FROM Product WHERE categoryId = ?', [id]);
                 rows[0].products = products;
-                
+
                 return res.json(rows[0]);
             }
 
@@ -109,18 +109,31 @@ module.exports = async (req, res) => {
 
             if (!id) return res.status(400).json({ error: 'ID is required' });
 
+            const slug = name ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : undefined;
+
             await pool.execute(`
                 UPDATE Category
                 SET name = COALESCE(?, name),
                     nameEn = COALESCE(?, nameEn),
                     nameAr = COALESCE(?, nameAr),
+                    slug = COALESCE(?, slug),
                     description = COALESCE(?, description),
                     image = COALESCE(?, image),
                     parentId = COALESCE(?, parentId),
                     sortOrder = COALESCE(?, sortOrder),
                     updatedAt = NOW()
                 WHERE id = ?
-            `, [name, nameEn, nameAr, description, image, parentId, sortOrder, id]);
+            `, [
+                name || null,
+                nameEn || null,
+                nameAr || null,
+                slug || null,
+                description || null,
+                image || null,
+                parentId || null,
+                sortOrder != null ? sortOrder : null,
+                id
+            ]);
 
             const [rows] = await pool.execute('SELECT * FROM Category WHERE id = ?', [id]);
             return res.json(rows[0]);
