@@ -400,6 +400,26 @@ module.exports = async (req, res) => {
     try {
         const action = normalizeQueryValue(req.query.action);
 
+        // Public: list active shops (no auth required)
+        if (action === 'public') {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+            const [rows] = await pool.execute(`
+                SELECT s.id, s.name, s.slug, s.description, s.logo,
+                    (SELECT COUNT(*) FROM Product p WHERE p.shopId = s.id) AS productCount
+                FROM Shop s
+                WHERE s.status = 'ACTIVE'
+                ORDER BY s.createdAt DESC
+            `);
+            return res.json(rows.map(r => ({
+                id: r.id,
+                name: r.name,
+                slug: r.slug,
+                description: r.description,
+                logo: r.logo,
+                productCount: Number(r.productCount || 0),
+            })));
+        }
+
         if (action === 'payouts') {
             const user = await requireAuth(req);
             return handlePayouts(req, res, user);
