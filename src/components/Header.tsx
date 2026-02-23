@@ -22,7 +22,7 @@ interface HeaderProps {
 
 export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   const { user, logout, shopMemberships, activeShop } = useAuth();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const [isHoverCardOpen, setIsHoverCardOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -48,34 +48,34 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
       switch (result.action) {
         case 'scrollDown':
           window.scrollBy({ top: 500, behavior: 'smooth' });
-          setVoiceMessage(`⬇️ Scrolling down`);
+          setVoiceMessage(`⬇️ ${t('header.scrollingDown')}`);
           break;
         case 'scrollUp':
           window.scrollBy({ top: -500, behavior: 'smooth' });
-          setVoiceMessage(`⬆️ Scrolling up`);
+          setVoiceMessage(`⬆️ ${t('header.scrollingUp')}`);
           break;
         case 'scrollToBottom':
           window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-          setVoiceMessage(`⬇️⬇️ Going to bottom`);
+          setVoiceMessage(`⬇️⬇️ ${t('header.goingToBottom')}`);
           break;
         case 'scrollToTop':
           window.scrollTo({ top: 0, behavior: 'smooth' });
-          setVoiceMessage(`⬆️⬆️ Going to top`);
+          setVoiceMessage(`⬆️⬆️ ${t('header.goingToTop')}`);
           break;
         case 'goBack':
           window.history.back();
-          setVoiceMessage(`⬅️ Going back`);
+          setVoiceMessage(`⬅️ ${t('header.goingBack')}`);
           break;
         case 'goForward':
           window.history.forward();
-          setVoiceMessage(`➡️ Going forward`);
+          setVoiceMessage(`➡️ ${t('header.goingForward')}`);
           break;
         case 'refresh':
-          setVoiceMessage(`🔄 Refreshing...`);
+          setVoiceMessage(`🔄 ${t('header.refreshing')}...`);
           setTimeout(() => window.location.reload(), 500);
           break;
         case 'stop':
-          setVoiceMessage(`⏹️ Stopped`);
+          setVoiceMessage(`⏹️ ${t('header.stop')}`);
           break;
       }
     } else if (result.type === 'category' && result.category) {
@@ -139,7 +139,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50">
+    <header className="sticky top-0 z-50" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Top Bar */}
       <div className="bg-[#4A5568] text-white">
         <div className="max-w-[1500px] mx-auto px-4">
@@ -154,7 +154,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                     <Menu className="h-6 w-6" />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className="bg-white w-[300px]">
+                <SheetContent side={isRTL ? 'right' : 'left'} className="bg-white w-[300px]">
                   <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                   <SheetDescription className="sr-only">Navigate to different sections of the site</SheetDescription>
                   <div className="flex flex-col gap-4 mt-8">
@@ -248,7 +248,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           className="justify-start text-emerald-600 font-bold"
                           onClick={() => navigate('/shop')}
                         >
-                          {activeShop ? `${activeShop.name} Dashboard` : 'Shop Dashboard'}
+                          {activeShop ? `${activeShop.name} ${t('header.shopDashboard')}` : t('header.shopDashboard')}
                         </Button>
                       </SheetClose>
                     )}
@@ -268,7 +268,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
             </div>
 
             {/* Deliver to */}
-            <div className="hidden lg:flex flex-col items-start px-2 py-1">
+            <div className={`hidden lg:flex flex-col ${isRTL ? 'items-end' : 'items-start'} px-2 py-1`}>
               <span className="text-xs text-gray-300">{t('header.deliverTo')}</span>
               <div className="flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
@@ -296,7 +296,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
             {/* Search Bar - Full width on mobile */}
             <div className="flex-1 w-full lg:w-auto lg:max-w-[800px] order-last lg:order-none mx-0 lg:mx-4">
               <div className="flex items-center relative">
-                <select className="hidden sm:block h-10 px-2 bg-[#F3F3F3] border-none rounded-l-md text-[#0F1111] text-sm focus:outline-none focus:ring-2 focus:ring-[#718096]">
+                <select className={`hidden sm:block h-10 px-2 bg-[#F3F3F3] border-none ${isRTL ? 'rounded-r-md' : 'rounded-l-md'} text-[#0F1111] text-sm focus:outline-none focus:ring-2 focus:ring-[#718096]`}>
                   <option>{t('header.all')}</option>
                   <option>{t('category.books')}</option>
                   <option>{t('category.fashion')}</option>
@@ -305,30 +305,29 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                 <Input
                   ref={searchInputRef}
                   type="text"
-                  placeholder={isListening ? (language === 'ar' ? '🎤 اتكلم دلوقتي...' : '🎤 Listening...') : t('header.searchPlaceholder')}
+                  placeholder={isListening ? t('header.listening') : t('header.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
                   style={{ backgroundColor: '#ffffff', color: '#374151' }}
-                  className="h-10 flex-1 rounded-md sm:rounded-none sm:rounded-r-none border-none focus-visible:ring-0 !bg-white !text-gray-700 placeholder:!text-gray-400"
+                  className={`h-10 flex-1 rounded-md sm:rounded-none border-none focus-visible:ring-0 !bg-white !text-gray-700 placeholder:!text-gray-400 ${isRTL ? 'text-right' : 'text-left'}`}
                 />
                 {/* Voice Search Button */}
                 {voiceSupported && (
                   <Button
                     onClick={handleVoiceClick}
-                    className={`h-10 px-3 rounded-none ${
-                      isListening
+                    className={`h-10 px-3 rounded-none ${isListening
                         ? 'bg-red-500 hover:bg-red-600 text-white'
                         : 'bg-[#718096] hover:bg-[#4A5568] text-white'
-                    }`}
-                    title={isListening ? (language === 'ar' ? 'إيقاف' : 'Stop') : (language === 'ar' ? 'بحث بالصوت' : 'Voice search')}
+                      }`}
+                    title={isListening ? t('header.stop') : t('header.voiceSearch')}
                   >
                     {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                   </Button>
                 )}
                 <Button
                   onClick={handleSearch}
-                  className="h-10 bg-[#718096] hover:bg-[#4A5568] text-white rounded-md rounded-l-none px-4 z-10"
+                  className={`h-10 bg-[#718096] hover:bg-[#4A5568] text-white ${isRTL ? 'rounded-l-md' : 'rounded-r-md'} px-4 z-10`}
                 >
                   <Search className="h-5 w-5" />
                 </Button>
@@ -347,7 +346,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                 <HoverCardTrigger asChild>
                   {user ? (
                     <button
-                      className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1"
+                      className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'} hover:outline hover:outline-1 hover:outline-white px-2 py-1`}
                       onClick={() => navigate('/account')}
                     >
                       <span className="text-xs">{t('header.hello')}, {user.name || user.email}</span>
@@ -357,7 +356,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                       </div>
                     </button>
                   ) : (
-                    <button className="flex flex-col items-start hover:outline hover:outline-1 hover:outline-white px-2 py-1 text-left">
+                    <button className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'} hover:outline hover:outline-1 hover:outline-white px-2 py-1 ${isRTL ? 'text-right' : 'text-left'}`}>
                       <span className="text-xs">{t('header.hello')}, {t('header.signIn')}</span>
                       <div className="flex items-center gap-1">
                         <span className="text-sm font-bold">{t('header.accountAndLists')}</span>
@@ -375,7 +374,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           <div className="w-10 h-10 rounded-full bg-[#FFD814] flex items-center justify-center font-bold text-[#0F1111]">
                             {user.name?.[0].toUpperCase() || user.email[0].toUpperCase()}
                           </div>
-                          <div className="flex flex-col">
+                          <div className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'}`}>
                             <span className="text-sm font-bold text-[#0F1111]">{user.name}</span>
                             <span className="text-xs text-gray-500 truncate max-w-[180px]">{user.email}</span>
                           </div>
@@ -427,7 +426,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                           }}
                         >
                           <Settings className="h-4 w-4" />
-                          {activeShop ? `${activeShop.name} Dashboard` : 'Shop Dashboard'}
+                          {activeShop ? `${activeShop.name} ${t('header.shopDashboard')}` : t('header.shopDashboard')}
                         </button>
                       )}
 
@@ -442,7 +441,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                       ].map((item) => (
                         <button
                           key={item.path}
-                          className="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors group"
+                          className={`flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors group ${isRTL ? 'flex-row-reverse text-right' : ''}`}
                           onClick={() => {
                             navigate(item.path);
                             setIsHoverCardOpen(false);
@@ -464,7 +463,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                             setIsHoverCardOpen(false);
                           }}
                         >
-                          <LogIn className="h-4 w-4 rotate-180" />
+                          <LogIn className={`h-4 w-4 ${isRTL ? '' : 'rotate-180'}`} />
                           {t('header.signOut')}
                         </button>
                       </div>
@@ -534,7 +533,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                   <span className="text-sm font-bold">{t('header.all')}</span>
                 </button>
               </SheetTrigger>
-              <SheetContent side="left" className="bg-white w-[350px]">
+              <SheetContent side={isRTL ? 'right' : 'left'} className="bg-white w-[350px]">
                 <SheetTitle className="sr-only">Department Menu</SheetTitle>
                 <SheetDescription className="sr-only">Browse all departments and categories</SheetDescription>
                 <div className="flex flex-col gap-2 mt-8">
@@ -556,7 +555,7 @@ export function Header({ onNavigate, cartItemCount }: HeaderProps) {
                         onClick={() => {
                           onNavigate('search', undefined, category.name);
                         }}
-                        className="text-left pl-6 pr-2 py-2 hover:bg-[#EAEDED] rounded text-[#0F1111] flex items-center gap-3"
+                        className={`text-left pr-2 py-2 hover:bg-[#EAEDED] rounded text-[#0F1111] flex items-center gap-3 ${isRTL ? 'flex-row-reverse text-right pl-6' : 'pl-6'}`}
                       >
                         <category.icon className="h-5 w-5 text-[#565959]" />
                         {t(category.translationKey)}

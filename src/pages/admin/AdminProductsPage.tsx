@@ -146,10 +146,10 @@ export function AdminProductsPage() {
                                     <td className="py-3 px-4">
                                         <div className="flex items-center gap-3">
                                             <div className="relative">
-                                                <img 
-                                                    src={product.image} 
-                                                    alt={product.name} 
-                                                    className="h-10 w-10 md:h-12 md:w-12 object-cover rounded-lg border border-gray-200" 
+                                                <img
+                                                    src={product.image}
+                                                    alt={product.name}
+                                                    className="h-10 w-10 md:h-12 md:w-12 object-cover rounded-lg border border-gray-200"
                                                 />
                                             </div>
                                             <div>
@@ -171,7 +171,7 @@ export function AdminProductsPage() {
                                             </div>
                                         ) : (
                                             <span className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
-                                                {product.subcategoryName || product.category || 'Uncategorized'}
+                                                {product.subcategoryName || product.category || t('admin.uncategorized')}
                                             </span>
                                         )}
                                     </td>
@@ -189,30 +189,30 @@ export function AdminProductsPage() {
                                         {product.inStock ? (
                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                                In Stock
+                                                {t('product.inStock')}
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                                                Out of Stock
+                                                {t('product.outOfStock')}
                                             </span>
                                         )}
                                     </td>
                                     <td className="py-3 px-4">
                                         <div className="flex justify-end gap-1">
                                             <Link to={`/admin/products/${product.id}`}>
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
                                                     className="h-8 w-8 rounded-lg hover:bg-gray-100"
                                                 >
                                                     <Pencil className="h-4 w-4" />
                                                 </Button>
                                             </Link>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
-                                                className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-50" 
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-50"
                                                 onClick={() => handleDelete(product.id)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -230,14 +230,14 @@ export function AdminProductsPage() {
                         <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gray-100 mb-4">
                             <Package className="h-7 w-7 text-gray-400" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">No products found</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('admin.noProductsFound')}</h3>
                         <p className="text-gray-500 mb-6">
-                            {searchQuery ? 'Try adjusting your search terms' : 'Get started by adding your first product'}
+                            {searchQuery ? t('admin.tryAdjustingSearch') : t('admin.getStartedProducts')}
                         </p>
                         {!searchQuery && (
                             <Link to="/admin/products/new">
                                 <Button className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold">
-                                    <Plus className="mr-2 h-4 w-4" /> Add First Product
+                                    <Plus className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4`} /> {t('admin.addFirstProduct')}
                                 </Button>
                             </Link>
                         )}

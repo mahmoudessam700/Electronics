@@ -34,36 +34,36 @@ export function AdminDashboard() {
     }
 
     const stats = [
-        { 
-            title: t('admin.totalRevenue'), 
-            value: formatCurrency(data?.stats?.totalRevenue || 0), 
-            change: '+0.0%', 
+        {
+            title: t('admin.totalRevenue'),
+            value: formatCurrency(data?.stats?.totalRevenue || 0),
+            change: '+0.0%',
             trend: 'up',
-            icon: DollarSign, 
+            icon: DollarSign,
             iconBg: 'bg-[#4A5568]'
         },
-        { 
-            title: t('admin.totalOrders'), 
-            value: data?.stats?.totalOrders || '0', 
-            change: '+0.0%', 
+        {
+            title: t('admin.totalOrders'),
+            value: data?.stats?.totalOrders || '0',
+            change: '+0.0%',
             trend: 'up',
-            icon: ShoppingCart, 
+            icon: ShoppingCart,
             iconBg: 'bg-[#718096]'
         },
-        { 
-            title: t('admin.totalProducts'), 
-            value: data?.stats?.totalProducts || '0', 
-            change: '+0.0%', 
+        {
+            title: t('admin.totalProducts'),
+            value: data?.stats?.totalProducts || '0',
+            change: '+0.0%',
             trend: 'up',
-            icon: Package, 
+            icon: Package,
             iconBg: 'bg-[#4A5568]'
         },
-        { 
-            title: t('admin.totalCustomers'), 
-            value: data?.stats?.totalCustomers || '0', 
-            change: '+0.0', 
+        {
+            title: t('admin.totalCustomers'),
+            value: data?.stats?.totalCustomers || '0',
+            change: '+0.0',
             trend: 'up',
-            icon: Users, 
+            icon: Users,
             iconBg: 'bg-[#718096]'
         },
     ];
@@ -90,11 +90,11 @@ export function AdminDashboard() {
             <div className="bg-[#4A5568] rounded-xl p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <p className="text-sm text-white/70 mb-1">{t('admin.salesOverview')}</p>
-                    <h1 className="text-2xl font-bold">Welcome back, Admin!</h1>
+                    <h1 className="text-2xl font-bold">{t('admin.welcomeBack')}</h1>
                     <p className="text-white/80 text-sm mt-1">{t('admin.viewAll')}</p>
                 </div>
-                <Link 
-                    to="/admin/financial" 
+                <Link
+                    to="/admin/financial"
                     className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 transition-all font-medium text-sm self-start md:self-center"
                 >
                     <DollarSign className="h-4 w-4" />
@@ -106,7 +106,7 @@ export function AdminDashboard() {
             {/* Stats Grid */}
             <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
                 {stats.map((stat) => (
-                    <div 
+                    <div
                         key={stat.title}
                         className="bg-white rounded-xl p-4 md:p-5 border border-gray-200"
                     >
@@ -114,11 +114,10 @@ export function AdminDashboard() {
                             <div className={`p-2.5 rounded-lg ${stat.iconBg}`}>
                                 <stat.icon className="h-5 w-5 text-white" />
                             </div>
-                            <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
-                                stat.trend === 'up' 
-                                    ? 'bg-emerald-100 text-emerald-700' 
+                            <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${stat.trend === 'up'
+                                    ? 'bg-emerald-100 text-emerald-700'
                                     : 'bg-red-100 text-red-700'
-                            }`}>
+                                }`}>
                                 {stat.trend === 'up' ? (
                                     <TrendingUp className="h-3 w-3" />
                                 ) : (
@@ -139,15 +138,15 @@ export function AdminDashboard() {
                 <div className="lg:col-span-4 bg-white rounded-xl p-5 border border-gray-200">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900">Revenue Overview</h3>
-                            <p className="text-sm text-gray-500">Monthly revenue performance</p>
+                            <h3 className="text-lg font-semibold text-gray-900">{t('admin.revenueOverview')}</h3>
+                            <p className="text-sm text-gray-500">{t('admin.monthlyRevenuePerformance')}</p>
                         </div>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                            <span className="text-sm font-medium text-emerald-700">Live</span>
+                            <span className="text-sm font-medium text-emerald-700">{t('admin.live')}</span>
                         </div>
                     </div>
-                    
+
                     {/* Chart Visualization */}
                     <div className="h-[200px] md:h-[240px] flex items-end justify-between gap-1 md:gap-2 px-2">
                         {revenueOverview.map((item: any, index: number) => {
@@ -155,7 +154,7 @@ export function AdminDashboard() {
                             const height = (parseFloat(item.revenue) || 0) / maxRevenue * 200;
                             return (
                                 <div key={index} className="flex-1 flex flex-col items-center gap-2 group">
-                                    <div 
+                                    <div
                                         className="w-full bg-[#4A5568] rounded-t opacity-70 hover:opacity-100 transition-all cursor-pointer hover:bg-[#718096] relative"
                                         style={{ height: `${Math.max(height, 4)}px` }}
                                         title={formatCurrency(item.revenue)}
@@ -185,7 +184,7 @@ export function AdminDashboard() {
                             <ArrowUpRight className="h-4 w-4" />
                         </Link>
                     </div>
-                    
+
                     <div className="space-y-3">
                         {recentSales.length > 0 ? recentSales.map((sale: any, index: number) => (
                             <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
@@ -201,7 +200,7 @@ export function AdminDashboard() {
                                 </div>
                             </div>
                         )) : (
-                            <p className="text-center text-gray-500 py-8 text-sm">No recent activity</p>
+                            <p className="text-center text-gray-500 py-8 text-sm">{t('admin.noRecentActivity')}</p>
                         )}
                     </div>
                 </div>
@@ -219,7 +218,7 @@ export function AdminDashboard() {
                         <ArrowUpRight className="h-4 w-4" />
                     </Link>
                 </div>
-                
+
                 <div className="overflow-x-auto -mx-5 px-5">
                     <table className="w-full min-w-[500px]">
                         <thead>
@@ -248,7 +247,7 @@ export function AdminDashboard() {
                                     </td>
                                     <td className="py-3 px-3">
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusStyle(order.status)}`}>
-                                            {order.status}
+                                            {t(`admin.${order.status.toLowerCase()}`)}
                                         </span>
                                     </td>
                                     <td className="py-3 px-3 text-right">
@@ -257,7 +256,7 @@ export function AdminDashboard() {
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} className="py-12 text-center text-gray-500 text-sm">No recent orders</td>
+                                    <td colSpan={5} className="py-12 text-center text-gray-500 text-sm">{t('admin.noRecentOrders')}</td>
                                 </tr>
                             )}
                         </tbody>

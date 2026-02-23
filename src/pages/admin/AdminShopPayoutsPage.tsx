@@ -52,7 +52,7 @@ interface CreateFormState {
 }
 
 export function AdminShopPayoutsPage() {
-    const { t } = useLanguage();
+    const { t, language, isRTL, formatCurrency } = useLanguage();
     const [shops, setShops] = useState<ShopSummary[]>([]);
     const [payouts, setPayouts] = useState<AdminPayout[]>([]);
     const [loading, setLoading] = useState(false);
@@ -86,7 +86,7 @@ export function AdminShopPayoutsPage() {
         try {
             const res = await fetch('/api/shops');
             if (!res.ok) {
-                throw new Error('Failed to load shops');
+                throw new Error(t('admin.failedToLoadShops'));
             }
             const data = await res.json();
             const options = Array.isArray(data)
@@ -95,7 +95,7 @@ export function AdminShopPayoutsPage() {
             setShops(options);
         } catch (error) {
             console.error(error);
-            toast.error('Unable to load shops');
+            toast.error(t('admin.unableToLoadShops'));
         }
     };
 
@@ -110,13 +110,13 @@ export function AdminShopPayoutsPage() {
             const res = await fetch(`/api/admin?${params.toString()}`);
             if (!res.ok) {
                 const payload = await res.json().catch(() => ({}));
-                throw new Error(payload.error || 'Failed to load payouts');
+                throw new Error(payload.error || t('admin.failedToLoadPayoutRecords'));
             }
             const data = await res.json();
             setPayouts(Array.isArray(data.payouts) ? data.payouts : []);
         } catch (error) {
             console.error(error);
-            toast.error(error instanceof Error ? error.message : 'Unable to load payouts');
+            toast.error(error instanceof Error ? error.message : t('admin.unableToLoadPayoutRecords'));
         } finally {
             setLoading(false);
         }
@@ -125,12 +125,12 @@ export function AdminShopPayoutsPage() {
     const handleCreate = async (event: React.FormEvent) => {
         event.preventDefault();
         if (!form.shopId || !form.amount) {
-            toast.error('Shop and amount are required');
+            toast.error(t('admin.shopAndAmountRequired'));
             return;
         }
         const numericAmount = Number(form.amount);
         if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-            toast.error('Enter a valid amount');
+            toast.error(t('admin.enterValidAmount'));
             return;
         }
         setSaving(true);
@@ -149,13 +149,13 @@ export function AdminShopPayoutsPage() {
             });
             if (!res.ok) {
                 const payload = await res.json().catch(() => ({}));
-                throw new Error(payload.error || 'Failed to create payout');
+                throw new Error(payload.error || t('admin.failedToCreatePayout'));
             }
-            toast.success('Payout queued');
+            toast.success(t('admin.payoutQueued'));
             setForm((prev) => ({ ...prev, amount: '', reference: '', notes: '' }));
             await fetchPayouts();
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Unable to create payout');
+            toast.error(error instanceof Error ? error.message : t('admin.failedToCreatePayout'));
         } finally {
             setSaving(false);
         }
@@ -171,18 +171,18 @@ export function AdminShopPayoutsPage() {
             });
             if (!res.ok) {
                 const payload = await res.json().catch(() => ({}));
-                throw new Error(payload.error || 'Failed to update payout');
+                throw new Error(payload.error || t('admin.failedToUpdatePayout'));
             }
-            toast.success('Payout updated');
+            toast.success(t('admin.payoutUpdated'));
             await fetchPayouts();
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Unable to update payout');
+            toast.error(error instanceof Error ? error.message : t('admin.failedToUpdatePayout'));
         } finally {
             setUpdatingId(null);
         }
     };
 
-    const formatAmount = (value: number) => `EGP ${value.toFixed(2)}`;
+    const formatAmount = (value: number) => formatCurrency(value);
 
     const loadPayoutOrders = async (payoutId: string) => {
         setPayoutOrderMap((prev) => ({
@@ -196,7 +196,7 @@ export function AdminShopPayoutsPage() {
             }
             const res = await fetch(`/api/orders?${params.toString()}`);
             if (!res.ok) {
-                throw new Error('Failed to load payout orders');
+                throw new Error(t('admin.failedToLoadPayoutOrders'));
             }
             const data = await res.json();
             setPayoutOrderMap((prev) => ({
@@ -208,7 +208,7 @@ export function AdminShopPayoutsPage() {
             }));
         } catch (error) {
             console.error(error);
-            toast.error('Unable to load payout orders');
+            toast.error(t('admin.unableToLoadPayoutOrders'));
             setPayoutOrderMap((prev) => ({
                 ...prev,
                 [payoutId]: { loading: false, data: prev[payoutId]?.data || [] },
@@ -228,8 +228,8 @@ export function AdminShopPayoutsPage() {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className={`flex flex-wrap items-center justify-between gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-400 font-semibold flex items-center gap-2">
                         <ShieldCheck className="h-4 w-4" />
@@ -240,7 +240,7 @@ export function AdminShopPayoutsPage() {
                         <p className="text-sm text-slate-500">{t('admin.currentlyViewing')} {selectedShop.name}</p>
                     )}
                 </div>
-                <div className="flex gap-2">
+                <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <Button variant="outline" onClick={fetchPayouts} className="border-slate-200 text-slate-600">
                         <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                         {t('admin.refresh')}
@@ -248,7 +248,7 @@ export function AdminShopPayoutsPage() {
                 </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap gap-4 items-center">
+            <div className={`bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap gap-4 items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className="flex flex-col">
                     <label className="text-xs font-semibold text-slate-500">{t('admin.shop')}</label>
                     <select
@@ -262,7 +262,7 @@ export function AdminShopPayoutsPage() {
                     </select>
                 </div>
                 <div className="flex flex-col">
-                    <label className="text-xs font-semibold text-slate-500 flex items-center gap-1">
+                    <label className={`text-xs font-semibold text-slate-500 flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <Filter className="h-3 w-3" /> {t('admin.status')}
                     </label>
                     <select
@@ -270,7 +270,8 @@ export function AdminShopPayoutsPage() {
                         onChange={(event) => setFilters((prev) => ({ ...prev, status: event.target.value }))}
                         className="mt-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
                     >
-                        {['ALL', ...STATUS_OPTIONS].map((status) => (
+                        <option value="ALL">{t('admin.all')}</option>
+                        {STATUS_OPTIONS.map((status) => (
                             <option key={status} value={status}>{status}</option>
                         ))}
                     </select>
@@ -282,7 +283,7 @@ export function AdminShopPayoutsPage() {
             </div>
 
             <form onSubmit={handleCreate} className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
-                <div className="flex items-center gap-3">
+                <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <Plus className="h-5 w-5 text-emerald-600" />
                     <h2 className="text-lg font-semibold text-slate-900">{t('admin.createPayout')}</h2>
                 </div>
@@ -349,7 +350,7 @@ export function AdminShopPayoutsPage() {
                         />
                     </div>
                 </div>
-                <div className="flex justify-end">
+                <div className={`flex justify-end ${isRTL ? 'justify-start' : 'justify-end'}`}>
                     <Button type="submit" disabled={saving}>
                         {saving ? t('admin.savingPayout') : t('admin.createPayout')}
                     </Button>
@@ -357,13 +358,13 @@ export function AdminShopPayoutsPage() {
             </form>
 
             <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                <div className={`px-4 py-3 border-b border-slate-100 flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <h3 className="font-semibold text-slate-900">{t('admin.recentPayouts')}</h3>
                     <Badge variant="outline">{payouts.length} {t('admin.entries')}</Badge>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-slate-50 text-left rtl:text-right text-xs uppercase tracking-wider text-slate-500">
+                        <thead className={`bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500 ${isRTL ? 'text-right' : 'text-left'}`}>
                             <tr>
                                 <th className="px-4 py-3">{t('admin.reference')}</th>
                                 <th className="px-4 py-3">{t('admin.shop')}</th>
@@ -385,7 +386,7 @@ export function AdminShopPayoutsPage() {
                                         <tr className="hover:bg-slate-50">
                                             <td className="px-4 py-4">
                                                 <div className="font-semibold text-slate-900">{payout.reference || '—'}</div>
-                                                <div className="text-xs text-slate-500">{t('admin.created')} {new Date(payout.createdAt).toLocaleDateString()}</div>
+                                                <div className="text-xs text-slate-500">{t('admin.created')} {new Date(payout.createdAt).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-EG')}</div>
                                             </td>
                                             <td className="px-4 py-4">
                                                 <div className="text-sm font-medium text-slate-900">{payout.shopName || selectedShop?.name || payout.shopId}</div>
@@ -396,16 +397,16 @@ export function AdminShopPayoutsPage() {
                                             <td className="px-4 py-4 font-semibold">{formatAmount(payout.amount)}</td>
                                             <td className="px-4 py-4 text-sm text-slate-600">
                                                 <div>{payout.orderCount ?? 0} {t('admin.orders').toLowerCase()}</div>
-                                                <div className="text-xs text-slate-500">{t('admin.queued')}: E£ {queuedTotal.toFixed(2)}</div>
+                                                <div className="text-xs text-slate-500">{t('admin.queued')}: {formatAmount(queuedTotal)}</div>
                                             </td>
                                             <td className="px-4 py-4">
                                                 <Badge variant="outline">{payout.status}</Badge>
                                             </td>
                                             <td className="px-4 py-4">
                                                 {payout.scheduledFor ? (
-                                                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                    <div className={`flex items-center gap-2 text-xs text-slate-500 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                         <CalendarDays className="h-4 w-4" />
-                                                        {new Date(payout.scheduledFor).toLocaleDateString()}
+                                                        {new Date(payout.scheduledFor).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-EG')}
                                                     </div>
                                                 ) : (
                                                     <span className="text-xs text-slate-400">—</span>
@@ -431,9 +432,9 @@ export function AdminShopPayoutsPage() {
                                         </tr>
                                         {expanded && (
                                             <tr>
-                                                <td colSpan={7} className="bg-slate-50 px-4 py-3 text-xs">
+                                                <td colSpan={7} className={`bg-slate-50 px-4 py-3 text-xs ${isRTL ? 'text-right' : 'text-left'}`}>
                                                     {ordersState?.loading ? (
-                                                        <div className="flex items-center gap-2 text-slate-500">
+                                                        <div className={`flex items-center gap-2 text-slate-500 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                             <RefreshCw className="h-4 w-4 animate-spin" />
                                                             <span>{t('admin.loadingOrders')}</span>
                                                         </div>
@@ -445,8 +446,8 @@ export function AdminShopPayoutsPage() {
                                                                         <p className="font-semibold text-slate-800">{order.orderNumber}</p>
                                                                         <p className="text-[11px] text-slate-500">{order.status}</p>
                                                                     </div>
-                                                                    <div className="text-right">
-                                                                        <p className="font-semibold text-slate-900">E£ {order.totalAmount.toFixed(2)}</p>
+                                                                    <div className={isRTL ? 'text-left' : 'text-right'}>
+                                                                        <p className="font-semibold text-slate-900">{formatAmount(order.totalAmount)}</p>
                                                                         <p className="text-[11px] text-slate-500">{order.shopPayoutStatus || '—'}</p>
                                                                     </div>
                                                                 </div>

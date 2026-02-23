@@ -6,6 +6,7 @@ import { Loader2, ArrowLeft, Folder, ImageIcon, Upload, Camera } from 'lucide-re
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CameraCapture } from '../../components/CameraCapture';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 // Allowed categories - only these can be created
 const ALLOWED_CATEGORIES = [
@@ -20,6 +21,7 @@ const ALLOWED_CATEGORIES = [
 ];
 
 export function AdminCategoryFormPage() {
+    const { t, isRTL } = useLanguage();
     const { id } = useParams();
     const isEditing = !!id;
     const navigate = useNavigate();
@@ -50,12 +52,12 @@ export function AdminCategoryFormPage() {
                 setDescription(category.description || '');
                 setImage(category.image || '');
             } else {
-                toast.error('Category not found');
+                toast.error(t('admin.categoryNotFound'));
                 navigate('/admin/categories');
             }
         } catch (error) {
             console.error('Failed to fetch category', error);
-            toast.error('Failed to load category');
+            toast.error(t('admin.failedToLoadCategory'));
         } finally {
             setFetchingCategory(false);
         }
@@ -77,13 +79,13 @@ export function AdminCategoryFormPage() {
             const data = await res.json();
             if (res.ok && data.files?.[0]?.url) {
                 setImage(data.files[0].url);
-                toast.success('Image uploaded!');
+                toast.success(t('admin.imageUploaded'));
             } else {
-                toast.error('Upload failed');
+                toast.error(t('admin.uploadFailed'));
             }
         } catch (error) {
             console.error('Upload error', error);
-            toast.error('Upload failed');
+            toast.error(t('admin.uploadFailed'));
         } finally {
             setUploading(false);
         }
@@ -93,7 +95,7 @@ export function AdminCategoryFormPage() {
         e.preventDefault();
 
         if (!name.trim()) {
-            toast.error('Category name is required');
+            toast.error(t('admin.categoryNameRequiredToast'));
             return;
         }
 
@@ -122,15 +124,15 @@ export function AdminCategoryFormPage() {
             });
 
             if (res.ok) {
-                toast.success(isEditing ? 'Category updated!' : 'Category created!');
+                toast.success(isEditing ? t('admin.categoryUpdatedToast') : t('admin.categoryCreatedToast'));
                 navigate('/admin/categories');
             } else {
                 const error = await res.json();
-                toast.error(error.error || 'Failed to save category');
+                toast.error(error.error || t('admin.failedToSaveCategory'));
             }
         } catch (error) {
             console.error('Save error', error);
-            toast.error('Failed to save category');
+            toast.error(t('admin.failedToSaveCategory'));
         } finally {
             setLoading(false);
         }
@@ -138,32 +140,32 @@ export function AdminCategoryFormPage() {
 
     if (fetchingCategory) {
         return (
-            <div className="flex flex-col items-center justify-center py-20">
+            <div className={`flex flex-col items-center justify-center py-20 ${isRTL ? 'text-right' : 'text-left'}`}>
                 <div className="w-12 h-12 border-4 border-[#4A5568]/30 border-t-[#4A5568] rounded-full animate-spin" />
-                <span className="mt-4 text-gray-500">Loading category...</span>
+                <span className="mt-4 text-gray-500">{t('admin.loadingCategory')}</span>
             </div>
         );
     }
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className={`max-w-2xl mx-auto space-y-6 ${isRTL ? 'text-right' : 'text-left'}`}>
             {/* Header */}
-            <div className="flex items-center gap-4">
+            <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <Link to="/admin/categories">
-                    <Button 
-                        variant="ghost" 
+                    <Button
+                        variant="ghost"
                         size="icon"
                         className="h-10 w-10 rounded-xl hover:bg-gray-100"
                     >
-                        <ArrowLeft className="h-5 w-5" />
+                        <ArrowLeft className={`h-5 w-5 ${isRTL ? 'rotate-180' : ''}`} />
                     </Button>
                 </Link>
-                <div>
+                <div className={isRTL ? 'text-right' : 'text-left'}>
                     <h1 className="text-2xl font-bold text-gray-900">
-                        {isEditing ? 'Edit Category' : 'New Category'}
+                        {isEditing ? t('admin.editCategory') : t('admin.newCategory')}
                     </h1>
                     <p className="text-sm text-gray-500">
-                        {isEditing ? 'Update category details' : 'Add a new category to your store'}
+                        {isEditing ? t('admin.updateCategoryDetails') : t('admin.addNewCategoryToStore')}
                     </p>
                 </div>
             </div>
@@ -171,23 +173,23 @@ export function AdminCategoryFormPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info Card */}
                 <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                        <div className="flex items-center gap-2">
+                    <div className={`px-6 py-4 border-b border-gray-100 bg-gray-50 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                             <Folder className="h-5 w-5 text-[#4A5568]" />
-                            <h2 className="font-semibold text-gray-900">Basic Information</h2>
+                            <h2 className="font-semibold text-gray-900">{t('admin.basicInformation')}</h2>
                         </div>
                     </div>
                     <div className="p-6 space-y-5">
                         <div className="space-y-2">
-                            <Label htmlFor="name" className="text-sm font-medium">Category Name *</Label>
+                            <Label htmlFor="name" className={`text-sm font-medium ${isRTL ? 'text-right block' : 'text-left block'}`}>{t('admin.categoryNameRequired')}</Label>
                             {isEditing ? (
                                 <Input
                                     id="name"
                                     required
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="Category name"
-                                    className="rounded-lg h-11"
+                                    placeholder={t('admin.categoryName')}
+                                    className={`rounded-lg h-11 ${isRTL ? 'text-right' : 'text-left'}`}
                                 />
                             ) : (
                                 <select
@@ -195,9 +197,9 @@ export function AdminCategoryFormPage() {
                                     required
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full h-11 px-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4A5568]/20 focus:border-[#4A5568] transition-colors bg-white"
+                                    className={`w-full h-11 px-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4A5568]/20 focus:border-[#4A5568] transition-colors bg-white ${isRTL ? 'text-right' : 'text-left'}`}
                                 >
-                                    <option value="">Select a category...</option>
+                                    <option value="">{t('admin.selectACategory')}</option>
                                     {ALLOWED_CATEGORIES.map(cat => (
                                         <option key={cat} value={cat}>{cat}</option>
                                     ))}
@@ -206,13 +208,13 @@ export function AdminCategoryFormPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+                            <Label htmlFor="description" className={`text-sm font-medium ${isRTL ? 'text-right block' : 'text-left block'}`}>{t('admin.description')}</Label>
                             <textarea
                                 id="description"
-                                className="w-full min-h-[100px] p-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4A5568]/20 focus:border-[#4A5568] transition-colors resize-none"
+                                className={`w-full min-h-[100px] p-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4A5568]/20 focus:border-[#4A5568] transition-colors resize-none ${isRTL ? 'text-right' : 'text-left'}`}
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                placeholder="Describe this category..."
+                                placeholder={t('admin.describeThisCategory')}
                             />
                         </div>
                     </div>
@@ -220,25 +222,25 @@ export function AdminCategoryFormPage() {
 
                 {/* Image Card */}
                 <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                        <div className="flex items-center gap-2">
+                    <div className={`px-6 py-4 border-b border-gray-100 bg-gray-50 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                             <ImageIcon className="h-5 w-5 text-[#718096]" />
-                            <h2 className="font-semibold text-gray-900">Category Image</h2>
+                            <h2 className="font-semibold text-gray-900">{t('admin.categoryImage')}</h2>
                         </div>
                     </div>
                     <div className="p-6">
-                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                        <div className={`flex flex-col sm:flex-row items-center sm:items-start gap-6 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
                             {/* Image Preview */}
                             <div className="flex-shrink-0">
                                 {image ? (
                                     <div className="relative group">
-                                        <img 
-                                            src={image} 
-                                            alt="Preview" 
-                                            className="h-32 w-32 object-cover rounded-xl border-2 border-gray-100 shadow-sm" 
+                                        <img
+                                            src={image}
+                                            alt="Preview"
+                                            className="h-32 w-32 object-cover rounded-xl border-2 border-gray-100 shadow-sm"
                                         />
                                         <div className="absolute inset-0 bg-black/50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <span className="text-white text-xs font-medium">Change</span>
+                                            <span className="text-white text-xs font-medium">{t('admin.change')}</span>
                                         </div>
                                     </div>
                                 ) : (
@@ -247,7 +249,7 @@ export function AdminCategoryFormPage() {
                                     </div>
                                 )}
                             </div>
-                            
+
                             {/* Upload Section */}
                             <div className="flex-1 w-full space-y-4">
                                 <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 hover:border-[#4A5568]/50 hover:bg-gray-50 transition-colors cursor-pointer relative">
@@ -258,52 +260,52 @@ export function AdminCategoryFormPage() {
                                         disabled={uploading}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                     />
-                                    <div className="flex items-center gap-3">
+                                    <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                         <div className="p-2 bg-[#4A5568]/10 rounded-lg">
                                             <Upload className="h-5 w-5 text-[#4A5568]" />
                                         </div>
-                                        <div>
+                                        <div className={isRTL ? 'text-right' : 'text-left'}>
                                             <p className="text-sm font-medium text-gray-900">
-                                                {uploading ? 'Uploading...' : 'Click to upload'}
+                                                {uploading ? t('admin.uploading') : t('admin.clickToUpload')}
                                             </p>
-                                            <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                            <p className="text-xs text-gray-500">{t('admin.uploadLimits')}</p>
                                         </div>
-                                        {uploading && <Loader2 className="h-5 w-5 animate-spin text-[#4A5568] ml-auto" />}
+                                        {uploading && <Loader2 className={`h-5 w-5 animate-spin text-[#4A5568] ${isRTL ? 'mr-auto' : 'ml-auto'}`} />}
                                     </div>
                                 </div>
 
-                                <div className="flex gap-2">
-                                    <CameraCapture 
+                                <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                    <CameraCapture
                                         onCapture={(file) => handleImageUpload(file)}
                                         trigger={
-                                            <Button 
-                                                type="button" 
-                                                variant="outline" 
-                                                className="flex-1 gap-2 border-gray-200 hover:bg-gray-50 h-11"
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                className={`flex-1 gap-2 border-gray-200 hover:bg-gray-50 h-11 ${isRTL ? 'flex-row-reverse' : ''}`}
                                                 disabled={uploading}
                                             >
                                                 <Camera className="h-4 w-4" />
-                                                Take Photo
+                                                {t('admin.takePhoto')}
                                             </Button>
                                         }
                                     />
                                 </div>
-                                
+
                                 <div className="relative">
                                     <div className="absolute inset-0 flex items-center">
                                         <span className="w-full border-t border-gray-200" />
                                     </div>
                                     <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-white px-2 text-gray-400">Or paste URL</span>
+                                        <span className={`bg-white px-2 text-gray-400 ${isRTL ? 'text-right' : 'text-left'}`}>{t('admin.orPasteUrl')}</span>
                                     </div>
                                 </div>
-                                
+
                                 <Input
                                     type="url"
                                     value={image}
                                     onChange={(e) => setImage(e.target.value)}
                                     placeholder="https://example.com/image.jpg"
-                                    className="rounded-lg h-11"
+                                    className={`rounded-lg h-11 ${isRTL ? 'text-right' : 'text-left'}`}
                                 />
                             </div>
                         </div>
@@ -311,22 +313,22 @@ export function AdminCategoryFormPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-3 pt-4">
+                <div className={`flex gap-3 pt-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <Button
                         type="button"
                         variant="outline"
                         onClick={() => navigate('/admin/categories')}
                         className="flex-1 h-12 rounded-lg border-gray-200 hover:bg-gray-50"
                     >
-                        Cancel
+                        {t('admin.cancel')}
                     </Button>
-                    <Button 
-                        type="submit" 
-                        disabled={loading || uploading} 
-                        className="flex-1 h-12 rounded-lg bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold"
+                    <Button
+                        type="submit"
+                        disabled={loading || uploading}
+                        className={`flex-1 h-12 rounded-lg bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold flex items-center justify-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
-                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {isEditing ? 'Update Category' : 'Create Category'}
+                        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                        {isEditing ? t('admin.updateCategory') : t('admin.createCategory')}
                     </Button>
                 </div>
             </form>

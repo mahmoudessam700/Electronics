@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
-import { 
-    DollarSign, 
-    TrendingUp, 
-    Plus, 
+import {
+    DollarSign,
+    TrendingUp,
+    Plus,
     ArrowDownRight,
-  Filter,
-  Download,
-  Wallet,
-  Receipt,
-  CreditCard,
-  PieChart,
-  Loader2
+    Filter,
+    Download,
+    Wallet,
+    Receipt,
+    CreditCard,
+    PieChart,
+    Loader2
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -69,31 +69,31 @@ export function AdminFinancialPage() {
     };
 
     const stats = [
-        { 
-            title: t('admin.currentRevenue'), 
-            value: formatCurrency(cycle.totalRevenue || 0), 
-            icon: DollarSign, 
+        {
+            title: t('admin.currentRevenue'),
+            value: formatCurrency(cycle.totalRevenue || 0),
+            icon: DollarSign,
             color: 'text-emerald-600',
             bg: 'bg-emerald-50'
         },
-        { 
-            title: t('admin.currentExpenses'), 
-            value: formatCurrency(cycle.totalExpenses || 0), 
-            icon: ArrowDownRight, 
+        {
+            title: t('admin.currentExpenses'),
+            value: formatCurrency(cycle.totalExpenses || 0),
+            icon: ArrowDownRight,
             color: 'text-red-600',
             bg: 'bg-red-50'
         },
-        { 
-            title: t('admin.estimatedTax'), 
-            value: formatCurrency(cycle.totalTax || 0), 
-            icon: Receipt, 
+        {
+            title: t('admin.estimatedTax'),
+            value: formatCurrency(cycle.totalTax || 0),
+            icon: Receipt,
             color: 'text-amber-600',
             bg: 'bg-amber-50'
         },
-        { 
-            title: t('admin.netProfit'), 
-            value: formatCurrency(cycle.netProfit || 0), 
-            icon: Wallet, 
+        {
+            title: t('admin.netProfit'),
+            value: formatCurrency(cycle.netProfit || 0),
+            icon: Wallet,
             color: 'text-blue-600',
             bg: 'bg-blue-50'
         },
@@ -113,9 +113,9 @@ export function AdminFinancialPage() {
                         {t('admin.exportReport')}
                     </button>
                     {!currentCycle && (
-                        <button 
+                        <button
                             onClick={async () => {
-                                const name = prompt('Enter cycle name (e.g., February 2026):');
+                                const name = prompt(t('admin.enterCycleName') || 'Enter cycle name:');
                                 if (name) {
                                     await fetch('/api/admin?resource=financial&type=cycle', {
                                         method: 'POST',
@@ -132,18 +132,18 @@ export function AdminFinancialPage() {
                         </button>
                     )}
                     {currentCycle && (
-                        <button 
+                        <button
                             onClick={async () => {
-                                const desc = prompt('Expense description:');
-                                const amt = prompt('Amount:');
-                                const cat = prompt('Category:');
+                                const desc = prompt(t('admin.expenseDescriptionPrompt') || 'Expense description:');
+                                const amt = prompt(t('admin.amountPrompt') || 'Amount:');
+                                const cat = prompt(t('admin.categoryPrompt') || 'Category:');
                                 if (desc && amt && cat) {
                                     await fetch('/api/admin?resource=financial&type=expense', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ 
-                                            description: desc, 
-                                            amount: parseFloat(amt), 
+                                        body: JSON.stringify({
+                                            description: desc,
+                                            amount: parseFloat(amt),
                                             category: cat,
                                             cycleId: currentCycle.id
                                         })
@@ -173,7 +173,7 @@ export function AdminFinancialPage() {
                         <h2 className="text-xl font-bold">{cycle.name}</h2>
                         {currentCycle && <span className="text-white/60 text-sm ml-2">{new Date(cycle.startDate).toLocaleDateString()} {t('admin.toPresent')}</span>}
                     </div>
-                    
+
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                         <div>
                             <p className="text-white/60 text-xs uppercase tracking-widest mb-1 font-semibold">{t('admin.totalRevenue')}</p>
@@ -220,13 +220,12 @@ export function AdminFinancialPage() {
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`pb-4 text-sm font-medium transition-all relative ${
-                                activeTab === tab ? 'text-[#0F172A]' : 'text-gray-400 hover:text-gray-600'
-                            }`}
+                            className={`pb-4 text-sm font-medium transition-all relative ${activeTab === tab ? 'text-[#0F172A]' : 'text-gray-400 hover:text-gray-600'
+                                }`}
                         >
-                            {tab === 'overview' ? t('admin.overview') : 
-                             tab === 'expenses' ? t('admin.expenses') : 
-                             tab === 'payouts' ? t('admin.payouts') : t('admin.analysis')}
+                            {tab === 'overview' ? t('admin.overview') :
+                                tab === 'expenses' ? t('admin.expenses') :
+                                    tab === 'payouts' ? t('admin.payouts') : t('admin.analysis')}
                             {activeTab === tab && (
                                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0F172A] rounded-full" />
                             )}
@@ -266,7 +265,7 @@ export function AdminFinancialPage() {
                             </div>
                         </div>
                     )}
-                    
+
                     {activeTab === 'expenses' && (
                         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
                             <Receipt className="h-12 w-12 text-slate-300 mx-auto mb-4" />
@@ -324,9 +323,9 @@ export function AdminFinancialPage() {
                         </h3>
                         <div className="space-y-2">
                             {currentCycle && (
-                                <button 
+                                <button
                                     onClick={async () => {
-                                        if (confirm(`Are you sure you want to close "${currentCycle.name}"?`)) {
+                                        if (confirm(t('admin.confirmCloseCycle')?.replace('{name}', currentCycle.name) || `Are you sure you want to close "${currentCycle.name}"?`)) {
                                             await fetch(`/api/admin?resource=financial&id=${currentCycle.id}&action=close`, { method: 'PUT' });
                                             fetchFinancialData();
                                         }

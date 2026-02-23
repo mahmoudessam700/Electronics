@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { User, MapPin, Mail, Phone, Package, List, Camera, Loader2, Save } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface AccountPageProps {
     onNavigate: (page: string) => void;
 }
 
 export function AccountPage({ onNavigate }: AccountPageProps) {
+    const { t, isRTL } = useLanguage();
     const { user, token } = useAuth();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -45,7 +47,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
         setMessage(null);
 
         if (!navigator.geolocation) {
-            setMessage({ type: 'error', text: 'Geolocation is not supported by your browser' });
+            setMessage({ type: 'error', text: t('account.geoNotSupported') });
             setDetecting(false);
             return;
         }
@@ -67,7 +69,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
             }
         }, (err) => {
             console.error('Geolocation error', err);
-            setMessage({ type: 'error', text: 'Failed to detect location. Please enter address manually.' });
+            setMessage({ type: 'error', text: t('account.geoError') });
             setDetecting(false);
         });
     };
@@ -91,10 +93,10 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
             const data = await res.json();
             if (data.success && data.files?.[0]?.url) {
                 setFormData(prev => ({ ...prev, image: data.files[0].url }));
-                setMessage({ type: 'success', text: 'Photo uploaded! Don\'t forget to save changes.' });
+                setMessage({ type: 'success', text: t('account.uploadSuccess') });
             }
         } catch (err) {
-            setMessage({ type: 'error', text: 'Failed to upload image' });
+            setMessage({ type: 'error', text: t('account.uploadError') });
         } finally {
             setUploading(false);
         }
@@ -115,13 +117,13 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
             });
 
             if (res.ok) {
-                setMessage({ type: 'success', text: 'Account details saved successfully!' });
+                setMessage({ type: 'success', text: t('account.saveSuccess') });
             } else {
                 const data = await res.json();
-                setMessage({ type: 'error', text: data.error || 'Failed to update profile' });
+                setMessage({ type: 'error', text: data.error || t('account.saveError') });
             }
         } catch (error) {
-            setMessage({ type: 'error', text: 'An unexpected error occurred' });
+            setMessage({ type: 'error', text: t('common.errorOccurred') || 'An unexpected error occurred' });
         } finally {
             setSaving(false);
         }
@@ -146,12 +148,12 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
         <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
             {/* Header */}
             <div style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e5e7eb' }}>
-                <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px 0' }}>
-                    <h1 style={{ fontSize: 24, fontWeight: 700, color: '#000000', margin: 0 }}>Your Account</h1>
-                    <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>Control your profile, security, and preferences</p>
+                <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px 0', textAlign: isRTL ? 'right' : 'left' }}>
+                    <h1 style={{ fontSize: 24, fontWeight: 700, color: '#000000', margin: 0 }}>{t('account.title')}</h1>
+                    <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>{t('account.subtitle')}</p>
 
                     {/* Navigation Tabs */}
-                    <div style={{ display: 'flex', gap: 24, marginTop: 24, borderBottom: '1px solid #e5e7eb' }}>
+                    <div style={{ display: 'flex', gap: 24, marginTop: 24, borderBottom: '1px solid #e5e7eb', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                         <button
                             onClick={() => onNavigate('orders')}
                             style={{
@@ -164,11 +166,12 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                 color: '#6b7280',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 8
+                                gap: 8,
+                                flexDirection: isRTL ? 'row-reverse' : 'row'
                             }}
                         >
                             <Package style={{ width: 16, height: 16 }} />
-                            Orders
+                            {t('account.orders')}
                         </button>
                         <button
                             onClick={() => onNavigate('lists')}
@@ -182,11 +185,12 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                 color: '#6b7280',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 8
+                                gap: 8,
+                                flexDirection: isRTL ? 'row-reverse' : 'row'
                             }}
                         >
                             <List style={{ width: 16, height: 16 }} />
-                            Lists
+                            {t('account.lists')}
                         </button>
                         <button
                             style={{
@@ -201,15 +205,15 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                 marginBottom: -1
                             }}
                         >
-                            A
+                            {t('account.title')}
                         </button>
                     </div>
                 </div>
             </div>
 
             {/* User Info Bar - Dark Navy */}
-            <div style={{ backgroundColor: '#374151' }}>
-                <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ backgroundColor: '#374151', direction: isRTL ? 'rtl' : 'ltr' }}>
+                <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 12, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                     <div style={{
                         width: 40,
                         height: 40,
@@ -226,7 +230,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                             <User style={{ width: 20, height: 20, color: '#ffffff' }} />
                         )}
                     </div>
-                    <div>
+                    <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
                         <div style={{ fontWeight: 600, color: '#ffffff', fontSize: 14 }}>{formData.name || 'Admin'}</div>
                         <div style={{ fontSize: 13, color: '#9ca3af' }}>{formData.email}</div>
                     </div>
@@ -234,7 +238,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
             </div>
 
             {/* Main Content */}
-            <div style={{ maxWidth: 1200, margin: '0 auto', padding: 24 }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: 24, direction: isRTL ? 'rtl' : 'ltr' }}>
                 <div style={{ maxWidth: 800, margin: '0 auto' }}>
                     {/* Main Content Area */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -243,19 +247,20 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                             backgroundColor: '#374151',
                             borderRadius: 12,
                             padding: 24,
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                            textAlign: isRTL ? 'right' : 'left'
                         }}>
-                            <h3 style={{ fontWeight: 600, fontSize: 18, color: '#ffffff', margin: 0, marginBottom: 8 }}>Complete Your Profile</h3>
+                            <h3 style={{ fontWeight: 600, fontSize: 18, color: '#ffffff', margin: 0, marginBottom: 8 }}>{t('account.completeProfile')}</h3>
                             <p style={{ fontSize: 14, color: '#9ca3af', margin: 0, marginBottom: 20 }}>
-                                Completing your profile items unlocks premium discounts and faster checkout experiences.
+                                {t('account.completeProfileDesc')}
                             </p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                                 <div style={{ flex: 1, backgroundColor: '#4b5563', borderRadius: 999, height: 8, overflow: 'hidden' }}>
                                     <div style={{ backgroundColor: '#ffffff', height: '100%', width: '65%', borderRadius: 999 }}></div>
                                 </div>
                                 <span style={{ fontWeight: 700, fontSize: 18, color: '#ffffff' }}>65%</span>
                             </div>
-                            <p style={{ fontSize: 13, color: '#9ca3af', margin: 0, marginTop: 8 }}>Completed</p>
+                            <p style={{ fontSize: 13, color: '#9ca3af', margin: 0, marginTop: 8 }}>{t('account.completed')}</p>
                         </div>
 
                         {/* Message Alert */}
@@ -265,6 +270,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                 borderRadius: 12,
                                 fontWeight: 500,
                                 fontSize: 14,
+                                textAlign: isRTL ? 'right' : 'left',
                                 backgroundColor: message.type === 'success' ? '#ecfdf5' : '#fef2f2',
                                 color: message.type === 'success' ? '#065f46' : '#991b1b',
                                 border: `1px solid ${message.type === 'success' ? '#a7f3d0' : '#fecaca'}`
@@ -274,10 +280,10 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                         )}
 
                         {/* Profile Details */}
-                        <div style={{ backgroundColor: '#ffffff', borderRadius: 12, padding: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                        <div style={{ backgroundColor: '#ffffff', borderRadius: 12, padding: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', textAlign: isRTL ? 'right' : 'left' }}>
                             <div style={{ borderBottom: '1px solid #f3f4f6', paddingBottom: 16, marginBottom: 24 }}>
-                                <h2 style={{ fontSize: 18, fontWeight: 600, color: '#000000', margin: 0 }}>Profile Details</h2>
-                                <p style={{ fontSize: 14, color: '#6b7280', margin: 0, marginTop: 4 }}>Update your public information and avatar</p>
+                                <h2 style={{ fontSize: 18, fontWeight: 600, color: '#000000', margin: 0 }}>{t('account.profileDetails')}</h2>
+                                <p style={{ fontSize: 14, color: '#6b7280', margin: 0, marginTop: 4 }}>{t('account.profileDetailsDesc')}</p>
                             </div>
 
                             {/* Avatar Upload */}
@@ -343,7 +349,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                     />
                                 </div>
 
-                                <p style={{ fontSize: 14, color: '#6b7280', marginTop: 16, marginBottom: 0 }}>Click the camera icon to upload your avatar</p>
+                                <p style={{ fontSize: 14, color: '#6b7280', marginTop: 16, marginBottom: 0 }}>{t('account.uploadAvatarHint')}</p>
                             </div>
 
                             {/* Form Fields */}
@@ -351,7 +357,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                 {/* Full Name */}
                                 <div>
                                     <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#000000', marginBottom: 8 }}>
-                                        Full Name
+                                        {t('account.fullName')}
                                     </label>
                                     <div style={{
                                         display: 'flex',
@@ -360,21 +366,23 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                         padding: '12px 16px',
                                         backgroundColor: '#ffffff',
                                         border: '1px solid #e5e7eb',
-                                        borderRadius: 8
+                                        borderRadius: 8,
+                                        flexDirection: isRTL ? 'row-reverse' : 'row'
                                     }}>
                                         <User style={{ width: 20, height: 20, color: '#9ca3af' }} />
                                         <input
                                             type="text"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            placeholder="Enter your full name"
+                                            placeholder={t('account.fullNamePlaceholder')}
                                             style={{
                                                 flex: 1,
                                                 border: 'none',
                                                 outline: 'none',
                                                 fontSize: 14,
                                                 color: '#000000',
-                                                backgroundColor: 'transparent'
+                                                backgroundColor: 'transparent',
+                                                textAlign: isRTL ? 'right' : 'left'
                                             }}
                                         />
                                     </div>
@@ -383,7 +391,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                 {/* Account Email */}
                                 <div>
                                     <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#000000', marginBottom: 8 }}>
-                                        Account Email
+                                        {t('account.email')}
                                     </label>
                                     <div style={{
                                         display: 'flex',
@@ -392,7 +400,8 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                         padding: '12px 16px',
                                         backgroundColor: '#f9fafb',
                                         border: '1px solid #e5e7eb',
-                                        borderRadius: 8
+                                        borderRadius: 8,
+                                        flexDirection: isRTL ? 'row-reverse' : 'row'
                                     }}>
                                         <Mail style={{ width: 20, height: 20, color: '#9ca3af' }} />
                                         <input
@@ -405,7 +414,8 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                                 outline: 'none',
                                                 fontSize: 14,
                                                 color: '#6b7280',
-                                                backgroundColor: 'transparent'
+                                                backgroundColor: 'transparent',
+                                                textAlign: isRTL ? 'right' : 'left'
                                             }}
                                         />
                                     </div>
@@ -414,7 +424,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                 {/* Phone */}
                                 <div>
                                     <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#000000', marginBottom: 8 }}>
-                                        Phone Connectivity
+                                        {t('account.phone')}
                                     </label>
                                     <div style={{
                                         display: 'flex',
@@ -423,21 +433,23 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                         padding: '12px 16px',
                                         backgroundColor: '#ffffff',
                                         border: '1px solid #e5e7eb',
-                                        borderRadius: 8
+                                        borderRadius: 8,
+                                        flexDirection: isRTL ? 'row-reverse' : 'row'
                                     }}>
                                         <Phone style={{ width: 20, height: 20, color: '#9ca3af' }} />
                                         <input
                                             type="tel"
                                             value={formData.phone}
                                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            placeholder="+20 123 456 7890"
+                                            placeholder={t('account.phonePlaceholder')}
                                             style={{
                                                 flex: 1,
                                                 border: 'none',
                                                 outline: 'none',
                                                 fontSize: 14,
                                                 color: '#000000',
-                                                backgroundColor: 'transparent'
+                                                backgroundColor: 'transparent',
+                                                textAlign: isRTL ? 'right' : 'left'
                                             }}
                                         />
                                     </div>
@@ -446,7 +458,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                 {/* Delivery Location */}
                                 <div>
                                     <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#000000', marginBottom: 8 }}>
-                                        Delivery Location
+                                        {t('account.deliveryLocation')}
                                     </label>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                         <button
@@ -465,6 +477,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                                 fontWeight: 500,
                                                 fontSize: 14,
                                                 width: 'fit-content',
+                                                flexDirection: isRTL ? 'row-reverse' : 'row',
                                                 opacity: detecting ? 0.5 : 1
                                             }}
                                         >
@@ -473,13 +486,13 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                             ) : (
                                                 <MapPin style={{ width: 16, height: 16 }} />
                                             )}
-                                            Auto-Detect Address
+                                            {t('account.autoDetect')}
                                         </button>
 
                                         <textarea
                                             value={formData.address}
                                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                            placeholder="Detect your address using the button..."
+                                            placeholder={t('account.addressPlaceholder')}
                                             rows={3}
                                             style={{
                                                 padding: 16,
@@ -490,7 +503,8 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                                 outline: 'none',
                                                 fontSize: 14,
                                                 color: '#000000',
-                                                fontFamily: 'inherit'
+                                                fontFamily: 'inherit',
+                                                textAlign: isRTL ? 'right' : 'left'
                                             }}
                                         />
 
@@ -529,8 +543,8 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                                     }}>
                                                         <MapPin style={{ width: 28, height: 28, color: '#9ca3af' }} />
                                                     </div>
-                                                    <p style={{ fontWeight: 500, color: '#6b7280', margin: 0 }}>Map Unavailable</p>
-                                                    <p style={{ fontSize: 13, color: '#9ca3af', margin: '4px 0 0' }}>Click detect location to see your address on the map</p>
+                                                    <p style={{ fontWeight: 500, color: '#6b7280', margin: 0 }}>{t('account.mapUnavailable')}</p>
+                                                    <p style={{ fontSize: 13, color: '#9ca3af', margin: '4px 0 0' }}>{t('account.mapHint')}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -554,6 +568,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                             gap: 8,
                                             fontWeight: 500,
                                             fontSize: 14,
+                                            flexDirection: isRTL ? 'row-reverse' : 'row',
                                             opacity: saving ? 0.5 : 1
                                         }}
                                     >
@@ -562,7 +577,7 @@ export function AccountPage({ onNavigate }: AccountPageProps) {
                                         ) : (
                                             <Save style={{ width: 16, height: 16 }} />
                                         )}
-                                        Save Account Details
+                                        {t('account.save')}
                                     </button>
                                 </div>
                             </div>

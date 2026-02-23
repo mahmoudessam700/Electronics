@@ -3,6 +3,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Loader2, Trash2, ExternalLink, RefreshCw, File, HardDrive, Search, Grid, List, Calendar, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface FileItem {
     name: string;
@@ -13,6 +14,7 @@ interface FileItem {
 }
 
 export function AdminFilesPage() {
+    const { t, isRTL } = useLanguage();
     const [files, setFiles] = useState<FileItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState<string | null>(null);
@@ -33,14 +35,14 @@ export function AdminFilesPage() {
             }
         } catch (error) {
             console.error('Failed to fetch files', error);
-            toast.error('Failed to load files');
+            toast.error(t('admin.fileLoadFailedToast') || 'Failed to load files');
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async (fileName: string) => {
-        if (!confirm(`Are you sure you want to delete ${fileName}? This action cannot be undone.`)) return;
+        if (!confirm(t('admin.deleteFileConfirm') || `Are you sure you want to delete ${fileName}? This action cannot be undone.`)) return;
 
         setDeleting(fileName);
         try {
@@ -48,14 +50,14 @@ export function AdminFilesPage() {
                 method: 'DELETE',
             });
             if (res.ok) {
-                toast.success('File deleted');
+                toast.success(t('admin.fileDeletedToast') || 'File deleted');
                 setFiles(files.filter(f => f.name !== fileName));
             } else {
-                toast.error('Failed to delete file');
+                toast.error(t('admin.fileDeleteFailedToast') || 'Failed to delete file');
             }
         } catch (error) {
             console.error('Failed to delete file', error);
-            toast.error('Failed to delete file');
+            toast.error(t('admin.fileDeleteFailedToast') || 'Failed to delete file');
         } finally {
             setDeleting(null);
         }
@@ -82,7 +84,7 @@ export function AdminFilesPage() {
         return (
             <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-12 h-12 border-4 border-[#4A5568]/30 border-t-[#4A5568] rounded-full animate-spin" />
-                <span className="mt-4 text-gray-500">Loading files...</span>
+                <span className="mt-4 text-gray-500">{t('admin.loadingFiles')}</span>
             </div>
         );
     }
@@ -93,17 +95,17 @@ export function AdminFilesPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        File Manager
+                        {t('admin.fileManager')}
                     </h1>
-                    <p className="text-gray-500 mt-1 text-sm">Manage uploaded files and media</p>
+                    <p className="text-gray-500 mt-1 text-sm">{t('admin.fileManagerSubtitle')}</p>
                 </div>
-                <Button 
-                    onClick={fetchFiles} 
-                    variant="outline" 
+                <Button
+                    onClick={fetchFiles}
+                    variant="outline"
                     className="rounded-lg border-gray-200 hover:bg-gray-50"
                 >
                     <RefreshCw className="mr-2 h-4 w-4" />
-                    Refresh
+                    {t('admin.refresh')}
                 </Button>
             </div>
 
@@ -115,7 +117,7 @@ export function AdminFilesPage() {
                             <File className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Total Files</p>
+                            <p className="text-sm text-gray-500">{t('admin.totalFiles')}</p>
                             <p className="text-xl font-bold text-gray-900">{files.length}</p>
                         </div>
                     </div>
@@ -126,7 +128,7 @@ export function AdminFilesPage() {
                             <ImageIcon className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Images</p>
+                            <p className="text-sm text-gray-500">{t('admin.images')}</p>
                             <p className="text-xl font-bold text-gray-900">{imageCount}</p>
                         </div>
                     </div>
@@ -137,7 +139,7 @@ export function AdminFilesPage() {
                             <HardDrive className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500">Total Size</p>
+                            <p className="text-sm text-gray-500">{t('admin.totalSize')}</p>
                             <p className="text-xl font-bold text-gray-900">{formatSize(totalSize)}</p>
                         </div>
                     </div>
@@ -149,7 +151,7 @@ export function AdminFilesPage() {
                 <div className="relative flex-1 w-full sm:max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                        placeholder="Search files..."
+                        placeholder={t('admin.searchFilesPlaceholder')}
                         className="pl-10 bg-white border-gray-200 focus:border-[#4A5568] focus:ring-[#4A5568]/20 rounded-lg"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -178,34 +180,34 @@ export function AdminFilesPage() {
                         <File className="h-7 w-7 text-gray-400" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {searchQuery ? 'No files found' : 'No files uploaded'}
+                        {searchQuery ? t('admin.noFilesFound') : t('admin.noFilesUploaded')}
                     </h3>
                     <p className="text-gray-500">
-                        {searchQuery ? 'Try adjusting your search' : 'Upload files through the product form'}
+                        {searchQuery ? t('admin.tryAdjustingSearch') : t('admin.uploadThroughForm')}
                     </p>
                 </div>
             ) : viewMode === 'grid' ? (
                 // Grid View
                 <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {filteredFiles.map((file) => (
-                        <div 
+                        <div
                             key={file.name}
                             className="group bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-300 overflow-hidden"
                         >
                             {/* Preview */}
                             <div className="aspect-square bg-gray-50 relative overflow-hidden">
                                 {isImage(file.name) ? (
-                                    <img 
-                                        src={file.url} 
-                                        alt={file.name} 
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                    <img
+                                        src={file.url}
+                                        alt={file.name}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center">
                                         <File className="h-12 w-12 text-gray-300" />
                                     </div>
                                 )}
-                                
+
                                 {/* Overlay actions */}
                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <div className="absolute bottom-2 left-2 right-2 flex gap-2">
@@ -216,7 +218,7 @@ export function AdminFilesPage() {
                                             className="flex-1 py-2 bg-white/90 rounded-md text-center text-sm font-medium text-gray-700 hover:bg-white transition-colors"
                                         >
                                             <ExternalLink className="h-4 w-4 inline mr-1" />
-                                            View
+                                            {t('admin.view')}
                                         </a>
                                         <button
                                             onClick={() => handleDelete(file.name)}
@@ -232,7 +234,7 @@ export function AdminFilesPage() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* File info */}
                             <div className="p-3">
                                 <p className="text-sm font-medium text-gray-900 truncate" title={file.name}>
@@ -257,11 +259,11 @@ export function AdminFilesPage() {
                         <table className="w-full">
                             <thead>
                                 <tr className="bg-gray-50 border-b border-gray-200">
-                                    <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Preview</th>
-                                    <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Filename</th>
-                                    <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden sm:table-cell">Size</th>
-                                    <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Date</th>
-                                    <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                                    <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.preview')}</th>
+                                    <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.fileName')}</th>
+                                    <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden sm:table-cell`}>{t('admin.fileSize')}</th>
+                                    <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell`}>{t('admin.uploadDate')}</th>
+                                    <th className={`${isRTL ? 'text-left' : 'text-right'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
@@ -269,10 +271,10 @@ export function AdminFilesPage() {
                                     <tr key={file.name} className="hover:bg-gray-50 transition-colors group">
                                         <td className="py-3 px-4">
                                             {isImage(file.name) ? (
-                                                <img 
-                                                    src={file.url} 
-                                                    alt={file.name} 
-                                                    className="h-12 w-12 object-cover rounded-lg border border-gray-100" 
+                                                <img
+                                                    src={file.url}
+                                                    alt={file.name}
+                                                    className="h-12 w-12 object-cover rounded-lg border border-gray-100"
                                                 />
                                             ) : (
                                                 <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -284,14 +286,14 @@ export function AdminFilesPage() {
                                             <p className="font-medium text-gray-900 truncate max-w-[150px] sm:max-w-[200px]" title={file.name}>
                                                 {file.name}
                                             </p>
-                                            <a 
-                                                href={file.url} 
-                                                target="_blank" 
-                                                rel="noopener noreferrer" 
+                                            <a
+                                                href={file.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
                                                 className="text-xs text-[#4A5568] hover:text-[#2D3748] flex items-center gap-1 mt-1"
                                             >
                                                 <ExternalLink className="h-3 w-3" />
-                                                View file
+                                                {t('admin.viewFile')}
                                             </a>
                                         </td>
                                         <td className="py-3 px-4 hidden sm:table-cell">

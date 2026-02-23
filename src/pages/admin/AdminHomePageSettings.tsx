@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { 
-    Layout, 
-    Eye, 
-    EyeOff, 
-    Save, 
-    Loader2, 
-    LayoutDashboard, 
+import {
+    Layout,
+    Eye,
+    EyeOff,
+    Save,
+    Loader2,
+    LayoutDashboard,
     RefreshCw,
     Info,
     CheckCircle2,
@@ -93,14 +93,14 @@ interface Section {
 }
 
 export function AdminHomePageSettings() {
-    const { t, isRTL } = useLanguage();
+    const { t, isRTL, formatCurrency } = useLanguage();
 
     const [sections, setSections] = useState<Section[]>([
-        { 
-            id: 'deals-of-the-day', 
-            name: 'Deals of the Day', 
+        {
+            id: 'deals-of-the-day',
+            name: 'Deals of the Day',
             nameAr: 'عروض اليوم',
-            description: 'Shows products that have an original price higher than their current price.', 
+            description: 'Shows products that have an original price higher than their current price.',
             descriptionAr: 'يعرض المنتجات التي لها سعر أصلي أعلى من سعرها الحالي.',
             isEnabled: true,
             badgeText: 'Ends in 12:34:56',
@@ -109,31 +109,31 @@ export function AdminHomePageSettings() {
             selectedProducts: [],
             useManualSelection: false
         },
-        { 
-            id: 'inspired-browsing', 
-            name: 'Inspired by your browsing history', 
+        {
+            id: 'inspired-browsing',
+            name: 'Inspired by your browsing history',
             nameAr: 'مستوحى من سجل التصفح الخاص بك',
-            description: 'Shows a carousel of recommended products for the user.', 
+            description: 'Shows a carousel of recommended products for the user.',
             descriptionAr: 'يعرض شريط من المنتجات الموصى بها للمستخدم.',
             isEnabled: true,
             selectedProducts: [],
             useManualSelection: false
         },
-        { 
-            id: 'trending', 
-            name: 'Trending in Electronics', 
+        {
+            id: 'trending',
+            name: 'Trending in Electronics',
             nameAr: 'الأكثر رواجاً في الإلكترونيات',
-            description: 'Shows high-value products (over E£50).', 
+            description: 'Shows high-value products (over E£50).',
             descriptionAr: 'يعرض المنتجات عالية القيمة (أكثر من 50 جنيه).',
             isEnabled: true,
             selectedProducts: [],
             useManualSelection: false
         },
-        { 
-            id: 'signup-banner', 
-            name: 'Sign Up Banner', 
+        {
+            id: 'signup-banner',
+            name: 'Sign Up Banner',
             nameAr: 'لافتة التسجيل',
-            description: 'The purple gradient banner encouraging users to create an account.', 
+            description: 'The purple gradient banner encouraging users to create an account.',
             descriptionAr: 'اللافتة المتدرجة التي تشجع المستخدمين على إنشاء حساب.',
             isEnabled: true,
             subtitleText: 'Get exclusive deals, personalized recommendations, and early access to sales',
@@ -141,109 +141,109 @@ export function AdminHomePageSettings() {
             buttonText: 'Create your account',
             buttonTextAr: 'أنشئ حسابك'
         },
-        { 
-            id: 'pc-peripherals', 
-            name: 'PC Accessories & Peripherals', 
+        {
+            id: 'pc-peripherals',
+            name: 'PC Accessories & Peripherals',
             nameAr: 'ملحقات وإكسسوارات الكمبيوتر',
-            description: 'Shows mice, keyboards, and headphones.', 
+            description: 'Shows mice, keyboards, and headphones.',
             descriptionAr: 'يعرض الماوسات ولوحات المفاتيح وسماعات الرأس.',
             isEnabled: true,
             selectedProducts: [],
             useManualSelection: false
         },
-        { 
-            id: 'footer-about-us', 
-            name: 'Footer: About Us', 
+        {
+            id: 'footer-about-us',
+            name: 'Footer: About Us',
             nameAr: 'التذييل: من نحن',
-            description: 'Control visibility of About Us link in footer.', 
+            description: 'Control visibility of About Us link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "من نحن" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-careers', 
-            name: 'Footer: Careers', 
+        {
+            id: 'footer-careers',
+            name: 'Footer: Careers',
             nameAr: 'التذييل: الوظائف',
-            description: 'Control visibility of Careers link in footer.', 
+            description: 'Control visibility of Careers link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "الوظائف" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-press', 
-            name: 'Footer: Press Releases', 
+        {
+            id: 'footer-press',
+            name: 'Footer: Press Releases',
             nameAr: 'التذييل: الأخبار الصحفية',
-            description: 'Control visibility of Press Releases link in footer.', 
+            description: 'Control visibility of Press Releases link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "الأخبار الصحفية" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-affiliate', 
-            name: 'Footer: Affiliate', 
+        {
+            id: 'footer-affiliate',
+            name: 'Footer: Affiliate',
             nameAr: 'التذييل: برنامج التسويق بالعمولة',
-            description: 'Control visibility of Affiliate link in footer.', 
+            description: 'Control visibility of Affiliate link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "التسويق بالعمولة" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-advertise', 
-            name: 'Footer: Advertise', 
+        {
+            id: 'footer-advertise',
+            name: 'Footer: Advertise',
             nameAr: 'التذييل: أعلن معنا',
-            description: 'Control visibility of Advertise link in footer.', 
+            description: 'Control visibility of Advertise link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "أعلن معنا" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-shop-card', 
-            name: 'Footer: Shop Card', 
+        {
+            id: 'footer-shop-card',
+            name: 'Footer: Shop Card',
             nameAr: 'التذييل: بطاقة المتجر',
-            description: 'Control visibility of Shop Card link in footer.', 
+            description: 'Control visibility of Shop Card link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "بطاقة المتجر" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-currency', 
-            name: 'Footer: Currency Converter', 
+        {
+            id: 'footer-currency',
+            name: 'Footer: Currency Converter',
             nameAr: 'التذييل: محول العملات',
-            description: 'Control visibility of Currency Converter link in footer.', 
+            description: 'Control visibility of Currency Converter link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "محول العملات" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-sell', 
-            name: 'Footer: Sell on Shop', 
+        {
+            id: 'footer-sell',
+            name: 'Footer: Sell on Shop',
             nameAr: 'التذييل: البيع على المتجر',
-            description: 'Control visibility of Sell on Shop link in footer.', 
+            description: 'Control visibility of Sell on Shop link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "البيع على المتجر" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-gift-cards', 
-            name: 'Footer: Gift Cards', 
+        {
+            id: 'footer-gift-cards',
+            name: 'Footer: Gift Cards',
             nameAr: 'التذييل: بطاقات الهدايا',
-            description: 'Control visibility of Gift Cards link in footer.', 
+            description: 'Control visibility of Gift Cards link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "بطاقات الهدايا" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-account', 
-            name: 'Footer: Your Account', 
+        {
+            id: 'footer-account',
+            name: 'Footer: Your Account',
             nameAr: 'التذييل: حسابك',
-            description: 'Control visibility of Your Account link in footer.', 
+            description: 'Control visibility of Your Account link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "حسابك" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-orders', 
-            name: 'Footer: Returns Center', 
+        {
+            id: 'footer-orders',
+            name: 'Footer: Returns Center',
             nameAr: 'التذييل: مركز الإرجاع',
-            description: 'Control visibility of Returns Center link in footer.', 
+            description: 'Control visibility of Returns Center link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "مركز الإرجاع" في تذييل الصفحة.',
             isEnabled: true
         },
-        { 
-            id: 'footer-help', 
-            name: 'Footer: Help/Customer Service', 
+        {
+            id: 'footer-help',
+            name: 'Footer: Help/Customer Service',
             nameAr: 'التذييل: المساعدة/خدمة العملاء',
-            description: 'Control visibility of Help link in footer.', 
+            description: 'Control visibility of Help link in footer.',
             descriptionAr: 'التحكم في ظهور رابط "المساعدة" في تذييل الصفحة.',
             isEnabled: true
         }
@@ -338,7 +338,7 @@ export function AdminHomePageSettings() {
     };
 
     const toggleSection = (id: string) => {
-        const newSections = sections.map(section => 
+        const newSections = sections.map(section =>
             section.id === id ? { ...section, isEnabled: !section.isEnabled } : section
         );
         setSections(newSections);
@@ -346,7 +346,7 @@ export function AdminHomePageSettings() {
     };
 
     const updateSection = (id: string, field: keyof Section, value: any) => {
-        const newSections = sections.map(section => 
+        const newSections = sections.map(section =>
             section.id === id ? { ...section, [field]: value } : section
         );
         setSections(newSections);
@@ -375,9 +375,9 @@ export function AdminHomePageSettings() {
     const removeProductFromSection = (sectionId: string, productId: string) => {
         const newSections = sections.map(section => {
             if (section.id === sectionId) {
-                return { 
-                    ...section, 
-                    selectedProducts: (section.selectedProducts || []).filter(id => id !== productId) 
+                return {
+                    ...section,
+                    selectedProducts: (section.selectedProducts || []).filter(id => id !== productId)
                 };
             }
             return section;
@@ -385,19 +385,19 @@ export function AdminHomePageSettings() {
         setSections(newSections);
     };
 
-    const filteredProducts = allProducts.filter(p => 
+    const filteredProducts = allProducts.filter(p =>
         p.name.toLowerCase().includes(productSearch.toLowerCase())
     );
 
     // Hero slide management functions
     const updateHeroSlide = (id: string, field: keyof HeroSlide, value: any) => {
-        setHeroSlides(prev => prev.map(slide => 
+        setHeroSlides(prev => prev.map(slide =>
             slide.id === id ? { ...slide, [field]: value } : slide
         ));
     };
 
     const updateHeroSlideNavigation = (id: string, type: 'category' | 'page', value: string) => {
-        setHeroSlides(prev => prev.map(slide => 
+        setHeroSlides(prev => prev.map(slide =>
             slide.id === id ? { ...slide, navigationTarget: { type, value } } : slide
         ));
     };
@@ -468,7 +468,7 @@ export function AdminHomePageSettings() {
             const res = await fetch('/api/settings?type=homepage', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     sections: newSections,
                     heroSlides: newHeroSlides || heroSlides
                 })
@@ -508,42 +508,42 @@ export function AdminHomePageSettings() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20">
+            <div className={`flex flex-col items-center justify-center py-20 ${isRTL ? 'text-right' : 'text-left'}`}>
                 <Loader2 className="h-10 w-10 animate-spin text-indigo-600 mb-4" />
-                <p className="text-slate-500 font-medium">{t('common.loading')}</p>
+                <p className="text-slate-500 font-medium">{t('admin.loadingSettings')}</p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className={`max-w-4xl mx-auto space-y-8 ${isRTL ? 'text-right' : 'text-left'}`}>
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
+            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+                <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <div className="p-3 bg-indigo-100 rounded-2xl">
                         <Layout className="h-6 w-6 text-indigo-600" />
                     </div>
-                    <div>
+                    <div className={isRTL ? 'text-right' : 'text-left'}>
                         <h1 className="text-2xl font-bold text-slate-900">{t('admin.homeLayoutTitle')}</h1>
                         <p className="text-sm text-slate-500">{t('admin.homeLayout')}</p>
                     </div>
                 </div>
-                <Button 
-                    onClick={handleSave} 
+                <Button
+                    onClick={handleSave}
                     disabled={saving}
-                    className="h-11 px-8 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white font-semibold transition-all shadow-lg active:scale-95"
+                    className={`h-11 px-8 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white font-semibold transition-all shadow-lg active:scale-95 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
                 >
-                    {saving ? <Loader2 className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4 animate-spin`} /> : <Save className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4`} />}
+                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     {t('admin.saveChanges')}
                 </Button>
             </div>
 
             {/* Info Box */}
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-4">
+            <div className={`bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className="bg-blue-100 p-2 rounded-lg h-fit">
                     <Info className="h-4 w-4 text-blue-600" />
                 </div>
-                <div>
+                <div className={isRTL ? 'text-right' : 'text-left'}>
                     <h3 className="text-sm font-bold text-blue-900">{t('admin.visibilityControl')}</h3>
                     <p className="text-xs text-blue-700 leading-relaxed mt-1">
                         {t('admin.visibilityControlDesc')}
@@ -553,24 +553,24 @@ export function AdminHomePageSettings() {
 
             {/* Hero Section */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                <div className={`p-5 border-b border-slate-100 flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-600">
                             <Sparkles className="h-5 w-5" />
                         </div>
-                        <div>
-                            <h2 className="font-bold text-slate-900">Hero Slider</h2>
-                            <p className="text-xs text-slate-500">The main banner carousel at the top of the homepage</p>
+                        <div className={isRTL ? 'text-right' : 'text-left'}>
+                            <h2 className="font-bold text-slate-900">{t('admin.heroSlider')}</h2>
+                            <p className="text-xs text-slate-500">{t('admin.heroSliderDesc')}</p>
                         </div>
                     </div>
                     <Button
                         onClick={addHeroSlide}
                         variant="outline"
                         size="sm"
-                        className="rounded-lg"
+                        className={`rounded-lg flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
-                        <Plus className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                        Add Slide
+                        <Plus className="h-4 w-4" />
+                        {t('admin.addSlide')}
                     </Button>
                 </div>
 
@@ -599,14 +599,14 @@ export function AdminHomePageSettings() {
                                             <ChevronDown className="h-3 w-3" />
                                         </button>
                                     </div>
-                                    <img 
-                                        src={slide.image} 
+                                    <img
+                                        src={slide.image}
                                         alt={slide.title}
                                         className="w-16 h-10 object-cover rounded-lg border border-slate-200"
                                     />
-                                    <div className="text-left">
-                                        <p className="text-sm font-semibold text-slate-800">{slide.title}</p>
-                                        <p className="text-xs text-slate-500">Slide {index + 1}</p>
+                                    <div className={isRTL ? 'text-right' : 'text-left'}>
+                                        <p className="text-sm font-semibold text-slate-800">{isRTL ? (slide.titleAr || slide.title) : slide.title}</p>
+                                        <p className="text-xs text-slate-500">{t('admin.slide')} {index + 1}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -625,9 +625,9 @@ export function AdminHomePageSettings() {
                                 <div className="px-4 pb-4 space-y-4 bg-slate-50/50">
                                     {/* Image URL */}
                                     <div>
-                                        <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">
-                                            <Image className="inline h-3.5 w-3.5 mr-1" />
-                                            Image
+                                        <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                            <Image className={`inline h-3.5 w-3.5 ${isRTL ? 'ml-1' : 'mr-1'}`} />
+                                            {t('admin.image')}
                                         </label>
                                         <div className="flex gap-2">
                                             <input
@@ -667,7 +667,7 @@ export function AdminHomePageSettings() {
                                         </div>
                                         {slide.image && (
                                             <div className="mt-2">
-                                                <img 
+                                                <img
                                                     src={slide.image}
                                                     alt="Preview"
                                                     className="h-20 object-cover rounded-lg border border-slate-200"
@@ -679,7 +679,7 @@ export function AdminHomePageSettings() {
                                     {/* Title EN/AR */}
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">Title (EN)</label>
+                                            <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t('admin.titleEn')}</label>
                                             <input
                                                 type="text"
                                                 value={slide.title}
@@ -690,7 +690,7 @@ export function AdminHomePageSettings() {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">Title (AR)</label>
+                                            <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t('admin.titleAr')}</label>
                                             <input
                                                 type="text"
                                                 value={slide.titleAr || ''}
@@ -705,7 +705,7 @@ export function AdminHomePageSettings() {
                                     {/* Subtitle EN/AR */}
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">Subtitle (EN)</label>
+                                            <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t('admin.subtitleEn')}</label>
                                             <input
                                                 type="text"
                                                 value={slide.subtitle}
@@ -716,7 +716,7 @@ export function AdminHomePageSettings() {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">Subtitle (AR)</label>
+                                            <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t('admin.subtitleAr')}</label>
                                             <input
                                                 type="text"
                                                 value={slide.subtitleAr || ''}
@@ -731,7 +731,7 @@ export function AdminHomePageSettings() {
                                     {/* Button Text EN/AR */}
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">Button Text (EN)</label>
+                                            <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t('admin.ctaTextEn')}</label>
                                             <input
                                                 type="text"
                                                 value={slide.ctaText}
@@ -742,7 +742,7 @@ export function AdminHomePageSettings() {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">Button Text (AR)</label>
+                                            <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t('admin.ctaTextAr')}</label>
                                             <input
                                                 type="text"
                                                 value={slide.ctaTextAr || ''}
@@ -757,25 +757,25 @@ export function AdminHomePageSettings() {
                                     {/* Navigation Target */}
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">Navigation Type</label>
+                                            <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t('admin.navigationType')}</label>
                                             <select
                                                 value={slide.navigationTarget.type}
                                                 onChange={(e) => updateHeroSlideNavigation(slide.id, e.target.value as 'category' | 'page', slide.navigationTarget.value)}
-                                                className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                className={`w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none ${isRTL ? 'text-right' : 'text-left'}`}
                                             >
-                                                <option value="page">Page</option>
-                                                <option value="category">Category</option>
+                                                <option value="page">{t('admin.page')}</option>
+                                                <option value="category">{t('admin.category')}</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">
-                                                {slide.navigationTarget.type === 'category' ? 'Category Name' : 'Page Name'}
+                                            <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                                {slide.navigationTarget.type === 'category' ? t('admin.categoryName') : t('admin.pageName')}
                                             </label>
                                             <input
                                                 type="text"
                                                 value={slide.navigationTarget.value}
                                                 onChange={(e) => updateHeroSlideNavigation(slide.id, slide.navigationTarget.type, e.target.value)}
-                                                className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                className={`w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none ${isRTL ? 'text-right' : 'text-left'}`}
                                                 placeholder={slide.navigationTarget.type === 'category' ? 'Laptops' : 'search'}
                                             />
                                         </div>
@@ -783,18 +783,18 @@ export function AdminHomePageSettings() {
 
                                     {/* Gradient */}
                                     <div>
-                                        <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1.5">Gradient Overlay</label>
+                                        <label className={`block text-[10px] font-bold text-slate-600 uppercase mb-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t('admin.gradientOverlay')}</label>
                                         <select
                                             value={slide.gradient}
                                             onChange={(e) => updateHeroSlide(slide.id, 'gradient', e.target.value)}
-                                            className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none"
+                                            className={`w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none ${isRTL ? 'text-right' : 'text-left'}`}
                                         >
-                                            <option value="from-blue-600/20 to-purple-600/20">Blue to Purple</option>
-                                            <option value="from-gray-600/20 to-blue-600/20">Gray to Blue</option>
-                                            <option value="from-purple-600/20 to-pink-600/20">Purple to Pink</option>
-                                            <option value="from-green-600/20 to-blue-600/20">Green to Blue</option>
-                                            <option value="from-orange-600/20 to-red-600/20">Orange to Red</option>
-                                            <option value="from-slate-600/20 to-slate-800/20">Dark Slate</option>
+                                            <option value="from-blue-600/20 to-purple-600/20">{t('admin.blueToPurple')}</option>
+                                            <option value="from-gray-600/20 to-blue-600/20">{t('admin.grayToBlue')}</option>
+                                            <option value="from-purple-600/20 to-pink-600/20">{t('admin.purpleToPink')}</option>
+                                            <option value="from-green-600/20 to-blue-600/20">{t('admin.greenToBlue')}</option>
+                                            <option value="from-orange-600/20 to-red-600/20">{t('admin.orangeToRed')}</option>
+                                            <option value="from-slate-600/20 to-slate-800/20">{t('admin.darkSlate')}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -807,52 +807,48 @@ export function AdminHomePageSettings() {
             {/* Sections Grid */}
             <div className="grid gap-4">
                 {sections.map((section) => (
-                    <div 
+                    <div
                         key={section.id}
-                        className={`group bg-white rounded-2xl border transition-all duration-300 ${
-                            section.isEnabled 
-                                ? 'border-slate-200 shadow-sm' 
-                                : 'border-slate-100 bg-slate-50/30 opacity-75'
-                        }`}
+                        className={`group bg-white rounded-2xl border transition-all duration-300 ${section.isEnabled
+                            ? 'border-slate-200 shadow-sm'
+                            : 'border-slate-100 bg-slate-50/30 opacity-75'
+                            }`}
                     >
                         <div className="p-5 flex items-center justify-between">
                             <div className="flex items-start gap-4">
-                                <div className={`mt-1 p-2.5 rounded-xl transition-colors ${
-                                    section.isEnabled ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-200 text-slate-500'
-                                }`}>
+                                <div className={`mt-1 p-2.5 rounded-xl transition-colors ${section.isEnabled ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-200 text-slate-500'
+                                    }`}>
                                     <LayoutDashboard className="h-5 w-5" />
                                 </div>
                                 <div className="flex-1 space-y-2">
                                     {/* Section Name - English */}
                                     <div className="flex items-center gap-2">
-                                        <input 
+                                        <input
                                             type="text"
                                             value={section.name}
                                             onChange={(e) => updateSection(section.id, 'name', e.target.value)}
                                             dir="ltr"
-                                            className={`block flex-1 font-bold bg-transparent border-none p-0 focus:ring-0 transition-colors ${
-                                                section.isEnabled ? 'text-slate-900' : 'text-slate-400'
-                                            }`}
+                                            className={`block flex-1 font-bold bg-transparent border-none p-0 focus:ring-0 transition-colors ${section.isEnabled ? 'text-slate-900' : 'text-slate-400'
+                                                }`}
                                             placeholder={t('admin.sectionName') + ' (EN)'}
                                         />
                                         <span className="text-[9px] text-slate-400 font-medium">EN</span>
                                     </div>
                                     {/* Section Name - Arabic */}
                                     <div className="flex items-center gap-2">
-                                        <input 
+                                        <input
                                             type="text"
                                             value={section.nameAr || ''}
                                             onChange={(e) => updateSection(section.id, 'nameAr', e.target.value)}
                                             dir="rtl"
-                                            className={`block flex-1 font-bold bg-transparent border-none p-0 focus:ring-0 transition-colors ${
-                                                section.isEnabled ? 'text-slate-700' : 'text-slate-400'
-                                            }`}
+                                            className={`block flex-1 font-bold bg-transparent border-none p-0 focus:ring-0 transition-colors ${section.isEnabled ? 'text-slate-700' : 'text-slate-400'
+                                                }`}
                                             placeholder={t('admin.sectionName') + ' (AR)'}
                                         />
                                         <span className="text-[9px] text-slate-400 font-medium">AR</span>
                                     </div>
                                     {/* Description - English */}
-                                    <textarea 
+                                    <textarea
                                         value={section.description}
                                         onChange={(e) => updateSection(section.id, 'description', e.target.value)}
                                         rows={1}
@@ -866,7 +862,7 @@ export function AdminHomePageSettings() {
                                         }}
                                     />
                                     {/* Description - Arabic */}
-                                    <textarea 
+                                    <textarea
                                         value={section.descriptionAr || ''}
                                         onChange={(e) => updateSection(section.id, 'descriptionAr', e.target.value)}
                                         rows={1}
@@ -891,16 +887,15 @@ export function AdminHomePageSettings() {
                                                 </div>
                                                 <button
                                                     onClick={() => updateSection(section.id, 'showBadge', !section.showBadge)}
-                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${
-                                                        section.showBadge ? 'bg-orange-100 text-orange-700' : 'bg-slate-200 text-slate-500'
-                                                    }`}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${section.showBadge ? 'bg-orange-100 text-orange-700' : 'bg-slate-200 text-slate-500'
+                                                        }`}
                                                 >
                                                     {section.showBadge ? t('admin.enabled') : t('admin.disabled')}
                                                 </button>
                                             </div>
                                             {section.showBadge && (
                                                 <div className="space-y-2">
-                                                    <input 
+                                                    <input
                                                         type="text"
                                                         value={section.badgeText || ''}
                                                         onChange={(e) => updateSection(section.id, 'badgeText', e.target.value)}
@@ -908,7 +903,7 @@ export function AdminHomePageSettings() {
                                                         className="w-full text-xs bg-white border border-slate-200 rounded-lg py-1.5 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                                                         placeholder={t('admin.enterBadgeText') + ' (EN)'}
                                                     />
-                                                    <input 
+                                                    <input
                                                         type="text"
                                                         value={section.badgeTextAr || ''}
                                                         onChange={(e) => updateSection(section.id, 'badgeTextAr', e.target.value)}
@@ -921,24 +916,23 @@ export function AdminHomePageSettings() {
 
                                             {/* Manual Product Selection Toggle */}
                                             <div className="border-t border-slate-200 pt-3 mt-1">
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <div className="flex items-center gap-2">
+                                                <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                                    <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                         <Package className="h-3.5 w-3.5 text-indigo-600" />
                                                         <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.manualProductSelection')}</span>
                                                     </div>
                                                     <button
                                                         onClick={() => updateSection(section.id, 'useManualSelection', !section.useManualSelection)}
-                                                        className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${
-                                                            section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
-                                                        }`}
+                                                        className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
+                                                            }`}
                                                     >
                                                         {section.useManualSelection ? t('admin.manual') : t('admin.automatic')}
                                                     </button>
                                                 </div>
 
-            {section.useManualSelection ? (
+                                                {section.useManualSelection ? (
                                                     <div className="space-y-3">
-                                                        <p className="text-[10px] text-slate-500">
+                                                        <p className={`text-[10px] text-slate-500 ${isRTL ? 'text-right' : 'text-left'}`}>
                                                             {t('admin.selectProductsToFeature')}
                                                         </p>
 
@@ -949,16 +943,16 @@ export function AdminHomePageSettings() {
                                                                     const product = allProducts.find(p => p.id === productId);
                                                                     if (!product) return null;
                                                                     return (
-                                                                        <div key={productId} className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2">
+                                                                        <div key={productId} className={`flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
                                                                             <GripVertical className="h-3.5 w-3.5 text-slate-300" />
-                                                                            <img 
-                                                                                src={product.image} 
+                                                                            <img
+                                                                                src={product.image}
                                                                                 alt={product.name}
                                                                                 className="w-8 h-8 object-contain rounded bg-slate-100"
                                                                             />
                                                                             <div className="flex-1 min-w-0">
                                                                                 <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
-                                                                                <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                                <p className="text-[10px] text-slate-500">{formatCurrency(product.price)}</p>
                                                                             </div>
                                                                             <button
                                                                                 onClick={() => removeProductFromSection(section.id, productId)}
@@ -976,24 +970,24 @@ export function AdminHomePageSettings() {
                                                         {!showProductPicker ? (
                                                             <button
                                                                 onClick={() => setShowProductPicker(true)}
-                                                                className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-dashed border-slate-300 rounded-lg text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all"
+                                                                className={`w-full flex items-center justify-center gap-2 py-2 bg-white border border-dashed border-slate-300 rounded-lg text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all ${isRTL ? 'flex-row-reverse' : ''}`}
                                                             >
                                                                 <Plus className="h-3.5 w-3.5" />
-                                                                Add Product
+                                                                {t('admin.addProduct')}
                                                             </button>
                                                         ) : (
                                                             <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                                                                <div className="p-2 border-b border-slate-100 flex items-center gap-2">
+                                                                <div className={`p-2 border-b border-slate-100 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                                     <Search className="h-3.5 w-3.5 text-slate-400" />
                                                                     <input
                                                                         type="text"
                                                                         value={productSearch}
                                                                         onChange={(e) => setProductSearch(e.target.value)}
-                                                                        placeholder="Search products..."
-                                                                        className="flex-1 text-xs outline-none bg-transparent"
+                                                                        placeholder={t('admin.searchProducts')}
+                                                                        className={`flex-1 text-xs outline-none bg-transparent ${isRTL ? 'text-right' : 'text-left'}`}
                                                                         autoFocus
                                                                     />
-                                                                    <button 
+                                                                    <button
                                                                         onClick={() => { setShowProductPicker(false); setProductSearch(''); }}
                                                                         className="text-slate-400 hover:text-slate-600"
                                                                     >
@@ -1012,20 +1006,19 @@ export function AdminHomePageSettings() {
                                                                                     }
                                                                                 }}
                                                                                 disabled={isSelected}
-                                                                                className={`w-full flex items-center gap-2 p-2 text-left transition-all ${
-                                                                                    isSelected 
-                                                                                        ? 'bg-indigo-50 opacity-50 cursor-not-allowed' 
-                                                                                        : 'hover:bg-slate-50'
-                                                                                }`}
+                                                                                className={`w-full flex items-center gap-2 p-2 text-left transition-all ${isRTL ? 'flex-row-reverse text-right' : 'text-left'} ${isSelected
+                                                                                    ? 'bg-indigo-50 opacity-50 cursor-not-allowed'
+                                                                                    : 'hover:bg-slate-50'
+                                                                                    }`}
                                                                             >
-                                                                                <img 
-                                                                                    src={product.image} 
+                                                                                <img
+                                                                                    src={product.image}
                                                                                     alt={product.name}
                                                                                     className="w-8 h-8 object-contain rounded bg-slate-100"
                                                                                 />
                                                                                 <div className="flex-1 min-w-0">
                                                                                     <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
-                                                                                    <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                                    <p className="text-[10px] text-slate-500">{formatCurrency(product.price)}</p>
                                                                                 </div>
                                                                                 {isSelected && (
                                                                                     <CheckCircle2 className="h-4 w-4 text-indigo-500" />
@@ -1034,14 +1027,14 @@ export function AdminHomePageSettings() {
                                                                         );
                                                                     })}
                                                                     {filteredProducts.length === 0 && (
-                                                                        <p className="p-3 text-xs text-slate-400 text-center">No products found</p>
+                                                                        <p className="p-3 text-xs text-slate-400 text-center">{t('admin.noProductsFound')}</p>
                                                                     )}
                                                                 </div>
                                                             </div>
                                                         )}
                                                     </div>
                                                 ) : (
-                                                    <p className="text-[10px] text-slate-500">
+                                                    <p className={`text-[10px] text-slate-500 ${isRTL ? 'text-right' : 'text-left'}`}>
                                                         {t('admin.autoShowsDiscounted')}
                                                     </p>
                                                 )}
@@ -1053,25 +1046,24 @@ export function AdminHomePageSettings() {
                                     {section.id === 'inspired-browsing' && (
                                         <div className="flex flex-col gap-3 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
                                             {/* Manual Product Selection Toggle */}
-                                            <div className="flex items-center justify-between mb-3">
-                                                <div className="flex items-center gap-2">
+                                            <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                                <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                     <Package className="h-3.5 w-3.5 text-indigo-600" />
-                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Manual Product Selection</span>
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.manualProductSelection')}</span>
                                                 </div>
                                                 <button
                                                     onClick={() => updateSection(section.id, 'useManualSelection', !section.useManualSelection)}
-                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${
-                                                        section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
-                                                    }`}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
+                                                        }`}
                                                 >
-                                                    {section.useManualSelection ? 'MANUAL' : 'AUTOMATIC'}
+                                                    {section.useManualSelection ? t('admin.manual') : t('admin.automatic')}
                                                 </button>
                                             </div>
 
                                             {section.useManualSelection ? (
                                                 <div className="space-y-3">
-                                                    <p className="text-[10px] text-slate-500">
-                                                        Select specific products to show as browsing recommendations.
+                                                    <p className={`text-[10px] text-slate-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                                        {t('admin.selectProductsForBrowsing')}
                                                     </p>
 
                                                     {/* Selected Products List */}
@@ -1081,16 +1073,16 @@ export function AdminHomePageSettings() {
                                                                 const product = allProducts.find(p => p.id === productId);
                                                                 if (!product) return null;
                                                                 return (
-                                                                    <div key={productId} className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2">
+                                                                    <div key={productId} className={`flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
                                                                         <GripVertical className="h-3.5 w-3.5 text-slate-300" />
-                                                                        <img 
-                                                                            src={product.image} 
+                                                                        <img
+                                                                            src={product.image}
                                                                             alt={product.name}
                                                                             className="w-8 h-8 object-contain rounded bg-slate-100"
                                                                         />
                                                                         <div className="flex-1 min-w-0">
                                                                             <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
-                                                                            <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                            <p className="text-[10px] text-slate-500">{formatCurrency(product.price)}</p>
                                                                         </div>
                                                                         <button
                                                                             onClick={() => removeProductFromSection(section.id, productId)}
@@ -1108,24 +1100,24 @@ export function AdminHomePageSettings() {
                                                     {!showProductPicker ? (
                                                         <button
                                                             onClick={() => setShowProductPicker(true)}
-                                                            className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-dashed border-slate-300 rounded-lg text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all"
+                                                            className={`w-full flex items-center justify-center gap-2 py-2 bg-white border border-dashed border-slate-300 rounded-lg text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all ${isRTL ? 'flex-row-reverse' : ''}`}
                                                         >
                                                             <Plus className="h-3.5 w-3.5" />
-                                                            Add Product
+                                                            {t('admin.addProduct')}
                                                         </button>
                                                     ) : (
                                                         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                                                            <div className="p-2 border-b border-slate-100 flex items-center gap-2">
+                                                            <div className={`p-2 border-b border-slate-100 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                                 <Search className="h-3.5 w-3.5 text-slate-400" />
                                                                 <input
                                                                     type="text"
                                                                     value={productSearch}
                                                                     onChange={(e) => setProductSearch(e.target.value)}
-                                                                    placeholder="Search products..."
-                                                                    className="flex-1 text-xs outline-none bg-transparent"
+                                                                    placeholder={t('admin.searchProducts')}
+                                                                    className={`flex-1 text-xs outline-none bg-transparent ${isRTL ? 'text-right' : 'text-left'}`}
                                                                     autoFocus
                                                                 />
-                                                                <button 
+                                                                <button
                                                                     onClick={() => { setShowProductPicker(false); setProductSearch(''); }}
                                                                     className="text-slate-400 hover:text-slate-600"
                                                                 >
@@ -1144,20 +1136,19 @@ export function AdminHomePageSettings() {
                                                                                 }
                                                                             }}
                                                                             disabled={isSelected}
-                                                                            className={`w-full flex items-center gap-2 p-2 text-left transition-all ${
-                                                                                isSelected 
-                                                                                    ? 'bg-indigo-50 opacity-50 cursor-not-allowed' 
-                                                                                    : 'hover:bg-slate-50'
-                                                                            }`}
+                                                                            className={`w-full flex items-center gap-2 p-2 text-left transition-all ${isRTL ? 'flex-row-reverse text-right' : 'text-left'} ${isSelected
+                                                                                ? 'bg-indigo-50 opacity-50 cursor-not-allowed'
+                                                                                : 'hover:bg-slate-50'
+                                                                                }`}
                                                                         >
-                                                                            <img 
-                                                                                src={product.image} 
+                                                                            <img
+                                                                                src={product.image}
                                                                                 alt={product.name}
                                                                                 className="w-8 h-8 object-contain rounded bg-slate-100"
                                                                             />
                                                                             <div className="flex-1 min-w-0">
                                                                                 <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
-                                                                                <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                                <p className="text-[10px] text-slate-500">{formatCurrency(product.price)}</p>
                                                                             </div>
                                                                             {isSelected && (
                                                                                 <CheckCircle2 className="h-4 w-4 text-indigo-500" />
@@ -1166,15 +1157,15 @@ export function AdminHomePageSettings() {
                                                                     );
                                                                 })}
                                                                 {filteredProducts.length === 0 && (
-                                                                    <p className="p-3 text-xs text-slate-400 text-center">No products found</p>
+                                                                    <p className="p-3 text-xs text-slate-400 text-center">{t('admin.noProductsFound')}</p>
                                                                 )}
                                                             </div>
                                                         </div>
                                                     )}
                                                 </div>
                                             ) : (
-                                                <p className="text-[10px] text-slate-500">
-                                                    Automatically shows the first 10 products as recommendations.
+                                                <p className={`text-[10px] text-slate-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                                    {t('admin.autoShowsFirst10')}
                                                 </p>
                                             )}
                                         </div>
@@ -1184,25 +1175,24 @@ export function AdminHomePageSettings() {
                                     {section.id === 'trending' && (
                                         <div className="flex flex-col gap-3 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
                                             {/* Manual Product Selection Toggle */}
-                                            <div className="flex items-center justify-between mb-3">
-                                                <div className="flex items-center gap-2">
+                                            <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                                <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                     <Package className="h-3.5 w-3.5 text-indigo-600" />
-                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Manual Product Selection</span>
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.manualProductSelection')}</span>
                                                 </div>
                                                 <button
                                                     onClick={() => updateSection(section.id, 'useManualSelection', !section.useManualSelection)}
-                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${
-                                                        section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
-                                                    }`}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
+                                                        }`}
                                                 >
-                                                    {section.useManualSelection ? 'MANUAL' : 'AUTOMATIC'}
+                                                    {section.useManualSelection ? t('admin.manual') : t('admin.automatic')}
                                                 </button>
                                             </div>
 
                                             {section.useManualSelection ? (
                                                 <div className="space-y-3">
-                                                    <p className="text-[10px] text-slate-500">
-                                                        Select specific products to show as trending.
+                                                    <p className={`text-[10px] text-slate-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                                        {t('admin.selectProductsForTrending')}
                                                     </p>
 
                                                     {/* Selected Products List */}
@@ -1212,16 +1202,16 @@ export function AdminHomePageSettings() {
                                                                 const product = allProducts.find(p => p.id === productId);
                                                                 if (!product) return null;
                                                                 return (
-                                                                    <div key={productId} className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2">
+                                                                    <div key={productId} className={`flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
                                                                         <GripVertical className="h-3.5 w-3.5 text-slate-300" />
-                                                                        <img 
-                                                                            src={product.image} 
+                                                                        <img
+                                                                            src={product.image}
                                                                             alt={product.name}
                                                                             className="w-8 h-8 object-contain rounded bg-slate-100"
                                                                         />
                                                                         <div className="flex-1 min-w-0">
                                                                             <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
-                                                                            <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                            <p className="text-[10px] text-slate-500">{formatCurrency(product.price)}</p>
                                                                         </div>
                                                                         <button
                                                                             onClick={() => removeProductFromSection(section.id, productId)}
@@ -1239,24 +1229,24 @@ export function AdminHomePageSettings() {
                                                     {!showProductPicker ? (
                                                         <button
                                                             onClick={() => setShowProductPicker(true)}
-                                                            className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-dashed border-slate-300 rounded-lg text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all"
+                                                            className={`w-full flex items-center justify-center gap-2 py-2 bg-white border border-dashed border-slate-300 rounded-lg text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all ${isRTL ? 'flex-row-reverse' : ''}`}
                                                         >
                                                             <Plus className="h-3.5 w-3.5" />
-                                                            Add Product
+                                                            {t('admin.addProduct')}
                                                         </button>
                                                     ) : (
                                                         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                                                            <div className="p-2 border-b border-slate-100 flex items-center gap-2">
+                                                            <div className={`p-2 border-b border-slate-100 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                                 <Search className="h-3.5 w-3.5 text-slate-400" />
                                                                 <input
                                                                     type="text"
                                                                     value={productSearch}
                                                                     onChange={(e) => setProductSearch(e.target.value)}
-                                                                    placeholder="Search products..."
-                                                                    className="flex-1 text-xs outline-none bg-transparent"
+                                                                    placeholder={t('admin.searchProducts')}
+                                                                    className={`flex-1 text-xs outline-none bg-transparent ${isRTL ? 'text-right' : 'text-left'}`}
                                                                     autoFocus
                                                                 />
-                                                                <button 
+                                                                <button
                                                                     onClick={() => { setShowProductPicker(false); setProductSearch(''); }}
                                                                     className="text-slate-400 hover:text-slate-600"
                                                                 >
@@ -1275,20 +1265,19 @@ export function AdminHomePageSettings() {
                                                                                 }
                                                                             }}
                                                                             disabled={isSelected}
-                                                                            className={`w-full flex items-center gap-2 p-2 text-left transition-all ${
-                                                                                isSelected 
-                                                                                    ? 'bg-indigo-50 opacity-50 cursor-not-allowed' 
-                                                                                    : 'hover:bg-slate-50'
-                                                                            }`}
+                                                                            className={`w-full flex items-center gap-2 p-2 text-left transition-all ${isRTL ? 'flex-row-reverse text-right' : 'text-left'} ${isSelected
+                                                                                ? 'bg-indigo-50 opacity-50 cursor-not-allowed'
+                                                                                : 'hover:bg-slate-50'
+                                                                                }`}
                                                                         >
-                                                                            <img 
-                                                                                src={product.image} 
+                                                                            <img
+                                                                                src={product.image}
                                                                                 alt={product.name}
                                                                                 className="w-8 h-8 object-contain rounded bg-slate-100"
                                                                             />
                                                                             <div className="flex-1 min-w-0">
                                                                                 <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
-                                                                                <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                                <p className="text-[10px] text-slate-500">{formatCurrency(product.price)}</p>
                                                                             </div>
                                                                             {isSelected && (
                                                                                 <CheckCircle2 className="h-4 w-4 text-indigo-500" />
@@ -1297,15 +1286,15 @@ export function AdminHomePageSettings() {
                                                                     );
                                                                 })}
                                                                 {filteredProducts.length === 0 && (
-                                                                    <p className="p-3 text-xs text-slate-400 text-center">No products found</p>
+                                                                    <p className="p-3 text-xs text-slate-400 text-center">{t('admin.noProductsFound')}</p>
                                                                 )}
                                                             </div>
                                                         </div>
                                                     )}
                                                 </div>
                                             ) : (
-                                                <p className="text-[10px] text-slate-500">
-                                                    Automatically shows products priced over E£50.
+                                                <p className={`text-[10px] text-slate-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                                    {t('admin.autoShowsOver50')}
                                                 </p>
                                             )}
                                         </div>
@@ -1315,25 +1304,24 @@ export function AdminHomePageSettings() {
                                     {section.id === 'pc-peripherals' && (
                                         <div className="flex flex-col gap-3 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
                                             {/* Manual Product Selection Toggle */}
-                                            <div className="flex items-center justify-between mb-3">
-                                                <div className="flex items-center gap-2">
+                                            <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                                <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                     <Package className="h-3.5 w-3.5 text-indigo-600" />
-                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Manual Product Selection</span>
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.manualProductSelection')}</span>
                                                 </div>
                                                 <button
                                                     onClick={() => updateSection(section.id, 'useManualSelection', !section.useManualSelection)}
-                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${
-                                                        section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
-                                                    }`}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-md font-bold transition-all ${section.useManualSelection ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'
+                                                        }`}
                                                 >
-                                                    {section.useManualSelection ? 'MANUAL' : 'AUTOMATIC'}
+                                                    {section.useManualSelection ? t('admin.manual') : t('admin.automatic')}
                                                 </button>
                                             </div>
 
                                             {section.useManualSelection ? (
                                                 <div className="space-y-3">
-                                                    <p className="text-[10px] text-slate-500">
-                                                        Select specific products to show as PC accessories.
+                                                    <p className={`text-[10px] text-slate-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                                        {t('admin.selectProductsForAccessories')}
                                                     </p>
 
                                                     {/* Selected Products List */}
@@ -1343,16 +1331,16 @@ export function AdminHomePageSettings() {
                                                                 const product = allProducts.find(p => p.id === productId);
                                                                 if (!product) return null;
                                                                 return (
-                                                                    <div key={productId} className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2">
+                                                                    <div key={productId} className={`flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
                                                                         <GripVertical className="h-3.5 w-3.5 text-slate-300" />
-                                                                        <img 
-                                                                            src={product.image} 
+                                                                        <img
+                                                                            src={product.image}
                                                                             alt={product.name}
                                                                             className="w-8 h-8 object-contain rounded bg-slate-100"
                                                                         />
                                                                         <div className="flex-1 min-w-0">
                                                                             <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
-                                                                            <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                            <p className="text-[10px] text-slate-500">{formatCurrency(product.price)}</p>
                                                                         </div>
                                                                         <button
                                                                             onClick={() => removeProductFromSection(section.id, productId)}
@@ -1370,24 +1358,24 @@ export function AdminHomePageSettings() {
                                                     {!showProductPicker ? (
                                                         <button
                                                             onClick={() => setShowProductPicker(true)}
-                                                            className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-dashed border-slate-300 rounded-lg text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all"
+                                                            className={`w-full flex items-center justify-center gap-2 py-2 bg-white border border-dashed border-slate-300 rounded-lg text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all ${isRTL ? 'flex-row-reverse' : ''}`}
                                                         >
                                                             <Plus className="h-3.5 w-3.5" />
-                                                            Add Product
+                                                            {t('admin.addProduct')}
                                                         </button>
                                                     ) : (
                                                         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                                                            <div className="p-2 border-b border-slate-100 flex items-center gap-2">
+                                                            <div className={`p-2 border-b border-slate-100 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                                 <Search className="h-3.5 w-3.5 text-slate-400" />
                                                                 <input
                                                                     type="text"
                                                                     value={productSearch}
                                                                     onChange={(e) => setProductSearch(e.target.value)}
-                                                                    placeholder="Search products..."
-                                                                    className="flex-1 text-xs outline-none bg-transparent"
+                                                                    placeholder={t('admin.searchProducts')}
+                                                                    className={`flex-1 text-xs outline-none bg-transparent ${isRTL ? 'text-right' : 'text-left'}`}
                                                                     autoFocus
                                                                 />
-                                                                <button 
+                                                                <button
                                                                     onClick={() => { setShowProductPicker(false); setProductSearch(''); }}
                                                                     className="text-slate-400 hover:text-slate-600"
                                                                 >
@@ -1406,20 +1394,19 @@ export function AdminHomePageSettings() {
                                                                                 }
                                                                             }}
                                                                             disabled={isSelected}
-                                                                            className={`w-full flex items-center gap-2 p-2 text-left transition-all ${
-                                                                                isSelected 
-                                                                                    ? 'bg-indigo-50 opacity-50 cursor-not-allowed' 
-                                                                                    : 'hover:bg-slate-50'
-                                                                            }`}
+                                                                            className={`w-full flex items-center gap-2 p-2 text-left transition-all ${isRTL ? 'flex-row-reverse text-right' : 'text-left'} ${isSelected
+                                                                                ? 'bg-indigo-50 opacity-50 cursor-not-allowed'
+                                                                                : 'hover:bg-slate-50'
+                                                                                }`}
                                                                         >
-                                                                            <img 
-                                                                                src={product.image} 
+                                                                            <img
+                                                                                src={product.image}
                                                                                 alt={product.name}
                                                                                 className="w-8 h-8 object-contain rounded bg-slate-100"
                                                                             />
                                                                             <div className="flex-1 min-w-0">
                                                                                 <p className="text-[11px] font-medium text-slate-800 truncate">{product.name}</p>
-                                                                                <p className="text-[10px] text-slate-500">E£{product.price.toLocaleString()}</p>
+                                                                                <p className="text-[10px] text-slate-500">{formatCurrency(product.price)}</p>
                                                                             </div>
                                                                             {isSelected && (
                                                                                 <CheckCircle2 className="h-4 w-4 text-indigo-500" />
@@ -1428,15 +1415,15 @@ export function AdminHomePageSettings() {
                                                                     );
                                                                 })}
                                                                 {filteredProducts.length === 0 && (
-                                                                    <p className="p-3 text-xs text-slate-400 text-center">No products found</p>
+                                                                    <p className="p-3 text-xs text-slate-400 text-center">{t('admin.noProductsFound')}</p>
                                                                 )}
                                                             </div>
                                                         </div>
                                                     )}
                                                 </div>
                                             ) : (
-                                                <p className="text-[10px] text-slate-500">
-                                                    Automatically shows products with category containing mouse, keyboard, or headphone.
+                                                <p className={`text-[10px] text-slate-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                                    {t('admin.autoShowsPeripherals')}
                                                 </p>
                                             )}
                                         </div>
@@ -1447,65 +1434,65 @@ export function AdminHomePageSettings() {
                                         <div className="flex flex-col gap-3 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
                                             {/* Subtitle Text - English */}
                                             <div>
-                                                <div className="flex items-center gap-2 mb-2">
+                                                <div className={`flex items-center gap-2 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                     <FileText className="h-3.5 w-3.5 text-indigo-600" />
-                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Subtitle Text (EN)</span>
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.subtitleText')} (EN)</span>
                                                 </div>
-                                                <textarea 
+                                                <textarea
                                                     value={section.subtitleText || ''}
                                                     onChange={(e) => updateSection(section.id, 'subtitleText', e.target.value)}
                                                     rows={2}
                                                     dir="ltr"
                                                     className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all resize-none"
-                                                    placeholder="Enter subtitle text (English)"
+                                                    placeholder={t('admin.enterSubtitleText') + ' (EN)'}
                                                 />
                                             </div>
 
                                             {/* Subtitle Text - Arabic */}
                                             <div>
-                                                <div className="flex items-center gap-2 mb-2">
+                                                <div className={`flex items-center gap-2 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                     <Languages className="h-3.5 w-3.5 text-indigo-600" />
-                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Subtitle Text (AR)</span>
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.subtitleText')} (AR)</span>
                                                 </div>
-                                                <textarea 
+                                                <textarea
                                                     value={section.subtitleTextAr || ''}
                                                     onChange={(e) => updateSection(section.id, 'subtitleTextAr', e.target.value)}
                                                     rows={2}
                                                     dir="rtl"
                                                     className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all resize-none"
-                                                    placeholder="أدخل النص الفرعي (عربي)"
+                                                    placeholder={t('admin.enterSubtitleText') + ' (AR)'}
                                                 />
                                             </div>
 
                                             {/* Button Text - English */}
                                             <div>
-                                                <div className="flex items-center gap-2 mb-2">
+                                                <div className={`flex items-center gap-2 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                     <Package className="h-3.5 w-3.5 text-indigo-600" />
-                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Button Text (EN)</span>
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.buttonText')} (EN)</span>
                                                 </div>
-                                                <input 
+                                                <input
                                                     type="text"
                                                     value={section.buttonText || ''}
                                                     onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)}
                                                     dir="ltr"
                                                     className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                                                    placeholder="Enter button text (English)"
+                                                    placeholder={t('admin.enterButtonText') + ' (EN)'}
                                                 />
                                             </div>
 
                                             {/* Button Text - Arabic */}
                                             <div>
-                                                <div className="flex items-center gap-2 mb-2">
+                                                <div className={`flex items-center gap-2 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                     <Languages className="h-3.5 w-3.5 text-indigo-600" />
-                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">Button Text (AR)</span>
+                                                    <span className="text-[10px] font-bold text-slate-600 uppercase">{t('admin.buttonText')} (AR)</span>
                                                 </div>
-                                                <input 
+                                                <input
                                                     type="text"
                                                     value={section.buttonTextAr || ''}
                                                     onChange={(e) => updateSection(section.id, 'buttonTextAr', e.target.value)}
                                                     dir="rtl"
                                                     className="w-full text-xs bg-white border border-slate-200 rounded-lg py-2 px-3 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                                                    placeholder="أدخل نص الزر (عربي)"
+                                                    placeholder={t('admin.enterButtonText') + ' (AR)'}
                                                 />
                                             </div>
                                         </div>
@@ -1515,11 +1502,10 @@ export function AdminHomePageSettings() {
 
                             <button
                                 onClick={() => toggleSection(section.id)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                                    section.isEnabled
-                                        ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                                        : 'bg-red-50 text-red-600 hover:bg-red-100'
-                                }`}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${section.isEnabled
+                                    ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                                    : 'bg-red-50 text-red-600 hover:bg-red-100'
+                                    }`}
                             >
                                 {section.isEnabled ? (
                                     <>

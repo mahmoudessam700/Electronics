@@ -32,7 +32,7 @@ export function AdminReviewsPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
-    
+
     // Logs state
     const [logs, setLogs] = useState<ReviewLog[]>([]);
     const [logsLoading, setLogsLoading] = useState(false);
@@ -40,7 +40,7 @@ export function AdminReviewsPage() {
 
     // Status Update Dialog
     const [showStatusDialog, setShowStatusDialog] = useState(false);
-    const [pendingStatusChange, setPendingStatusChange] = useState<{id: string, status: string} | null>(null);
+    const [pendingStatusChange, setPendingStatusChange] = useState<{ id: string, status: string } | null>(null);
     const [statusReason, setStatusReason] = useState('');
     const [updating, setUpdating] = useState(false);
 
@@ -107,19 +107,19 @@ export function AdminReviewsPage() {
             });
 
             if (res.ok) {
-                toast.success(`Review ${status.toLowerCase()}`);
+                toast.success(t(`admin.review${status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}Success`) || `Review ${status.toLowerCase()}`);
                 setShowStatusDialog(false);
                 fetchReviews();
             }
         } catch (error) {
-            toast.error('Failed to update review status');
+            toast.error(t('admin.failedToUpdateReviewStatus') || 'Failed to update review status');
         } finally {
             setUpdating(false);
         }
     };
 
     const deleteReview = async (id: string) => {
-        if (!confirm('Delete this review?')) return;
+        if (!confirm(t('admin.confirmDeleteReview') || 'Delete this review?')) return;
         try {
             const res = await fetch(`/api/products?resource=reviews&id=${id}`, {
                 method: 'DELETE',
@@ -127,11 +127,11 @@ export function AdminReviewsPage() {
             });
 
             if (res.ok) {
-                toast.success('Review deleted');
+                toast.success(t('admin.reviewDeleted') || 'Review deleted');
                 setReviews(reviews.filter(r => r.id !== id));
             }
         } catch (error) {
-            toast.error('Failed to delete review');
+            toast.error(t('admin.failedToDeleteReview') || 'Failed to delete review');
         }
     };
 
@@ -174,14 +174,13 @@ export function AdminReviewsPage() {
                         <button
                             key={s}
                             onClick={() => setStatusFilter(s)}
-                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                                statusFilter === s ? 'bg-[#4A5568] text-white' : 'bg-white text-gray-600 border border-gray-200'
-                            }`}
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${statusFilter === s ? 'bg-[#4A5568] text-white' : 'bg-white text-gray-600 border border-gray-200'
+                                }`}
                         >
-                            {s === 'ALL' ? t('header.all') : 
-                             s === 'PENDING' ? t('admin.reviewPending') : 
-                             s === 'APPROVED' ? t('admin.reviewApproved') : 
-                             t('admin.reviewRejected')}
+                            {s === 'ALL' ? t('header.all') :
+                                s === 'PENDING' ? t('admin.reviewPending') :
+                                    s === 'APPROVED' ? t('admin.reviewApproved') :
+                                        t('admin.reviewRejected')}
                         </button>
                     ))}
                 </div>
@@ -212,19 +211,18 @@ export function AdminReviewsPage() {
                                     <p className="text-gray-500 line-clamp-2 italic">{r.comment || t('admin.noComment')}</p>
                                 </td>
                                 <td className="py-4 px-4">
-                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                        r.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' :
+                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${r.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' :
                                         r.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
-                                        'bg-rose-100 text-rose-700'
-                                    }`}>
-                                        {r.status === 'PENDING' ? t('admin.reviewPending') : 
-                                         r.status === 'APPROVED' ? t('admin.reviewApproved') : 
-                                         t('admin.reviewRejected')}
+                                            'bg-rose-100 text-rose-700'
+                                        }`}>
+                                        {r.status === 'PENDING' ? t('admin.reviewPending') :
+                                            r.status === 'APPROVED' ? t('admin.reviewApproved') :
+                                                t('admin.reviewRejected')}
                                     </span>
                                 </td>
                                 <td className="py-4 px-4 text-right rtl:text-left">
                                     <div className="flex justify-end rtl:flex-row-reverse gap-1">
-                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400 hover:bg-gray-100" onClick={() => fetchLogs(r)} title="Moderation History">
+                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400 hover:bg-gray-100" onClick={() => fetchLogs(r)} title={t('admin.moderationHistory')}>
                                             <History className="h-4 w-4" />
                                         </Button>
                                         {r.status === 'PENDING' && (
@@ -263,7 +261,9 @@ export function AdminReviewsPage() {
                     </DialogHeader>
                     <div className="space-y-4 py-2">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">{t('admin.reasonFor')} {pendingStatusChange?.status.toLowerCase()}</label>
+                            <label className="text-sm font-medium text-slate-700">
+                                {t('admin.reasonFor')} {pendingStatusChange ? t(`admin.review${pendingStatusChange.status.charAt(0).toUpperCase() + pendingStatusChange.status.slice(1).toLowerCase()}`).toLowerCase() : ''}
+                            </label>
                             <textarea
                                 className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-100 outline-none text-sm min-h-[100px]"
                                 placeholder={t('admin.reasonPlaceholder')}
@@ -273,7 +273,7 @@ export function AdminReviewsPage() {
                         </div>
                         <div className="flex justify-end gap-2">
                             <Button variant="outline" onClick={() => setShowStatusDialog(false)}>{t('admin.cancel')}</Button>
-                            <Button 
+                            <Button
                                 disabled={updating || !statusReason.trim()}
                                 onClick={() => updateStatus(pendingStatusChange!.id, pendingStatusChange!.status, statusReason)}
                                 className={pendingStatusChange?.status === 'REJECTED' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-slate-900'}
@@ -319,11 +319,10 @@ export function AdminReviewsPage() {
                                             <div className="flex items-center gap-2 text-xs">
                                                 <span className="text-slate-400 line-through">{log.oldStatus}</span>
                                                 <span className="text-slate-400">→</span>
-                                                <span className={`font-bold ${
-                                                    log.newStatus === 'APPROVED' ? 'text-emerald-600' :
+                                                <span className={`font-bold ${log.newStatus === 'APPROVED' ? 'text-emerald-600' :
                                                     log.newStatus === 'REJECTED' ? 'text-rose-600' : 'text-amber-600'
-                                                }`}>
-                                                    {log.newStatus}
+                                                    }`}>
+                                                    {t(`admin.review${log.newStatus.charAt(0).toUpperCase() + log.newStatus.slice(1).toLowerCase()}`)}
                                                 </span>
                                             </div>
                                             {log.reason && (
@@ -344,5 +343,5 @@ export function AdminReviewsPage() {
 }
 
 function Input({ className, ...props }: any) {
-  return <input className={`h-11 px-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-200 w-full ${className}`} {...props} />;
+    return <input className={`h-11 px-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-200 w-full ${className}`} {...props} />;
 }

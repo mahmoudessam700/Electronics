@@ -1,15 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-    ShoppingBag, 
-    Clock, 
-    Package, 
-    Truck, 
-    CheckCircle2, 
-    XCircle, 
-    Search, 
-    Calendar, 
-    History, 
-    Home, 
+import {
+    ShoppingBag,
+    Clock,
+    Package,
+    Truck,
+    CheckCircle2,
+    XCircle,
+    Search,
+    Calendar,
+    History,
     User,
     Shield
 } from 'lucide-react';
@@ -66,7 +65,7 @@ export function AdminOrdersPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('ALL');
     const [payoutFilter, setPayoutFilter] = useState<string>('ALL');
-    
+
     // Timeline state
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [showTimeline, setShowTimeline] = useState(false);
@@ -110,10 +109,10 @@ export function AdminOrdersPage() {
                 fetchOrders(); // Refresh to get logs/timestamps
             } else {
                 const err = await res.json();
-                toast.error(err.error || 'Failed to update');
+                toast.error(err.error || t('admin.failedToUpdate'));
             }
         } catch (error) {
-            toast.error('Failed to update status');
+            toast.error(t('admin.failedToUpdateStatus'));
         }
     };
 
@@ -182,11 +181,10 @@ export function AdminOrdersPage() {
                         <button
                             key={status}
                             onClick={() => setStatusFilter(status)}
-                            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-                                statusFilter === status
-                                    ? 'bg-slate-800 text-white shadow-sm'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                            }`}
+                            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${statusFilter === status
+                                ? 'bg-slate-800 text-white shadow-sm'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                                }`}
                         >
                             {status === 'ALL' ? t('header.all') : STATUS_CONFIG[status]?.label || status}
                         </button>
@@ -201,11 +199,10 @@ export function AdminOrdersPage() {
                         <button
                             key={status}
                             onClick={() => setPayoutFilter(status)}
-                            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-                                payoutFilter === status
-                                    ? 'bg-slate-800 text-white shadow-sm'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                            }`}
+                            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${payoutFilter === status
+                                ? 'bg-slate-800 text-white shadow-sm'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                                }`}
                         >
                             {status === 'ALL' ? t('header.all') : t(`shop.payout.${status}`)}
                         </button>
@@ -223,7 +220,7 @@ export function AdminOrdersPage() {
                                 <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden sm:table-cell`}>{t('admin.customer')}</th>
                                 <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell`}>{t('admin.date')}</th>
                                 <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.amount')}</th>
-                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>Payout</th>
+                                <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.payout')}</th>
                                 <th className={`${isRTL ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.status')}</th>
                                 <th className="px-4 py-4 text-right rtl:text-left">{t('admin.actions')}</th>
                             </tr>
@@ -231,7 +228,7 @@ export function AdminOrdersPage() {
                         <tbody className="divide-y divide-gray-100">
                             {filteredOrders.map((order) => {
                                 const config = STATUS_CONFIG[order.status] || STATUS_CONFIG.PENDING;
-                                
+
                                 return (
                                     <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="py-3 px-4">
@@ -290,10 +287,10 @@ export function AdminOrdersPage() {
                                             </div>
                                         </td>
                                         <td className="px-4 py-4 text-right rtl:text-left">
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
-                                                className="h-8 w-8 text-gray-400 hover:text-slate-800" 
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-gray-400 hover:text-slate-800"
                                                 onClick={() => openTimeline(order)}
                                             >
                                                 <History className="h-4 w-4" />
@@ -313,8 +310,8 @@ export function AdminOrdersPage() {
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('admin.noResults')}</h3>
                         <p className="text-gray-500">
-                            {searchQuery || statusFilter !== 'ALL' 
-                                ? t('admin.noResults') 
+                            {searchQuery || statusFilter !== 'ALL'
+                                ? t('admin.noResults')
                                 : t('admin.noRecentOrders')}
                         </p>
                     </div>
@@ -330,7 +327,7 @@ export function AdminOrdersPage() {
                             {t('shop.orderNumber')}: {selectedOrder?.orderNumber}
                         </DialogTitle>
                     </DialogHeader>
-                    
+
                     {selectedOrder && (
                         <div className="space-y-8 mt-6">
                             <div className="grid grid-cols-2 gap-4">
@@ -347,9 +344,9 @@ export function AdminOrdersPage() {
                             <div className="space-y-4">
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
                                     <History className="h-3.5 w-3.5" />
-                                    {t('admin.actions')} Audit Trail
+                                    {t('admin.actions')} {t('admin.auditTrail')}
                                 </h3>
-                                
+
                                 <div className="relative pl-8 space-y-6 before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-px before:bg-slate-200">
                                     {selectedOrder.logs && selectedOrder.logs.length > 0 ? (
                                         selectedOrder.logs.map((log) => (
@@ -375,7 +372,7 @@ export function AdminOrdersPage() {
                                             <div className="absolute -left-8 p-1 rounded-full bg-white border border-slate-300 z-10">
                                                 <Clock className="h-3 w-3 text-slate-400" />
                                             </div>
-                                            <div className="text-xs text-slate-400 italic">No logs recorded yet. This order was likely created before tracking was enabled.</div>
+                                            <div className="text-xs text-slate-400 italic">{t('admin.noLogs')}</div>
                                         </div>
                                     )}
 
@@ -384,7 +381,7 @@ export function AdminOrdersPage() {
                                         <div className="absolute -left-8 p-1 rounded-full bg-slate-800 border border-slate-800 z-10 shadow-sm">
                                             <ShoppingBag className="h-3 w-3 text-white" />
                                         </div>
-                                        <div className="text-xs font-bold text-slate-900">Order Placed</div>
+                                        <div className="text-xs font-bold text-slate-900">{t('admin.orderPlaced')}</div>
                                         <div className="text-[10px] text-slate-500">{new Date(selectedOrder.createdAt).toLocaleString()}</div>
                                     </div>
                                 </div>

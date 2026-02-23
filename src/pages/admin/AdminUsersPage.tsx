@@ -70,11 +70,11 @@ export function AdminUsersPage() {
             if (res.ok) {
                 setUsers(data);
             } else {
-                toast.error(data.error || 'Failed to fetch users');
+                toast.error(data.error || t('admin.failedToFetchUsers'));
             }
         } catch (error) {
             console.error('Failed to fetch users', error);
-            toast.error('Failed to fetch users');
+            toast.error(t('admin.failedToFetchUsers'));
         } finally {
             setLoading(false);
         }
@@ -107,23 +107,23 @@ export function AdminUsersPage() {
             });
 
             if (res.ok) {
-                toast.success('User updated successfully');
+                toast.success(t('admin.userUpdatedSuccess'));
                 fetchUsers();
                 setIsDialogOpen(false);
             } else {
                 const data = await res.json();
-                toast.error(data.error || 'Failed to update user');
+                toast.error(data.error || t('admin.failedToUpdateUser'));
             }
         } catch (error) {
             console.error('Failed to update user', error);
-            toast.error('Failed to update user');
+            toast.error(t('admin.failedToUpdateUser'));
         } finally {
             setIsSaving(false);
         }
     };
 
     const handleDelete = async (userId: string) => {
-        if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+        if (!confirm(t('admin.confirmDeleteUser'))) return;
 
         try {
             const res = await fetch(`/api/users?id=${userId}`, {
@@ -131,14 +131,14 @@ export function AdminUsersPage() {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
-                toast.success('User deleted');
+                toast.success(t('admin.userDeleted'));
                 setUsers(users.filter(u => u.id !== userId));
             } else {
-                toast.error('Failed to delete user');
+                toast.error(t('admin.failedToDeleteUser'));
             }
         } catch (error) {
             console.error('Failed to delete user', error);
-            toast.error('Failed to delete user');
+            toast.error(t('admin.failedToDeleteUser'));
         }
     };
 
@@ -189,11 +189,11 @@ export function AdminUsersPage() {
                 fetchUsers();
                 setIsCreateDialogOpen(false);
             } else {
-                toast.error(data.error || 'Failed to create user');
+                toast.error(data.error || t('admin.failedToCreateUser'));
             }
         } catch (error) {
             console.error('Failed to create user', error);
-            toast.error('Failed to create user');
+            toast.error(t('admin.failedToCreateUser'));
         } finally {
             setIsSaving(false);
         }
@@ -304,10 +304,10 @@ export function AdminUsersPage() {
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className={`absolute ${t('common.isRTL') === 'true' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400`} />
                     <Input
                         placeholder={t('admin.searchUsers')}
-                        className="pl-10 bg-white border-gray-200 focus:border-[#4A5568] rounded-lg"
+                        className={`${t('common.isRTL') === 'true' ? 'pr-10' : 'pl-10'} bg-white border-gray-200 focus:border-[#4A5568] rounded-lg`}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -317,11 +317,10 @@ export function AdminUsersPage() {
                         <button
                             key={role}
                             onClick={() => setRoleFilter(role)}
-                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                                roleFilter === role
-                                    ? 'bg-[#4A5568] text-white'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                            }`}
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${roleFilter === role
+                                ? 'bg-[#4A5568] text-white'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                                }`}
                         >
                             {role === 'ALL' ? t('admin.allUsers') : role === 'ADMIN' ? t('admin.admins') : role === 'CUSTOMER' ? t('admin.customers') : role === 'SHOP_OWNER' ? t('admin.shopOwners') : t('admin.shopStaffs')}
                         </button>
@@ -335,11 +334,11 @@ export function AdminUsersPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-200">
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{t('admin.user')}</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{t('admin.role')}</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">{t('admin.contact')}</th>
-                                <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{t('admin.location')}</th>
-                                <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{t('admin.actions')}</th>
+                                <th className={`${t('common.isRTL') === 'true' ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.user')}</th>
+                                <th className={`${t('common.isRTL') === 'true' ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.role')}</th>
+                                <th className={`${t('common.isRTL') === 'true' ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell`}>{t('admin.contact')}</th>
+                                <th className={`${t('common.isRTL') === 'true' ? 'text-right' : 'text-left'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell`}>{t('admin.location')}</th>
+                                <th className={`${t('common.isRTL') === 'true' ? 'text-left' : 'text-right'} py-3 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500`}>{t('admin.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -347,11 +346,10 @@ export function AdminUsersPage() {
                                 <tr key={user.id} className="hover:bg-gray-50 transition-colors group">
                                     <td className="py-3 px-4">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white font-semibold text-sm ${
-                                                user.role === 'ADMIN' 
-                                                    ? 'bg-purple-500' 
-                                                    : 'bg-[#4A5568]'
-                                            }`}>
+                                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white font-semibold text-sm ${user.role === 'ADMIN'
+                                                ? 'bg-purple-500'
+                                                : 'bg-[#4A5568]'
+                                                }`}>
                                                 {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                                             </div>
                                             <div>
@@ -364,13 +362,15 @@ export function AdminUsersPage() {
                                         </div>
                                     </td>
                                     <td className="py-3 px-4">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                                            user.role === 'ADMIN'
-                                                ? 'bg-purple-100 text-purple-700'
-                                                : 'bg-emerald-100 text-emerald-700'
-                                        }`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${user.role === 'ADMIN'
+                                            ? 'bg-purple-100 text-purple-700'
+                                            : 'bg-emerald-100 text-emerald-700'
+                                            }`}>
                                             {user.role === 'ADMIN' ? <Crown className="h-3 w-3" /> : <User className="h-3 w-3" />}
-                                            {user.role}
+                                            {user.role === 'ADMIN' ? t('admin.administrator') :
+                                                user.role === 'SHOP_OWNER' ? t('admin.shopOwner') :
+                                                    user.role === 'SHOP_STAFF' ? t('admin.shopStaff') :
+                                                        t('admin.customer')}
                                         </span>
                                     </td>
                                     <td className="py-3 px-4 hidden md:table-cell">
@@ -485,8 +485,8 @@ export function AdminUsersPage() {
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-lg">
                                 {t('admin.cancel')}
                             </Button>
-                            <Button 
-                                type="submit" 
+                            <Button
+                                type="submit"
                                 disabled={isSaving}
                                 className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
                             >
@@ -611,7 +611,7 @@ export function AdminUsersPage() {
                                 </Label>
                             </div>
                             <p className="text-xs text-gray-500 ml-7">{t('admin.sendEmailInviteDesc')}</p>
-                            
+
                             {!createFormData.sendInvite && (
                                 <div className="space-y-2 mt-3">
                                     <Label htmlFor="create-password" className="text-sm font-medium">{t('admin.temporaryPassword')} *</Label>
@@ -633,8 +633,8 @@ export function AdminUsersPage() {
                             <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="rounded-lg">
                                 {t('admin.cancel')}
                             </Button>
-                            <Button 
-                                type="submit" 
+                            <Button
+                                type="submit"
                                 disabled={isSaving}
                                 className="bg-[#4A5568] hover:bg-[#2D3748] text-white font-semibold rounded-lg"
                             >

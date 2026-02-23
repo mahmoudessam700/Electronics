@@ -66,11 +66,11 @@ export function AdminShopsPage() {
             if (res.ok) {
                 setShops(data);
             } else {
-                toast.error(data.error || 'Failed to fetch shops');
+                toast.error(data.error || t('admin.failedToFetchShops'));
             }
         } catch (error) {
             console.error('Failed to fetch shops', error);
-            toast.error('Failed to fetch shops');
+            toast.error(t('admin.failedToFetchShops'));
         } finally {
             setLoading(false);
         }
@@ -105,16 +105,16 @@ export function AdminShopsPage() {
             });
 
             if (res.ok) {
-                toast.success('Shop updated successfully');
+                toast.success(t('admin.shopUpdatedSuccess'));
                 fetchShops();
                 setIsDialogOpen(false);
             } else {
                 const data = await res.json();
-                toast.error(data.error || 'Failed to update shop');
+                toast.error(data.error || t('admin.failedToUpdateShop'));
             }
         } catch (error) {
             console.error('Failed to update shop', error);
-            toast.error('Failed to update shop');
+            toast.error(t('admin.failedToUpdateShop'));
         } finally {
             setIsSaving(false);
         }
@@ -153,10 +153,10 @@ export function AdminShopsPage() {
 
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className={`absolute ${t('common.isRTL') === 'true' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400`} />
                     <Input
                         placeholder={t('admin.searchShops')}
-                        className="pl-10 bg-white border-gray-200"
+                        className={`${t('common.isRTL') === 'true' ? 'pr-10' : 'pl-10'} bg-white border-gray-200`}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -166,16 +166,15 @@ export function AdminShopsPage() {
                         <button
                             key={status}
                             onClick={() => setStatusFilter(status)}
-                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                                statusFilter === status
-                                    ? 'bg-[#4A5568] text-white'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                            }`}
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${statusFilter === status
+                                ? 'bg-[#4A5568] text-white'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                                }`}
                         >
-                            {status === 'ALL' ? t('admin.allFilter') : 
-                             status === 'ACTIVE' ? t('admin.active') :
-                             status === 'PENDING' ? t('admin.pending') :
-                             t('admin.suspended')}
+                            {status === 'ALL' ? t('admin.allFilter') :
+                                status === 'ACTIVE' ? t('admin.active') :
+                                    status === 'PENDING' ? t('admin.pending') :
+                                        t('admin.suspended')}
                         </button>
                     ))}
                 </div>
@@ -220,12 +219,13 @@ export function AdminShopsPage() {
                                         </div>
                                     </td>
                                     <td className="py-3 px-4">
-                                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
-                                            shop.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' :
+                                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${shop.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' :
                                             shop.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
-                                            'bg-rose-100 text-rose-700'
-                                        }`}>
-                                            {shop.status}
+                                                'bg-rose-100 text-rose-700'
+                                            }`}>
+                                            {shop.status === 'ACTIVE' ? t('admin.active') :
+                                                shop.status === 'PENDING' ? t('admin.pending') :
+                                                    t('admin.suspended')}
                                         </span>
                                     </td>
                                     <td className="py-3 px-4">
@@ -237,7 +237,12 @@ export function AdminShopsPage() {
                                             ) : (
                                                 <Shield className="h-4 w-4 text-amber-600" />
                                             )}
-                                            <span className="font-medium text-gray-700">{shop.kycStatus}</span>
+                                            <span className="font-medium text-gray-700">
+                                                {shop.kycStatus === 'VERIFIED' ? t('admin.verified') :
+                                                    shop.kycStatus === 'REJECTED' ? t('admin.rejected') :
+                                                        shop.kycStatus === 'SUBMITTED' ? t('admin.submitted') :
+                                                            t('admin.unverified')}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="py-3 px-4">
@@ -308,21 +313,21 @@ export function AdminShopsPage() {
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4 pt-2 text-xs text-slate-500">
-                             <div>
+                            <div>
                                 <p className="font-bold">{t('admin.contactEmail')}</p>
                                 <p>{formData.email || t('admin.na')}</p>
-                             </div>
-                             <div>
+                            </div>
+                            <div>
                                 <p className="font-bold">{t('admin.contactPhone')}</p>
                                 <p>{formData.phone || t('admin.na')}</p>
-                             </div>
+                            </div>
                         </div>
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                                 {t('admin.cancel')}
                             </Button>
-                            <Button 
-                                type="submit" 
+                            <Button
+                                type="submit"
                                 disabled={isSaving}
                                 className="bg-[#4A5568] hover:bg-[#2D3748] text-white"
                             >

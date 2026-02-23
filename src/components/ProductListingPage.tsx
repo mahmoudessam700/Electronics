@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { ProductCard, Product } from './ProductCard';
 import { SlidersHorizontal, Star, ChevronRight, Loader2 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
@@ -23,6 +24,7 @@ interface ProductListingPageProps {
 }
 
 export function ProductListingPage({ onProductClick, selectedCategory, onNavigate }: ProductListingPageProps) {
+  const { t, isRTL } = useLanguage();
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
   const [products, setProducts] = useState<Product[]>([]);
@@ -47,7 +49,7 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
       } catch (err: unknown) {
         console.error('Error fetching products:', err);
         // Show a generic error message for any failure
-        setError('Unable to load products right now. Please try again later.');
+        setError(t('common.errorOccurred') || 'Unable to load products right now. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -76,9 +78,9 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
   };
 
   const FilterSidebar = () => (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`}>
       <div>
-        <h3 className="mb-4">Price Range</h3>
+        <h3 className="mb-4">{t('product.filters')}</h3>
         <Slider
           value={priceRange}
           onValueChange={setPriceRange}
@@ -86,17 +88,17 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
           step={10}
           className="mb-4"
         />
-        <div className="flex items-center justify-between text-sm text-[#718096]">
-          <span>E£{priceRange[0]}</span>
-          <span>E£{priceRange[1]}</span>
+        <div className={`flex items-center justify-between text-sm text-[#718096] ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <span>{isRTL ? ' ج.م' : 'E£'}{priceRange[0]}</span>
+          <span>{isRTL ? ' ج.م' : 'E£'}{priceRange[1]}</span>
         </div>
       </div>
 
       <div className="border-t border-[#D5D9D9] pt-6">
-        <h3 className="mb-4">Brand</h3>
+        <h3 className="mb-4">{t('product.brand')}</h3>
         <div className="space-y-3">
           {brands.map((brand) => (
-            <div key={brand} className="flex items-center space-x-2">
+            <div key={brand} className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
               <Checkbox
                 id={brand}
                 checked={selectedBrands.includes(brand)}
@@ -114,10 +116,10 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
       </div>
 
       <div className="border-t border-[#D5D9D9] pt-6">
-        <h3 className="mb-4">Customer Rating</h3>
+        <h3 className="mb-4">{t('product.customerRating')}</h3>
         <div className="space-y-3">
           {[4, 3, 2, 1].map((rating) => (
-            <div key={rating} className="flex items-center space-x-2">
+            <div key={rating} className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
               <Checkbox
                 id={`rating-${rating}`}
                 checked={selectedRatings.includes(rating)}
@@ -136,7 +138,7 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
                     />
                   ))}
                 </div>
-                <span className="text-sm">& Up</span>
+                <span className="text-sm">{t('product.andUp')}</span>
               </Label>
             </div>
           ))}
@@ -144,8 +146,8 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
       </div>
 
       <div className="border-t border-[#D5D9D9] pt-6">
-        <h3 className="mb-4">Prime Shipping</h3>
-        <div className="flex items-center space-x-2">
+        <h3 className="mb-4">{t('product.prime')}</h3>
+        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
           <Checkbox id="prime" />
           <Label htmlFor="prime" className="text-sm cursor-pointer hover:text-[#C7511F]">
             <div className="bg-[#007185] text-white text-xs px-2 py-0.5 rounded inline-block">
@@ -156,18 +158,18 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
       </div>
 
       <div className="border-t border-[#D5D9D9] pt-6">
-        <h3 className="mb-4">Delivery Day</h3>
+        <h3 className="mb-4">{t('product.deliveryDay')}</h3>
         <div className="space-y-3">
-          <div className="flex items-center space-x-2">
+          <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
             <Checkbox id="tomorrow" />
             <Label htmlFor="tomorrow" className="text-sm cursor-pointer hover:text-[#2D3748]">
-              Get It Tomorrow
+              {t('product.tomorrow')}
             </Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
             <Checkbox id="two-days" />
             <Label htmlFor="two-days" className="text-sm cursor-pointer hover:text-[#C7511F]">
-              Get It in 2 Days
+              {t('product.twoDays')}
             </Label>
           </div>
         </div>
@@ -176,43 +178,43 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
   );
 
   return (
-    <div className="min-h-screen bg-[#EAEDED]">
+    <div className="min-h-screen bg-[#EAEDED]" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-[1500px] mx-auto px-4 py-6">
         {/* Breadcrumb */}
-        <div className="text-sm text-[#565959] mb-4 flex items-center">
+        <div className={`text-sm text-[#565959] mb-4 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
           <span
             className="hover:text-[#C7511F] cursor-pointer"
             onClick={() => onNavigate('home')}
           >
-            Home
+            {t('header.home')}
           </span>
-          <ChevronRight className="h-4 w-4 mx-1" />
+          <ChevronRight className={`h-4 w-4 mx-1 ${isRTL ? 'rotate-180' : ''}`} />
           <span
             className="hover:text-[#C7511F] cursor-pointer"
             onClick={() => onNavigate('search', undefined, undefined)}
           >
-            Shop
+            {t('header.shop')}
           </span>
           {selectedCategory && (
             <>
-              <ChevronRight className="h-4 w-4 mx-1" />
+              <ChevronRight className={`h-4 w-4 mx-1 ${isRTL ? 'rotate-180' : ''}`} />
               <span className="text-[#0F1111] font-medium">{selectedCategory}</span>
             </>
           )}
           {!selectedCategory && (
             <>
-              <ChevronRight className="h-4 w-4 mx-1" />
-              <span className="text-[#0F1111] font-medium">All Products</span>
+              <ChevronRight className={`h-4 w-4 mx-1 ${isRTL ? 'rotate-180' : ''}`} />
+              <span className="text-[#0F1111] font-medium">{t('product.allProducts')}</span>
             </>
           )}
         </div>
 
         {/* Results Header */}
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl mb-1">{selectedCategory || 'All Products'}</h1>
+          <div className={isRTL ? 'text-right' : 'text-left'}>
+            <h1 className="text-2xl mb-1">{selectedCategory || t('product.allProducts')}</h1>
             <p className="text-sm text-[#565959]">
-              {filteredByCategory.length} results
+              {filteredByCategory.length} {t('product.results')}
             </p>
           </div>
 
@@ -221,12 +223,12 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" className="lg:hidden">
-                  <SlidersHorizontal className="h-4 w-4 mr-2" />
-                  Filters
+                  <SlidersHorizontal className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                  {t('product.filters')}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] overflow-y-auto">
-                <SheetTitle>Filters</SheetTitle>
+              <SheetContent side={isRTL ? 'right' : 'left'} className="w-[300px] overflow-y-auto">
+                <SheetTitle>{t('product.filters')}</SheetTitle>
                 <SheetDescription className="sr-only">Filter products by price, brand, rating, and more</SheetDescription>
                 <div className="mt-8">
                   <FilterSidebar />
@@ -237,14 +239,14 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
             {/* Sort By */}
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder={t('product.sortBy')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="featured">Featured</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="rating">Customer Rating</SelectItem>
-                <SelectItem value="newest">Newest Arrivals</SelectItem>
+                <SelectItem value="featured">{t('product.sortFeatured')}</SelectItem>
+                <SelectItem value="price-low">{t('product.priceLowToHigh')}</SelectItem>
+                <SelectItem value="price-high">{t('product.priceHighToLow')}</SelectItem>
+                <SelectItem value="rating">{t('product.avgCustomerReview')}</SelectItem>
+                <SelectItem value="newest">{t('product.newestArrivals')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -263,21 +265,21 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <Loader2 className="h-8 w-8 animate-spin text-[#718096]" />
-                <span className="ml-2 text-[#565959]">Loading products...</span>
+                <span className={`text-[#565959] ${isRTL ? 'mr-2 ml-0' : 'ml-2'}`}>{t('product.loadingProducts')}</span>
               </div>
             ) : error ? (
               <div className="text-center py-20">
                 <p className="text-red-500 mb-4">{error}</p>
-                <Button onClick={() => window.location.reload()}>Try Again</Button>
+                <Button onClick={() => window.location.reload()}>{t('common.tryAgain') || 'Try Again'}</Button>
               </div>
             ) : filteredByCategory.length === 0 ? (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">📦</div>
-                <h3 className="text-xl font-medium text-[#0F1111] mb-2">No products available</h3>
+                <h3 className="text-xl font-medium text-[#0F1111] mb-2">{t('product.noProducts')}</h3>
                 <p className="text-[#565959]">
                   {products.length === 0
-                    ? "There are no products in this category yet. Check back later!"
-                    : "No products match your current filters. Try adjusting your filters."}
+                    ? t('product.noProductsCategory')
+                    : t('product.noProductsFilter')}
                 </p>
               </div>
             ) : (
@@ -293,9 +295,9 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
             )}
 
             {/* Pagination */}
-            <div className="flex items-center justify-center gap-2 mt-8">
+            <div className={`flex items-center justify-center gap-2 mt-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <Button variant="outline" disabled>
-                Previous
+                {t('common.previous') || 'Previous'}
               </Button>
               <Button variant="outline" className="bg-[#718096] text-white border-[#718096]">
                 1
@@ -305,7 +307,7 @@ export function ProductListingPage({ onProductClick, selectedCategory, onNavigat
               <Button variant="outline">4</Button>
               <span className="px-2">...</span>
               <Button variant="outline">10</Button>
-              <Button variant="outline">Next</Button>
+              <Button variant="outline">{t('common.next') || 'Next'}</Button>
             </div>
           </main>
         </div>

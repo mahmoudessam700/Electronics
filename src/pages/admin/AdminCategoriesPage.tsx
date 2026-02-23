@@ -116,7 +116,7 @@ export function AdminCategoriesPage() {
             setCategories(filtered);
         } catch (error) {
             console.error('Failed to fetch categories:', error);
-            toast.error('Failed to load categories');
+            toast.error(t('admin.failedToLoadCategories'));
         } finally {
             setLoading(false);
         }
@@ -167,9 +167,9 @@ export function AdminCategoriesPage() {
             const data = await res.json();
             if (res.ok && data.files?.[0]?.url) {
                 setFormData(prev => ({ ...prev, image: data.files[0].url }));
-                toast.success('Image uploaded!');
+                toast.success(t('admin.imageUploaded'));
             } else {
-                toast.error(data.error || 'Upload failed');
+                toast.error(data.error || t('admin.uploadFailed'));
             }
         } catch (error) {
             console.error('Upload error', error);
@@ -181,7 +181,7 @@ export function AdminCategoriesPage() {
 
     async function handleSave() {
         if (!formData.name.trim()) {
-            toast.error('Category name is required');
+            toast.error(t('admin.categoryNameRequired'));
             return;
         }
 
@@ -204,7 +204,7 @@ export function AdminCategoriesPage() {
                 throw new Error(error.error || 'Failed to save');
             }
 
-            toast.success(editingCategory ? 'Category updated!' : 'Category created!');
+            toast.success(editingCategory ? t('admin.categoryUpdated') : t('admin.categoryCreated'));
             setIsFormOpen(false);
             fetchCategories();
         } catch (error: any) {
@@ -226,12 +226,12 @@ export function AdminCategoriesPage() {
                 throw new Error('Failed to delete');
             }
 
-            toast.success('Category deleted!');
+            toast.success(t('admin.categoryDeleted'));
             setIsDeleteOpen(false);
             setDeletingCategory(null);
             fetchCategories();
         } catch (error) {
-            toast.error('Failed to delete category');
+            toast.error(t('admin.failedToDeleteCategory'));
         }
     }
 

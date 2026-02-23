@@ -297,7 +297,7 @@ const defaultPages: PageContent[] = [
 ];
 
 export function AdminPageContentSettings() {
-    const { language } = useLanguage();
+    const { t, language, isRTL } = useLanguage();
     const [pages, setPages] = useState<PageContent[]>(defaultPages);
     const [expandedPage, setExpandedPage] = useState<string | null>(null);
     const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -346,7 +346,7 @@ export function AdminPageContentSettings() {
     };
 
     const updatePage = (pageId: string, field: keyof PageContent, value: any) => {
-        setPages(prev => prev.map(page => 
+        setPages(prev => prev.map(page =>
             page.id === pageId ? { ...page, [field]: value } : page
         ));
     };
@@ -449,33 +449,30 @@ export function AdminPageContentSettings() {
     };
 
     return (
-        <div className="p-6 max-w-6xl mx-auto">
+        <div className={`p-6 max-w-6xl mx-auto ${isRTL ? 'text-right' : 'text-left'}`}>
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <div className={`flex items-center justify-between mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
+                    <h1 className={`text-2xl font-bold text-slate-800 flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <FileText className="h-7 w-7 text-indigo-600" />
-                        {language === 'ar' ? 'إدارة محتوى الصفحات' : 'Page Content Manager'}
+                        {t('admin.pageContentManager')}
                     </h1>
                     <p className="text-slate-500 mt-1">
-                        {language === 'ar' 
-                            ? 'تحكم في محتوى جميع صفحات الموقع' 
-                            : 'Control the content of all website pages'}
+                        {t('admin.pageContentSubtitle')}
                     </p>
                 </div>
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
-                        saveSuccess 
-                            ? 'bg-green-500 text-white' 
-                            : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                    }`}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${saveSuccess
+                        ? 'bg-green-500 text-white'
+                        : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
                 >
                     <Save className="h-5 w-5" />
-                    {saving ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') 
-                        : saveSuccess ? (language === 'ar' ? 'تم الحفظ!' : 'Saved!') 
-                        : (language === 'ar' ? 'حفظ التغييرات' : 'Save Changes')}
+                    {saving ? t('admin.saving')
+                        : saveSuccess ? t('admin.saved')
+                            : t('admin.saveChanges')}
                 </button>
             </div>
 
@@ -486,9 +483,9 @@ export function AdminPageContentSettings() {
                         {/* Page Header */}
                         <button
                             onClick={() => setExpandedPage(expandedPage === page.id ? null : page.id)}
-                            className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors"
+                            className={`w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
                         >
-                            <div className="flex items-center gap-3">
+                            <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                 <Globe className="h-5 w-5 text-indigo-500" />
                                 <span className="font-semibold text-slate-800">
                                     {language === 'ar' ? page.nameAr : page.name}
@@ -509,14 +506,14 @@ export function AdminPageContentSettings() {
                             <div className="border-t border-slate-100 p-5 space-y-6">
                                 {/* Hero Section */}
                                 <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-5">
-                                    <h3 className="font-semibold text-indigo-800 mb-4 flex items-center gap-2">
+                                    <h3 className={`font-semibold text-indigo-800 mb-4 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                         <Image className="h-4 w-4" />
-                                        {language === 'ar' ? 'القسم الرئيسي (Hero)' : 'Hero Section'}
+                                        {t('admin.heroSection')}
                                     </h3>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div>
+                                        <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
                                             <label className="block text-xs font-medium text-slate-600 mb-1">
-                                                Hero Title (EN)
+                                                {t('admin.heroTitleEn')}
                                             </label>
                                             <input
                                                 type="text"
@@ -525,9 +522,9 @@ export function AdminPageContentSettings() {
                                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                                             />
                                         </div>
-                                        <div>
+                                        <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
                                             <label className="block text-xs font-medium text-slate-600 mb-1">
-                                                العنوان الرئيسي (AR)
+                                                {t('admin.heroTitleAr')}
                                             </label>
                                             <input
                                                 type="text"
@@ -537,9 +534,9 @@ export function AdminPageContentSettings() {
                                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                                             />
                                         </div>
-                                        <div>
+                                        <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
                                             <label className="block text-xs font-medium text-slate-600 mb-1">
-                                                Hero Subtitle (EN)
+                                                {t('admin.heroSubtitleEn')}
                                             </label>
                                             <textarea
                                                 value={page.heroSubtitle}
@@ -548,9 +545,9 @@ export function AdminPageContentSettings() {
                                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
                                             />
                                         </div>
-                                        <div>
+                                        <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
                                             <label className="block text-xs font-medium text-slate-600 mb-1">
-                                                العنوان الفرعي (AR)
+                                                {t('admin.heroSubtitleAr')}
                                             </label>
                                             <textarea
                                                 value={page.heroSubtitleAr}
@@ -565,16 +562,16 @@ export function AdminPageContentSettings() {
 
                                 {/* Sections */}
                                 <div>
-                                    <div className="flex items-center justify-between mb-3">
+                                    <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                         <h3 className="font-semibold text-slate-700">
-                                            {language === 'ar' ? 'أقسام الصفحة' : 'Page Sections'}
+                                            {t('admin.pageSections')}
                                         </h3>
                                         <button
                                             onClick={() => addSection(page.id)}
-                                            className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800"
+                                            className={`flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800 ${isRTL ? 'flex-row-reverse' : ''}`}
                                         >
                                             <Plus className="h-4 w-4" />
-                                            {language === 'ar' ? 'إضافة قسم' : 'Add Section'}
+                                            {t('admin.addSection')}
                                         </button>
                                     </div>
 
@@ -583,17 +580,22 @@ export function AdminPageContentSettings() {
                                             <div key={section.id} className="border border-slate-200 rounded-xl overflow-hidden">
                                                 <button
                                                     onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
-                                                    className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors"
+                                                    className={`w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}
                                                 >
-                                                    <div className="flex items-center gap-2">
+                                                    <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                         <span className="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded capitalize">
-                                                            {section.type}
+                                                            {section.type === 'text' ? t('admin.textBlock') :
+                                                                section.type === 'benefits' ? t('admin.benefitsGrid') :
+                                                                    section.type === 'cards' ? t('admin.cards') :
+                                                                        section.type === 'faq' ? t('admin.faq') :
+                                                                            section.type === 'list' ? t('admin.list') :
+                                                                                section.type === 'cta' ? t('admin.cta') : section.type}
                                                         </span>
                                                         <span className="font-medium text-slate-700">
                                                             {language === 'ar' ? section.titleAr : section.title}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -614,29 +616,29 @@ export function AdminPageContentSettings() {
                                                 {expandedSection === section.id && (
                                                     <div className="p-4 space-y-4">
                                                         {/* Section Type */}
-                                                        <div>
+                                                        <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
                                                             <label className="block text-xs font-medium text-slate-600 mb-1">
-                                                                Section Type
+                                                                {t('admin.sectionType')}
                                                             </label>
                                                             <select
                                                                 value={section.type}
                                                                 onChange={(e) => updateSection(page.id, section.id, 'type', e.target.value)}
                                                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                                                             >
-                                                                <option value="text">Text Block</option>
-                                                                <option value="benefits">Benefits/Features Grid</option>
-                                                                <option value="cards">Cards</option>
-                                                                <option value="faq">FAQ</option>
-                                                                <option value="list">List</option>
-                                                                <option value="cta">Call to Action</option>
+                                                                <option value="text">{t('admin.textBlock')}</option>
+                                                                <option value="benefits">{t('admin.benefitsGrid')}</option>
+                                                                <option value="cards">{t('admin.cards')}</option>
+                                                                <option value="faq">{t('admin.faq')}</option>
+                                                                <option value="list">{t('admin.list')}</option>
+                                                                <option value="cta">{t('admin.cta')}</option>
                                                             </select>
                                                         </div>
 
                                                         {/* Section Title */}
                                                         <div className="grid grid-cols-2 gap-4">
-                                                            <div>
+                                                            <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
                                                                 <label className="block text-xs font-medium text-slate-600 mb-1">
-                                                                    Section Title (EN)
+                                                                    {t('admin.sectionTitleEn')}
                                                                 </label>
                                                                 <input
                                                                     type="text"
@@ -645,9 +647,9 @@ export function AdminPageContentSettings() {
                                                                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                                                                 />
                                                             </div>
-                                                            <div>
+                                                            <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
                                                                 <label className="block text-xs font-medium text-slate-600 mb-1">
-                                                                    عنوان القسم (AR)
+                                                                    {t('admin.sectionTitleAr')}
                                                                 </label>
                                                                 <input
                                                                     type="text"
@@ -662,9 +664,9 @@ export function AdminPageContentSettings() {
                                                         {/* Section Content (for text type) */}
                                                         {(section.type === 'text' || section.type === 'cta') && (
                                                             <div className="grid grid-cols-2 gap-4">
-                                                                <div>
+                                                                <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
                                                                     <label className="block text-xs font-medium text-slate-600 mb-1">
-                                                                        Content (EN)
+                                                                        {t('admin.contentEn')}
                                                                     </label>
                                                                     <textarea
                                                                         value={section.content}
@@ -673,9 +675,9 @@ export function AdminPageContentSettings() {
                                                                         className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
                                                                     />
                                                                 </div>
-                                                                <div>
+                                                                <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
                                                                     <label className="block text-xs font-medium text-slate-600 mb-1">
-                                                                        المحتوى (AR)
+                                                                        {t('admin.contentAr')}
                                                                     </label>
                                                                     <textarea
                                                                         value={section.contentAr}
@@ -691,24 +693,24 @@ export function AdminPageContentSettings() {
                                                         {/* Section Items (for benefits, faq, list types) */}
                                                         {(section.type === 'benefits' || section.type === 'faq' || section.type === 'list' || section.type === 'cards') && (
                                                             <div>
-                                                                <div className="flex items-center justify-between mb-2">
+                                                                <div className={`flex items-center justify-between mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                                     <label className="text-xs font-medium text-slate-600">
-                                                                        {language === 'ar' ? 'العناصر' : 'Items'}
+                                                                        {t('admin.items')}
                                                                     </label>
                                                                     <button
                                                                         onClick={() => addSectionItem(page.id, section.id)}
-                                                                        className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800"
+                                                                        className={`flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 ${isRTL ? 'flex-row-reverse' : ''}`}
                                                                     >
                                                                         <Plus className="h-3 w-3" />
-                                                                        {language === 'ar' ? 'إضافة' : 'Add'}
+                                                                        {t('admin.add')}
                                                                     </button>
                                                                 </div>
                                                                 <div className="space-y-2">
                                                                     {section.items?.map((item, index) => (
-                                                                        <div key={item.id} className="bg-slate-50 rounded-lg p-3">
-                                                                            <div className="flex items-center justify-between mb-2">
+                                                                        <div key={item.id} className={`bg-slate-50 rounded-lg p-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                                                            <div className={`flex items-center justify-between mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                                                                 <span className="text-xs text-slate-500">
-                                                                                    {language === 'ar' ? `عنصر ${index + 1}` : `Item ${index + 1}`}
+                                                                                    {t('admin.item')} {index + 1}
                                                                                 </span>
                                                                                 <button
                                                                                     onClick={() => removeSectionItem(page.id, section.id, item.id)}
@@ -722,14 +724,14 @@ export function AdminPageContentSettings() {
                                                                                     type="text"
                                                                                     value={item.title}
                                                                                     onChange={(e) => updateSectionItem(page.id, section.id, item.id, 'title', e.target.value)}
-                                                                                    placeholder="Title (EN)"
+                                                                                    placeholder={t('admin.titleEn')}
                                                                                     className="px-2 py-1.5 border border-slate-200 rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                                 />
                                                                                 <input
                                                                                     type="text"
                                                                                     value={item.titleAr}
                                                                                     onChange={(e) => updateSectionItem(page.id, section.id, item.id, 'titleAr', e.target.value)}
-                                                                                    placeholder="العنوان (AR)"
+                                                                                    placeholder={t('admin.titleAr')}
                                                                                     dir="rtl"
                                                                                     className="px-2 py-1.5 border border-slate-200 rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                                 />
@@ -737,14 +739,14 @@ export function AdminPageContentSettings() {
                                                                                     type="text"
                                                                                     value={item.description}
                                                                                     onChange={(e) => updateSectionItem(page.id, section.id, item.id, 'description', e.target.value)}
-                                                                                    placeholder="Description (EN)"
+                                                                                    placeholder={t('admin.descriptionEn')}
                                                                                     className="px-2 py-1.5 border border-slate-200 rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                                 />
                                                                                 <input
                                                                                     type="text"
                                                                                     value={item.descriptionAr}
                                                                                     onChange={(e) => updateSectionItem(page.id, section.id, item.id, 'descriptionAr', e.target.value)}
-                                                                                    placeholder="الوصف (AR)"
+                                                                                    placeholder={t('admin.descriptionAr')}
                                                                                     dir="rtl"
                                                                                     className="px-2 py-1.5 border border-slate-200 rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                                 />

@@ -116,9 +116,9 @@ export function AdminProductFormPage() {
             const data = await res.json();
             if (res.ok && data.files?.[0]?.url) {
                 setImage(data.files[0].url);
-                toast.success('Image uploaded!');
+                toast.success(t('admin.imageUploaded'));
             } else {
-                toast.error('Upload failed');
+                toast.error(t('admin.uploadFailed'));
             }
         } catch (error) {
             console.error('Upload error', error);
@@ -132,15 +132,15 @@ export function AdminProductFormPage() {
         e.preventDefault();
 
         if (!name.trim()) {
-            toast.error('Product name is required');
+            toast.error(t('admin.productNameRequired'));
             return;
         }
         if (!price || parseFloat(price) <= 0) {
-            toast.error('Valid price is required');
+            toast.error(t('admin.priceRequired'));
             return;
         }
         if (!image) {
-            toast.error('Product image is required');
+            toast.error(t('admin.productImageRequired'));
             return;
         }
 
@@ -173,11 +173,11 @@ export function AdminProductFormPage() {
             });
 
             if (res.ok) {
-                toast.success(isEditing ? 'Product updated!' : 'Product created!');
+                toast.success(isEditing ? t('admin.productUpdated') : t('admin.productCreated'));
                 navigate('/admin/products');
             } else {
                 const error = await res.json();
-                toast.error(error.error || 'Failed to save product');
+                toast.error(error.error || t('admin.failedToSaveProduct'));
             }
         } catch (error) {
             console.error('Save error', error);
@@ -206,8 +206,8 @@ export function AdminProductFormPage() {
             {/* Header */}
             <div className="flex items-center gap-4">
                 <Link to="/admin/products">
-                    <Button 
-                        variant="ghost" 
+                    <Button
+                        variant="ghost"
                         size="icon"
                         className="h-10 w-10 rounded-xl hover:bg-slate-100"
                     >
@@ -216,10 +216,10 @@ export function AdminProductFormPage() {
                 </Link>
                 <div>
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                        {isEditing ? 'Edit Product' : 'New Product'}
+                        {isEditing ? t('admin.editProduct') : t('admin.newProduct')}
                     </h1>
                     <p className="text-sm text-slate-500">
-                        {isEditing ? 'Update product details' : 'Add a new product to your store'}
+                        {isEditing ? t('admin.updateProductDetails') : t('admin.addNewProductSubtitle')}
                     </p>
                 </div>
             </div>
@@ -241,7 +241,7 @@ export function AdminProductFormPage() {
                                 required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="e.g., Gaming Laptop Pro"
+                                placeholder={t('admin.productNamePlaceholder')}
                                 className="rounded-xl h-11"
                             />
                         </div>
@@ -253,7 +253,7 @@ export function AdminProductFormPage() {
                                 className="w-full min-h-[120px] p-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors resize-none"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                placeholder="Describe your product..."
+                                placeholder={t('admin.describeProduct')}
                                 dir="ltr"
                             />
                         </div>
@@ -312,13 +312,13 @@ export function AdminProductFormPage() {
                     <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
                         <div className="flex items-center gap-2">
                             <DollarSign className="h-5 w-5 text-emerald-600" />
-                            <h2 className="font-semibold text-slate-900">Pricing</h2>
+                            <h2 className="font-semibold text-slate-900">{t('admin.pricing')}</h2>
                         </div>
                     </div>
                     <div className="p-6">
                         <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="price" className="text-sm font-medium">Sale Price *</Label>
+                                <Label htmlFor="price" className="text-sm font-medium">{t('admin.salePrice')} *</Label>
                                 <div className="flex items-center">
                                     <div className="bg-slate-50 border border-slate-200 px-3 h-11 flex items-center justify-center rounded-l-xl text-slate-500 font-bold text-xs border-r-0">
                                         E£
@@ -336,7 +336,7 @@ export function AdminProductFormPage() {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="costPrice" className="text-sm font-medium">Cost Price</Label>
+                                <Label htmlFor="costPrice" className="text-sm font-medium">{t('admin.costPrice')}</Label>
                                 <div className="flex items-center">
                                     <div className="bg-slate-50 border border-slate-200 px-3 h-11 flex items-center justify-center rounded-l-xl text-slate-500 font-bold text-xs border-r-0">
                                         E£
@@ -353,7 +353,7 @@ export function AdminProductFormPage() {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="originalPrice" className="text-sm font-medium">Original Price</Label>
+                                <Label htmlFor="originalPrice" className="text-sm font-medium">{t('admin.originalPrice')}</Label>
                                 <div className="flex items-center">
                                     <div className="bg-slate-50 border border-slate-200 px-3 h-11 flex items-center justify-center rounded-l-xl text-slate-500 font-bold text-xs border-r-0">
                                         E£
@@ -378,13 +378,13 @@ export function AdminProductFormPage() {
                     <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
                         <div className="flex items-center gap-2">
                             <Tag className="h-5 w-5 text-violet-600" />
-                            <h2 className="font-semibold text-slate-900">Organization</h2>
+                            <h2 className="font-semibold text-slate-900">{t('admin.organization')}</h2>
                         </div>
                     </div>
                     <div className="p-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="categoryId" className="text-sm font-medium">Category</Label>
+                                <Label htmlFor="categoryId" className="text-sm font-medium">{t('admin.productCategory')}</Label>
                                 <select
                                     id="categoryId"
                                     value={categoryId}
@@ -395,7 +395,7 @@ export function AdminProductFormPage() {
                                     }}
                                     className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors bg-white"
                                 >
-                                    <option value="">Select a category</option>
+                                    <option value="">{t('admin.selectCategory')}</option>
                                     {flatCategories.map((cat) => (
                                         <option key={cat.id} value={cat.id}>
                                             {cat.name}
@@ -405,14 +405,14 @@ export function AdminProductFormPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="supplierId" className="text-sm font-medium">Supplier</Label>
+                                <Label htmlFor="supplierId" className="text-sm font-medium">{t('admin.supplier')}</Label>
                                 <select
                                     id="supplierId"
                                     value={supplierId}
                                     onChange={(e) => setSupplierId(e.target.value)}
                                     className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD814]/20 focus:border-[#FFD814] transition-colors bg-white"
                                 >
-                                    <option value="">Select a supplier</option>
+                                    <option value="">{t('admin.selectSupplier')}</option>
                                     {suppliers.map((sup) => (
                                         <option key={sup.id} value={sup.id}>
                                             {sup.name}
@@ -429,7 +429,7 @@ export function AdminProductFormPage() {
                     <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
                         <div className="flex items-center gap-2">
                             <ImageIcon className="h-5 w-5 text-pink-600" />
-                            <h2 className="font-semibold text-slate-900">Product Image *</h2>
+                            <h2 className="font-semibold text-slate-900">{t('admin.productImage')} *</h2>
                         </div>
                     </div>
                     <div className="p-6">
@@ -438,13 +438,13 @@ export function AdminProductFormPage() {
                             <div className="flex-shrink-0">
                                 {image ? (
                                     <div className="relative group">
-                                        <img 
-                                            src={image} 
-                                            alt="Preview" 
-                                            className="h-32 w-32 object-cover rounded-2xl border-2 border-slate-100 shadow-sm" 
+                                        <img
+                                            src={image}
+                                            alt="Preview"
+                                            className="h-32 w-32 object-cover rounded-2xl border-2 border-slate-100 shadow-sm"
                                         />
                                         <div className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <span className="text-white text-xs font-medium">Change</span>
+                                            <span className="text-white text-xs font-medium">{t('admin.changeImage')}</span>
                                         </div>
                                     </div>
                                 ) : (
@@ -453,7 +453,7 @@ export function AdminProductFormPage() {
                                     </div>
                                 )}
                             </div>
-                            
+
                             {/* Upload Section */}
                             <div className="flex-1 space-y-4">
                                 <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 hover:border-indigo-300 hover:bg-indigo-50/30 transition-colors cursor-pointer relative">
@@ -470,40 +470,40 @@ export function AdminProductFormPage() {
                                         </div>
                                         <div>
                                             <p className="text-sm font-medium text-slate-900">
-                                                {uploading ? 'Uploading...' : 'Click to upload'}
+                                                {uploading ? t('admin.uploadingFile') : t('admin.clickToUpload')}
                                             </p>
-                                            <p className="text-xs text-slate-500">PNG, JPG, GIF up to 10MB</p>
+                                            <p className="text-xs text-slate-500">{t('admin.fileTypes')}</p>
                                         </div>
                                         {uploading && <Loader2 className="h-5 w-5 animate-spin text-indigo-600 ml-auto" />}
                                     </div>
                                 </div>
 
                                 <div className="flex gap-2">
-                                    <CameraCapture 
+                                    <CameraCapture
                                         onCapture={(file) => handleImageUpload(file)}
                                         trigger={
-                                            <Button 
-                                                type="button" 
-                                                variant="outline" 
+                                            <Button
+                                                type="button"
+                                                variant="outline"
                                                 className="flex-1 gap-2 border-slate-200 hover:bg-slate-50 h-11 rounded-xl"
                                                 disabled={uploading}
                                             >
                                                 <Camera className="h-4 w-4" />
-                                                Take Photo
+                                                {t('admin.takePhoto')}
                                             </Button>
                                         }
                                     />
                                 </div>
-                                
+
                                 <div className="relative">
                                     <div className="absolute inset-0 flex items-center">
                                         <span className="w-full border-t border-slate-200" />
                                     </div>
                                     <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-white px-2 text-slate-400">Or paste URL</span>
+                                        <span className="bg-white px-2 text-slate-400">{t('admin.orPasteUrl')}</span>
                                     </div>
                                 </div>
-                                
+
                                 <Input
                                     type="url"
                                     value={image}
@@ -521,7 +521,7 @@ export function AdminProductFormPage() {
                     <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
                         <div className="flex items-center gap-2">
                             <CheckSquare className="h-5 w-5 text-amber-600" />
-                            <h2 className="font-semibold text-slate-900">Availability</h2>
+                            <h2 className="font-semibold text-slate-900">{t('admin.availability')}</h2>
                         </div>
                     </div>
                     <div className="p-6">
@@ -537,10 +537,10 @@ export function AdminProductFormPage() {
                             </div>
                             <div>
                                 <span className="text-sm font-medium text-slate-900">
-                                    {inStock ? 'In Stock' : 'Out of Stock'}
+                                    {inStock ? t('admin.inStockLabel') : t('admin.outOfStockLabel')}
                                 </span>
                                 <p className="text-xs text-slate-500">
-                                    {inStock ? 'Product is available for purchase' : 'Product is not available'}
+                                    {inStock ? t('admin.productAvailable') : t('admin.productNotAvailable')}
                                 </p>
                             </div>
                         </label>
@@ -555,15 +555,15 @@ export function AdminProductFormPage() {
                         onClick={() => navigate('/admin/products')}
                         className="flex-1 h-12 rounded-xl border-slate-200 hover:bg-slate-50"
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
-                    <Button 
-                        type="submit" 
-                        disabled={loading || uploading} 
+                    <Button
+                        type="submit"
+                        disabled={loading || uploading}
                         className="flex-1 h-12 rounded-xl bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-semibold shadow-md hover:shadow-lg transition-all"
                     >
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {isEditing ? 'Update Product' : 'Create Product'}
+                        {isEditing ? t('admin.updateProduct') : t('admin.createProduct')}
                     </Button>
                 </div>
             </form>
