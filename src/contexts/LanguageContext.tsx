@@ -1358,6 +1358,11 @@ const en: Record<string, string> = {
     'admin.noOwner': 'No owner',
     'admin.shopNamePlaceholder': 'Enter shop name',
     'admin.shopDescPlaceholder': 'Describe the shop...',
+    'admin.description': 'Description',
+    'admin.ownerEmail': 'Owner email (login username)',
+    'admin.ownerPassword': 'Password',
+    'admin.ownerCredentialsNote': 'These credentials will be used by the shop owner to log in and manage their shop at /shop',
+    'admin.shopCreatedSuccess': 'Shop created successfully',
 
     // Admin Reviews Page
     'admin.reviewModeration': 'Review Moderation',
@@ -2801,6 +2806,11 @@ const ar: Record<string, string> = {
     'admin.noOwner': 'لا يوجد',
     'admin.shopNamePlaceholder': 'أدخل اسم المتجر',
     'admin.shopDescPlaceholder': 'صف المتجر...',
+    'admin.description': 'الوصف',
+    'admin.ownerEmail': 'بريد صاحب المتجر (اسم الدخول)',
+    'admin.ownerPassword': 'كلمة المرور',
+    'admin.ownerCredentialsNote': 'سيتم استخدام هذه البيانات من قبل صاحب المتجر لتسجيل الدخول وإدارة متجره في /shop',
+    'admin.shopCreatedSuccess': 'تم إنشاء المتجر بنجاح',
 
     // Admin Reviews Page
     'admin.reviewModeration': 'إدارة المراجعات',
